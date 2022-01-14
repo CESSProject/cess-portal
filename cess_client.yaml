@@ -1,0 +1,6 @@
+boardInfo:
+  boardPath: ""
+
+CoreData:
+  CessRpcAddr: ""
+  IdAccountPhraseOrSeed : ""
