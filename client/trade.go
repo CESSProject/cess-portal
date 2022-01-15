@@ -2,6 +2,7 @@ package client
 
 import (
 	"dapp_cess_client/conf"
+	"dapp_cess_client/internal/chain"
 	"dapp_cess_client/internal/logger"
 	"dapp_cess_client/tools"
 	"encoding/json"
@@ -44,6 +45,13 @@ func ObtainFromFaucet(pbk string) {
 }
 
 func Expansion(quantity string) {
-	//quant, _ := strconv.Atoi(quantity)
+	chain.Chain_Init()
 
+	var ci chain.CessInfo
+	ci.RpcAddr = conf.ClientConf.ChainData.CessRpcAddr
+	ci.IdentifyAccountPhrase = conf.ClientConf.ChainData.IdAccountPhraseOrSeed
+	ci.ChainModule = chain.BuySpaceChainModule
+	ci.TransactionName = chain.BuySpaceTransactionName
+	ci.ChainModuleMethod = chain.BuySpaceModuleMethod
+	ci.BuySpaceOnChain(quantity)
 }
