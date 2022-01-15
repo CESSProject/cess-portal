@@ -9,14 +9,16 @@ import (
 
 type CessClient struct {
 	BoardInfo BoardInfo `yaml:"boardInfo"`
+	ChainData ChainData `yaml:"chainData"`
 }
 
 type BoardInfo struct {
 	BoardPath string `yaml:"boardPath"`
 }
-type CoreData struct {
-	CessRpcAddr           string `yaml:"CessRpcAddr"`
-	IdAccountPhraseOrSeed string `yaml:"IdAccountPhraseOrSeed"`
+type ChainData struct {
+	CessRpcAddr           string `yaml:"cessRpcAddr"`
+	IdAccountPhraseOrSeed string `yaml:"idAccountPhraseOrSeed"`
+	FaucetAddress         string `yaml:"faucetAddress"`
 }
 
 var ClientConf = new(CessClient)
