@@ -1,6 +1,7 @@
 package command
 
 import (
+	"dapp_cess_client/client"
 	"fmt"
 	"github.com/spf13/cobra"
 )
@@ -50,7 +51,9 @@ func NewFindPurchasedSpaceCommand() *cobra.Command {
 }
 
 func FindPurchasedSpaceCommand(cmd *cobra.Command, args []string) {
-	fmt.Println("there is Purchased Space command!")
+	InitComponents(cmd)
+
+	client.FindPurchasedSpace()
 }
 
 func NewFindFileCommand() *cobra.Command {

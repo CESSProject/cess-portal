@@ -9,30 +9,34 @@ import (
 )
 
 // etcd register
-func (ci *CessInfo) BuySpaceOnChain(Addr string) (string, error) {
+func (ci *CessInfo) BuySpaceOnChain(Quantity, Expected string) (string, error) {
 	var (
 		err         error
 		accountInfo types.AccountInfo
 	)
-	api := getSubstrateApiSafe()
+	api.getSubstrateApiSafe()
 	defer func() {
-		releaseSubstrateApi()
-		recover()
+		api.releaseSubstrateApi()
+		err := recover()
+		if err != nil {
+			fmt.Printf("[Error]Recover UserHoldSpaceDetails panic fail :", err)
+		}
 	}()
 	keyring, err := signature.KeyringPairFromSecret(ci.IdentifyAccountPhrase, 0)
 	if err != nil {
 		return "", errors.Wrap(err, "KeyringPairFromSecret err")
 	}
 
-	meta, err := api.RPC.State.GetMetadataLatest()
+	meta, err := api.r.RPC.State.GetMetadataLatest()
 	if err != nil {
 		return "", errors.Wrap(err, "GetMetadataLatest err")
 	}
-	addr, err := types.HexDecodeString(Addr)
+	quantity, err := types.HexDecodeString(Quantity)
+	expected, err := types.HexDecodeString(Expected)
 	if err != nil {
 		return "", err
 	}
-	c, err := types.NewCall(meta, ci.TransactionName, types.NewAccountID(addr))
+	c, err := types.NewCall(meta, ci.TransactionName, types.NewAccountID(quantity), types.NewAccountID(expected))
 	if err != nil {
 		return "", errors.Wrap(err, "NewCall err")
 	}
@@ -42,12 +46,12 @@ func (ci *CessInfo) BuySpaceOnChain(Addr string) (string, error) {
 		return "", errors.Wrap(err, "NewExtrinsic err")
 	}
 
-	genesisHash, err := api.RPC.Chain.GetBlockHash(0)
+	genesisHash, err := api.r.RPC.Chain.GetBlockHash(0)
 	if err != nil {
 		return "", errors.Wrap(err, "GetBlockHash err")
 	}
 
-	rv, err := api.RPC.State.GetRuntimeVersionLatest()
+	rv, err := api.r.RPC.State.GetRuntimeVersionLatest()
 	if err != nil {
 		return "", errors.Wrap(err, "GetRuntimeVersionLatest err")
 	}
@@ -57,7 +61,7 @@ func (ci *CessInfo) BuySpaceOnChain(Addr string) (string, error) {
 		return "", errors.Wrap(err, "CreateStorageKey err")
 	}
 
-	ok, err := api.RPC.State.GetStorageLatest(key, &accountInfo)
+	ok, err := api.r.RPC.State.GetStorageLatest(key, &accountInfo)
 	if err != nil {
 		return "", errors.Wrap(err, "GetStorageLatest err")
 	}
@@ -82,7 +86,7 @@ func (ci *CessInfo) BuySpaceOnChain(Addr string) (string, error) {
 	}
 
 	// Do the transfer and track the actual status
-	sub, err := api.RPC.Author.SubmitAndWatchExtrinsic(ext)
+	sub, err := api.r.RPC.Author.SubmitAndWatchExtrinsic(ext)
 	if err != nil {
 		return "", errors.Wrap(err, "SubmitAndWatchExtrinsic err")
 	}

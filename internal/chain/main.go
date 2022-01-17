@@ -21,7 +21,7 @@ func Chain_Init() {
 
 	api.r, err = gsrpc.NewSubstrateAPI(conf.ClientConf.ChainData.CessRpcAddr)
 	if err != nil {
-		fmt.Printf("[Error]Problem with chain connection:%s", err)
+		fmt.Printf("[Error]Problem with chain connection:%s\n", err)
 		os.Exit(conf.Exit_ChainErr)
 	}
 	go substrateAPIKeepAlive()
@@ -57,18 +57,19 @@ func healthchek(a *gsrpc.SubstrateAPI) (uint64, error) {
 	defer func() {
 		err := recover()
 		if err != nil {
-
+			fmt.Printf("[Error]Recover healthchek panic fail :", err)
 		}
 	}()
 	h, err := a.RPC.System.Health()
 	return uint64(h.Peers), err
 }
 
-func getSubstrateApiSafe() *gsrpc.SubstrateAPI {
-	api.wlock.Lock()
-	return api.r
+func (myapi *mySubstrateApi) getSubstrateApiSafe() {
+	myapi.wlock.Lock()
+	return
 }
 
-func releaseSubstrateApi() {
-	api.wlock.Unlock()
+func (myapi *mySubstrateApi) releaseSubstrateApi() {
+	myapi.wlock.Unlock()
+	return
 }

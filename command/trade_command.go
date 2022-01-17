@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"github.com/spf13/cobra"
 	"os"
+	"strconv"
 	"strings"
 	"unicode"
 )
@@ -25,9 +26,9 @@ func NewTradeCommand() *cobra.Command {
 
 func NewTradeBuySpaceCommand() *cobra.Command {
 	tbs := &cobra.Command{
-		Use:   "exp <spacequantity>",
-		Short: "exp refers to make your space bigger unit:[1/512G]",
-		Long:  `Exp command send on-chain transactions, buy space.`,
+		Use:   "exp <spacequantity> <expected price>",
+		Short: "exp refers to make your space bigger,unit:[1/512G].",
+		Long:  `<spacequantity> buy space(not nullable); <expected price> set the expected price for the purchase(nullable) if null accept the storage unit price at the current moment.`,
 
 		Run: TradeBuySpaceCommandFunc,
 	}
@@ -37,10 +38,20 @@ func NewTradeBuySpaceCommand() *cobra.Command {
 
 func TradeBuySpaceCommandFunc(cmd *cobra.Command, args []string) {
 	InitComponents(cmd)
+	expected := ""
 	if len(args) == 0 {
 		fmt.Printf("[Error]Please fill in the amount of storage space you want to purchase! Usage: cessctl trade exp <quantity>\n")
-		logger.OutPutLogger.Sugar().Infof("[Error]Please fill in the amount of storage space you want to purchase! Usage: cessctl trade exp <quantity>\n")
+		logger.OutPutLogger.Sugar().Infof("[Error]Please fill in the amount of storage space you want to purchase! Usage: cessctl trade exp <spacequantity>\n")
 		os.Exit(conf.Exit_CmdLineParaErr)
+	}
+	if len(args) > 1 {
+		_, err := strconv.ParseFloat(args[1], 64)
+		if err != nil {
+			fmt.Printf("[Error]Please enter the correct price(need decimal float)\n")
+			logger.OutPutLogger.Sugar().Infof("[Error]Please enter the correct price(need decimal float)\n")
+			os.Exit(conf.Exit_CmdLineParaErr)
+		}
+		expected = args[1]
 	}
 	for _, r := range args[0] {
 		if !unicode.IsNumber(r) {
@@ -49,7 +60,7 @@ func TradeBuySpaceCommandFunc(cmd *cobra.Command, args []string) {
 			os.Exit(conf.Exit_CmdLineParaErr)
 		}
 	}
-	client.Expansion(args[0])
+	client.Expansion(args[0], expected)
 }
 
 func NewTradeObtainCommand() *cobra.Command {
