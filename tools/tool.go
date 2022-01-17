@@ -3,8 +3,11 @@ package tools
 import (
 	"bytes"
 	"encoding/json"
+	"io"
 	"io/ioutil"
+	"mime/multipart"
 	"net/http"
+	"os"
 )
 
 func Post(url string, para interface{}) ([]byte, error) {
@@ -26,4 +29,26 @@ func Post(url string, para interface{}) ([]byte, error) {
 		return respBody, err
 	}
 	return nil, err
+}
+
+func PostFile(url, filepath string) {
+	r, w := io.Pipe()
+	m := multipart.NewWriter(w)
+	go func() {
+		defer w.Close()
+		defer m.Close()
+		part, err := m.CreateFormFile("myFile", "foo.txt")
+		if err != nil {
+			return
+		}
+		file, err := os.Open(filepath)
+		if err != nil {
+			return
+		}
+		defer file.Close()
+		if _, err = io.Copy(part, file); err != nil {
+			return
+		}
+	}()
+	http.Post(url, m.FormDataContentType(), r)
 }

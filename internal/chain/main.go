@@ -11,7 +11,6 @@ import (
 
 type mySubstrateApi struct {
 	wlock sync.Mutex
-	c     chan bool
 	r     *gsrpc.SubstrateAPI
 }
 
@@ -25,9 +24,6 @@ func Chain_Init() {
 		fmt.Printf("[Error]Problem with chain connection:%s", err)
 		os.Exit(conf.Exit_ChainErr)
 	}
-	api.c = make(chan bool, 1)
-	api.c <- true
-	go waitBlock(api.c)
 	go substrateAPIKeepAlive()
 }
 
@@ -68,19 +64,8 @@ func healthchek(a *gsrpc.SubstrateAPI) (uint64, error) {
 	return uint64(h.Peers), err
 }
 
-func waitBlock(ch chan bool) {
-	for {
-		ch <- true
-		time.Sleep(time.Second * 3)
-	}
-}
-
 func getSubstrateApiSafe() *gsrpc.SubstrateAPI {
 	api.wlock.Lock()
-	for len(api.c) == 0 {
-		time.Sleep(time.Millisecond * 200)
-	}
-	<-api.c
 	return api.r
 }
 
