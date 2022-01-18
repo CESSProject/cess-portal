@@ -58,9 +58,9 @@ func FindPurchasedSpaceCommand(cmd *cobra.Command, args []string) {
 
 func NewFindFileCommand() *cobra.Command {
 	cc := &cobra.Command{
-		Use:   "file",
+		Use:   "file <fileId>",
 		Short: "File refers to the query storage file",
-		Long:  `File command chain query all file information that has been uploaded by the current account (sorting, keyword retrieval...).`,
+		Long:  `File command chain query file information ,If <fileId> is null then show the file list`,
 
 		Run: FindFindFileCommand,
 	}
@@ -70,5 +70,12 @@ func NewFindFileCommand() *cobra.Command {
 
 func FindFindFileCommand(cmd *cobra.Command, args []string) {
 	InitComponents(cmd)
+	fileid := ""
+	if len(args) != 0 {
+		fileid = args[0]
+	} else {
+		cmd.Println("No parameter query, return a list of all files")
+	}
 
+	client.FindFile(fileid)
 }
