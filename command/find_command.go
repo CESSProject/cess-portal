@@ -2,7 +2,6 @@ package command
 
 import (
 	"dapp_cess_client/client"
-	"fmt"
 	"github.com/spf13/cobra"
 )
 
@@ -24,8 +23,7 @@ func NewFindPriceCommand() *cobra.Command {
 	cc := &cobra.Command{
 		Use:   "price",
 		Short: "Price refers to the query storage price",
-		Long: `Price command chain to query and display the current storage space rental unit price (unit: MB).
-`,
+		Long:  `Price command chain to query and display the current storage space rental unit price (unit: MB).`,
 
 		Run: FindPriceCommandFunc,
 	}
@@ -34,7 +32,9 @@ func NewFindPriceCommand() *cobra.Command {
 }
 
 func FindPriceCommandFunc(cmd *cobra.Command, args []string) {
-	cmd.Printf("there is find price command!\n")
+	InitComponents(cmd)
+
+	client.FindPrice()
 }
 
 func NewFindPurchasedSpaceCommand() *cobra.Command {
@@ -69,5 +69,6 @@ func NewFindFileCommand() *cobra.Command {
 }
 
 func FindFindFileCommand(cmd *cobra.Command, args []string) {
-	fmt.Println("there is Find File command!")
+	InitComponents(cmd)
+
 }

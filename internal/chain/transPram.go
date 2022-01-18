@@ -9,6 +9,9 @@ var (
 	//find
 	PurchasedSpaceChainModule  = "FileBank"
 	PurchasedSpaceModuleMethod = "UserHoldSpaceDetails"
+
+	FindPriceChainModule  = "Sminer"
+	FindPriceModuleMethod = []string{"PurchasedSpace", "AvailableSpace"}
 )
 
 type CessInfo struct {

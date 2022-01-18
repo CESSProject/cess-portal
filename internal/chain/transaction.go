@@ -5,11 +5,12 @@ import (
 	"github.com/centrifuge/go-substrate-rpc-client/v4/signature"
 	"github.com/centrifuge/go-substrate-rpc-client/v4/types"
 	"github.com/pkg/errors"
+	"math/big"
 	"time"
 )
 
 // etcd register
-func (ci *CessInfo) BuySpaceOnChain(Quantity, Expected string) (string, error) {
+func (ci *CessInfo) BuySpaceOnChain(Quantity, Expected int) (string, error) {
 	var (
 		err         error
 		accountInfo types.AccountInfo
@@ -17,10 +18,10 @@ func (ci *CessInfo) BuySpaceOnChain(Quantity, Expected string) (string, error) {
 	api.getSubstrateApiSafe()
 	defer func() {
 		api.releaseSubstrateApi()
-		err := recover()
-		if err != nil {
-			fmt.Printf("[Error]Recover UserHoldSpaceDetails panic fail :", err)
-		}
+		//err := recover()
+		//if err != nil {
+		//	fmt.Printf("[Error]Recover UserHoldSpaceDetails panic :%s\n", err)
+		//}
 	}()
 	keyring, err := signature.KeyringPairFromSecret(ci.IdentifyAccountPhrase, 0)
 	if err != nil {
@@ -31,12 +32,12 @@ func (ci *CessInfo) BuySpaceOnChain(Quantity, Expected string) (string, error) {
 	if err != nil {
 		return "", errors.Wrap(err, "GetMetadataLatest err")
 	}
-	quantity, err := types.HexDecodeString(Quantity)
-	expected, err := types.HexDecodeString(Expected)
+
 	if err != nil {
 		return "", err
 	}
-	c, err := types.NewCall(meta, ci.TransactionName, types.NewAccountID(quantity), types.NewAccountID(expected))
+
+	c, err := types.NewCall(meta, ci.TransactionName, types.NewU128(*big.NewInt(int64(Quantity))), types.NewU128(*big.NewInt(int64(Expected))))
 	if err != nil {
 		return "", errors.Wrap(err, "NewCall err")
 	}

@@ -44,7 +44,7 @@ func ObtainFromFaucet(pbk string) {
 	logger.OutPutLogger.Sugar().Infof("[Success]Obtain from faucet success,AsInBlock is:%s\n", res.Ans.AsInBlock)
 }
 
-func Expansion(quantity, expected string) {
+func Expansion(quantity, expected int) {
 	chain.Chain_Init()
 
 	var ci chain.CessInfo
@@ -58,5 +58,5 @@ func Expansion(quantity, expected string) {
 		logger.OutPutLogger.Sugar().Infof("[Error] Buy space on chain fail:%s\n", err)
 		return
 	}
-	fmt.Printf("Transaction chain block number is:%s", AsInBlock)
+	fmt.Printf("Transaction chain block number is:%s\n", AsInBlock)
 }
