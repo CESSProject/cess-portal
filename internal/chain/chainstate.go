@@ -183,7 +183,7 @@ func (fileinfo FileInfo) String() string {
 	ret += fmt.Sprintf("                  Filename:%x\n", string(fileinfo.Filename[:]))
 	ret += fmt.Sprintf("                  Filehash:%x\n", string(fileinfo.Filehash[:]))
 	ret += fmt.Sprintf("                  Backups:%x\n", string(fileinfo.Backups))
-	ret += fmt.Sprintf("                  Filesize:%f\n", float64(fileinfo.Filesize.Int64()))
-	ret += fmt.Sprintf("                  Downloadfee:%f\n", float64(fileinfo.Downloadfee.Int64()))
+	ret += fmt.Sprintf("                  Filesize:%x\n", fileinfo.Filesize.String())
+	ret += fmt.Sprintf("                  Downloadfee:%x\n", fileinfo.Downloadfee.String())
 	return ret
 }

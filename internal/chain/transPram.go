@@ -42,5 +42,5 @@ type FileInfo struct {
 }
 
 type FileList struct {
-	Fileid types.U8 `json:"fileid"`
+	Fileid types.Bytes8 `json:"fileid"`
 }

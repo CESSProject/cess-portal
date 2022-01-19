@@ -59,3 +59,7 @@ func FileUpload(filepath, downloadfee string) {
 	}
 	fmt.Printf("Transaction chain block number is:%s\n", AsInBlock)
 }
+
+func FileDownload(fileid, savepath string) {
+	chain.Chain_Init()
+}

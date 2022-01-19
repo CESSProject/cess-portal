@@ -82,7 +82,7 @@ func FindFile(fileid string) {
 			return
 		}
 		for _, fileinfo := range data {
-			fmt.Printf("%x\n", string(fileinfo.Fileid))
+			fmt.Printf("%x\n", fileinfo.Fileid[:])
 		}
 	}
 }
