@@ -5,6 +5,7 @@ import (
 	"crypto/sha256"
 	"encoding/hex"
 	"encoding/json"
+	"fmt"
 	"github.com/bwmarrin/snowflake"
 	"io"
 	"io/ioutil"
@@ -34,26 +35,33 @@ func Post(url string, para interface{}) ([]byte, error) {
 	return nil, err
 }
 
-func PostFile(url, filepath string) {
+func PostFile(url, filepath string) (status int, err error) {
 	r, w := io.Pipe()
 	m := multipart.NewWriter(w)
 	go func() {
 		defer w.Close()
 		defer m.Close()
-		part, err := m.CreateFormFile("myFile", "foo.txt")
-		if err != nil {
-			return
-		}
 		file, err := os.Open(filepath)
 		if err != nil {
+			fmt.Printf("Fail to open the file,error:%s", err)
+			return
+		}
+		part, err := m.CreateFormFile("File", file.Name())
+		if err != nil {
+			fmt.Printf("Failed to create form file,error:%s", err)
 			return
 		}
 		defer file.Close()
 		if _, err = io.Copy(part, file); err != nil {
+			fmt.Printf("Failed to send file chunks,error:%s", err)
 			return
 		}
 	}()
-	http.Post(url, m.FormDataContentType(), r)
+	resp, err := http.Post(url, m.FormDataContentType(), r)
+	if err != nil {
+		return resp.StatusCode, err
+	}
+	return
 }
 
 func CalcFileHash(filepath string) (string, error) {

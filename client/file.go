@@ -40,6 +40,7 @@ func FileUpload(filepath, downloadfee string) {
 		fmt.Printf("[Error]Create snowflake fail! error:%s\n", err)
 		return
 	}
+	//todo:send file to scheduler
 
 	var ci chain.CessInfo
 	filesize := new(big.Int)
@@ -50,7 +51,6 @@ func FileUpload(filepath, downloadfee string) {
 
 	filesize.SetInt64(file.Size() / 100)
 	fee.SetInt64(int64(cosfee))
-	fmt.Println(file.Size() / 100)
 
 	AsInBlock, err := ci.UploadFileMetaInformation(fileid, file.Name(), filehash, filesize, fee)
 	if err != nil {
