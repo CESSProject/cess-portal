@@ -2,8 +2,10 @@ package command
 
 import (
 	"dapp_cess_client/client"
+	"dapp_cess_client/conf"
 	"fmt"
 	"github.com/spf13/cobra"
+	"os"
 )
 
 func NewFileCommand() *cobra.Command {
@@ -20,7 +22,7 @@ func NewFileCommand() *cobra.Command {
 
 func NewFileUploadCommand() *cobra.Command {
 	cc := &cobra.Command{
-		Use:   "upload <filepath>",
+		Use:   "upload <filepath> <downloadfee>",
 		Short: "upload refers to the upload file",
 		Long:  `Price command send local source files to scheduling nodes.`,
 
@@ -31,9 +33,13 @@ func NewFileUploadCommand() *cobra.Command {
 }
 
 func FileUploadCommandFunc(cmd *cobra.Command, args []string) {
-	fmt.Println("there is File Upload command!")
+	InitComponents(cmd)
+	if len(args) < 2 {
+		fmt.Printf("Please enter correct parameters 'upload <filepath> <downloadfee>'\n")
+		os.Exit(conf.Exit_CmdLineParaErr)
+	}
 
-	client.FileUpload()
+	client.FileUpload(args[0], args[1])
 }
 
 func NewFileDownloadCommand() *cobra.Command {

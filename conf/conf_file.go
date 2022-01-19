@@ -17,9 +17,10 @@ type BoardInfo struct {
 }
 type ChainData struct {
 	CessRpcAddr           string `yaml:"cessRpcAddr"`
-	IdAccountPhraseOrSeed string `yaml:"idAccountPhraseOrSeed"`
 	FaucetAddress         string `yaml:"faucetAddress"`
+	IdAccountPhraseOrSeed string `yaml:"idAccountPhraseOrSeed"`
 	AccountPublicKey      string `yaml:"accountPublicKey"`
+	WalletAddress         string `yaml:"walletAddress"`
 }
 
 var ClientConf = new(CessClient)

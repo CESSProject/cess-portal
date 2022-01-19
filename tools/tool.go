@@ -2,7 +2,10 @@ package tools
 
 import (
 	"bytes"
+	"crypto/sha256"
+	"encoding/hex"
 	"encoding/json"
+	"github.com/bwmarrin/snowflake"
 	"io"
 	"io/ioutil"
 	"mime/multipart"
@@ -51,4 +54,28 @@ func PostFile(url, filepath string) {
 		}
 	}()
 	http.Post(url, m.FormDataContentType(), r)
+}
+
+func CalcFileHash(filepath string) (string, error) {
+	f, err := os.Open(filepath)
+	if err != nil {
+		return "", err
+	}
+	defer f.Close()
+
+	h := sha256.New()
+	if _, err := io.Copy(h, f); err != nil {
+		return "", err
+	}
+	return hex.EncodeToString(h.Sum(nil)), nil
+}
+
+func GetGuid(num int64) (string, error) {
+	node, err := snowflake.NewNode(num)
+	if err != nil {
+		return "", err
+	}
+
+	id := node.Generate()
+	return id.String(), nil
 }

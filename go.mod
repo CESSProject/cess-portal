@@ -13,6 +13,7 @@ require (
 
 require (
 	github.com/ChainSafe/go-schnorrkel v0.0.0-20210318173838-ccb5cd955283 // indirect
+	github.com/bwmarrin/snowflake v0.3.0 // indirect
 	github.com/cosmos/go-bip39 v1.0.0 // indirect
 	github.com/deckarep/golang-set v1.7.1 // indirect
 	github.com/decred/base58 v1.0.3 // indirect

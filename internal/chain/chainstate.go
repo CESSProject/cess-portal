@@ -45,7 +45,7 @@ func (ci *CessInfo) UserHoldSpaceDetails() (UserHoldSpaceDetails, error) {
 func (userinfo UserHoldSpaceDetails) String() string {
 	ret := "———————————————————You Purchased Space———————————————————\n"
 	ret += "                   PurchasedSpace:" + userinfo.PurchasedSpace.String() + "\n"
-	ret += "                   UsedSpace:" + userinfo.RemainingSpace.String() + "\n"
+	ret += "                   UsedSpace:" + userinfo.UsedSpace.String() + "\n"
 	ret += "                   RemainingSpace:" + userinfo.RemainingSpace.String() + "\n"
 	ret += "—————————————————————————————————————————————————————————"
 	return ret

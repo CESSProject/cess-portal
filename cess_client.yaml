@@ -3,6 +3,7 @@ boardInfo:
 
 chainData:
   cessRpcAddr: ""
-  idAccountPhraseOrSeed : ""
   faucetAddress: "139.224.19.104:9708/transfer"
+  idAccountPhraseOrSeed : ""
   accountPublicKey: ""
+  walletAddress : ""

@@ -4,7 +4,8 @@ import "github.com/centrifuge/go-substrate-rpc-client/v4/types"
 
 var (
 	//trade
-	BuySpaceTransactionName = "FileBank.buy_space"
+	BuySpaceTransactionName   = "FileBank.buy_space"
+	UploadFileTransactionName = "FileBank.upload"
 
 	//find
 	PurchasedSpaceChainModule  = "FileBank"
@@ -32,9 +33,9 @@ type UserHoldSpaceDetails struct {
 }
 
 type FileInfo struct {
-	Filename    types.Bytes8    `json:"filename"`
-	Owner       types.AccountID `json:"owner"`
-	Filehash    types.Bytes8    `json:"filehash"`
+	Filename    types.Bytes8    `json:"filename"` //
+	Owner       types.AccountID `json:"owner"`    //
+	Filehash    types.Bytes8    `json:"filehash"` //
 	Backups     types.U8        `json:"backups"`
 	Filesize    types.U128      `json:"filesize"`
 	Downloadfee types.U128      `json:"downloadfee"`
