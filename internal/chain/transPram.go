@@ -33,9 +33,9 @@ type UserHoldSpaceDetails struct {
 }
 
 type FileInfo struct {
-	Filename    types.Bytes8    `json:"filename"` //
+	Filename    types.Bytes     `json:"filename"` //
 	Owner       types.AccountID `json:"owner"`    //
-	Filehash    types.Bytes8    `json:"filehash"` //
+	Filehash    types.Bytes     `json:"filehash"` //
 	Backups     types.U8        `json:"backups"`
 	Filesize    types.U128      `json:"filesize"`
 	Downloadfee types.U128      `json:"downloadfee"`
