@@ -3,7 +3,9 @@ package client
 import (
 	"dapp_cess_client/conf"
 	"dapp_cess_client/internal/chain"
+	"dapp_cess_client/internal/logger"
 	"dapp_cess_client/tools"
+	"encoding/json"
 	"fmt"
 	"math/big"
 	"os"
@@ -41,6 +43,21 @@ func FileUpload(filepath, downloadfee string) {
 		return
 	}
 	//todo:send file to scheduler
+	uploadinfo := map[string]string{
+		"file":      file.Name(),
+		"fileid":    fileid,
+		"backupnum": "3",
+	}
+
+	status, err := tools.PostFile("", filepath, uploadinfo)
+	if err != nil {
+		fmt.Printf("[Error]Post file to scheduler fail,error:\n", err)
+		return
+	}
+	if status != 200 {
+		fmt.Printf("[Error]Scheduler can not receive the file ,status code:%d\n", status)
+		return
+	}
 
 	var ci chain.CessInfo
 	filesize := new(big.Int)
@@ -60,6 +77,43 @@ func FileUpload(filepath, downloadfee string) {
 	fmt.Printf("Transaction chain block number is:%s\n", AsInBlock)
 }
 
-func FileDownload(fileid, savepath string) {
+type RespMsg struct {
+	Code int         `json:"code"`
+	Msg  string      `json:"msg"`
+	Data interface{} `json:"data,omitempty"`
+}
+
+func FileDownload(fileid string) {
 	chain.Chain_Init()
+
+	var ci chain.CessInfo
+	ci.RpcAddr = conf.ClientConf.ChainData.CessRpcAddr
+	ci.ChainModule = chain.FindFileChainModule
+
+	data, err := ci.GetFileInfo(fileid)
+	if err != nil {
+		fmt.Printf("[Error]Get file:%s info fail:%s\n", fileid, err)
+		logger.OutPutLogger.Sugar().Infof("[Error]Get file:%s info fail:%s\n", fileid, err)
+		return
+	}
+
+	var fd = struct {
+		Hash     string `json:"hash"`
+		FileName string `json:"filename"`
+	}{
+		string(data.Filehash),
+		string(data.Filename),
+	}
+	resp, err := tools.Post("", fd)
+	if err != nil {
+		fmt.Printf("[Error]System error:%s\n", err)
+		logger.OutPutLogger.Sugar().Infof("[Error]System error:%s\n", err)
+		return
+	}
+	var res RespMsg
+	err = json.Unmarshal(resp, &res)
+	if err != nil {
+		fmt.Println("unmarshal error:", err)
+	}
+	fmt.Println("The file address is:", res.Data)
 }

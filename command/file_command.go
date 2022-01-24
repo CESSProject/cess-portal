@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"github.com/spf13/cobra"
 	"os"
-	"path/filepath"
 )
 
 func NewFileCommand() *cobra.Command {
@@ -45,7 +44,7 @@ func FileUploadCommandFunc(cmd *cobra.Command, args []string) {
 
 func NewFileDownloadCommand() *cobra.Command {
 	cc := &cobra.Command{
-		Use:   "download <fileid> <savepath>",
+		Use:   "download <fileid>",
 		Short: "download refers to the download file",
 		Long:  `Download command download file based on fileId.`,
 
@@ -57,14 +56,10 @@ func NewFileDownloadCommand() *cobra.Command {
 
 func FileDownloadCommandFunc(cmd *cobra.Command, args []string) {
 	InitComponents(cmd)
-	if len(args) < 2 {
-		fmt.Printf("Please enter the fileid of the downloaded file 'download <fileid> <savepath>'\n")
-		os.Exit(conf.Exit_CmdLineParaErr)
-	}
-	if !filepath.IsAbs(args[1]) {
-		fmt.Printf("Please enter the absolute path to save the file\n")
+	if len(args) == 0 {
+		fmt.Printf("Please enter the fileid of the downloaded file 'download <fileid>'\n")
 		os.Exit(conf.Exit_CmdLineParaErr)
 	}
 
-	client.FileDownload(args[0], args[1])
+	client.FileDownload(args[0])
 }

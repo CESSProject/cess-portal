@@ -35,7 +35,7 @@ func Post(url string, para interface{}) ([]byte, error) {
 	return nil, err
 }
 
-func PostFile(url, filepath string) (status int, err error) {
+func PostFile(url, filepath string, params map[string]string) (status int, err error) {
 	r, w := io.Pipe()
 	m := multipart.NewWriter(w)
 	go func() {
@@ -46,10 +46,13 @@ func PostFile(url, filepath string) (status int, err error) {
 			fmt.Printf("Fail to open the file,error:%s", err)
 			return
 		}
-		part, err := m.CreateFormFile("File", file.Name())
+		part, err := m.CreateFormFile("file", params["file"])
 		if err != nil {
 			fmt.Printf("Failed to create form file,error:%s", err)
 			return
+		}
+		for key, val := range params {
+			m.WriteField(key, val)
 		}
 		defer file.Close()
 		if _, err = io.Copy(part, file); err != nil {
