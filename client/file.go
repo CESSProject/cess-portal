@@ -89,7 +89,7 @@ func FileDownload(fileid string) {
 	var ci chain.CessInfo
 	ci.RpcAddr = conf.ClientConf.ChainData.CessRpcAddr
 	ci.ChainModule = chain.FindFileChainModule
-
+	ci.ChainModuleMethod = chain.FindFileModuleMethod[0]
 	data, err := ci.GetFileInfo(fileid)
 	if err != nil {
 		fmt.Printf("[Error]Get file:%s info fail:%s\n", fileid, err)

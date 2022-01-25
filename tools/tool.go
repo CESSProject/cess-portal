@@ -35,9 +35,12 @@ func Post(url string, para interface{}) ([]byte, error) {
 	return nil, err
 }
 
-func PostFile(url, filepath string, params map[string]string) (status int, err error) {
+func PostFileChunks(url, filepath string, params map[string]string) (status int, err error) {
 	r, w := io.Pipe()
 	m := multipart.NewWriter(w)
+	//for key, val := range params {
+	//	m.WriteField(key, val)
+	//}
 	go func() {
 		defer w.Close()
 		defer m.Close()
@@ -56,7 +59,7 @@ func PostFile(url, filepath string, params map[string]string) (status int, err e
 		}
 		defer file.Close()
 		if _, err = io.Copy(part, file); err != nil {
-			fmt.Printf("Failed to send file chunks,error:%s", err)
+			fmt.Printf("Failed to send file chunks,error:%s\n", err)
 			return
 		}
 	}()
@@ -65,6 +68,50 @@ func PostFile(url, filepath string, params map[string]string) (status int, err e
 		return resp.StatusCode, err
 	}
 	return
+}
+
+func PostFile(url string, filepath string, params map[string]string) (status int, err error) {
+	body := new(bytes.Buffer)
+	writer := multipart.NewWriter(body)
+	part, err := writer.CreateFormFile("file", params["file"])
+	if err != nil {
+		return 0, err
+	}
+	src, err := os.Open(filepath)
+	if err != nil {
+		return 0, err
+	}
+	defer src.Close()
+
+	_, err = io.Copy(part, src)
+	if err != nil {
+		return 0, err
+	}
+	for key, val := range params {
+		writer.WriteField(key, val)
+	}
+	err = writer.Close()
+	if err != nil {
+		return 0, err
+	}
+	request, err := http.NewRequest("POST", url, body)
+	if err != nil {
+		return 0, err
+	}
+	request.Header.Add("Content-Type", writer.FormDataContentType())
+	client := &http.Client{}
+	resp, err := client.Do(request)
+	if err != nil {
+		return 0, err
+	}
+	defer resp.Body.Close()
+	// content, err := ioutil.ReadAll(resp.Body)
+	// if err != nil {
+	// 	logger.ErrLogger.Sugar().Errorf("%v", err)
+	// 	return  err
+	// }
+	// fmt.Println(string(content))
+	return resp.StatusCode, err
 }
 
 func CalcFileHash(filepath string) (string, error) {
