@@ -44,3 +44,24 @@ type FileInfo struct {
 type FileList struct {
 	Fileid types.Bytes8 `json:"fileid"`
 }
+
+//On-chain event analysis param
+type Event_UnsignedPhaseStarted struct {
+	Phase  types.Phase
+	Round  types.U32
+	Topics []types.Hash
+}
+type Event_SolutionStored struct {
+	Phase            types.Phase
+	Election_compute types.ElectionCompute
+	Prev_ejected     types.Bool
+	Topics           []types.Hash
+}
+
+type MyEventRecords struct {
+	types.EventRecords
+
+	//
+	ElectionProviderMultiPhase_UnsignedPhaseStarted []Event_UnsignedPhaseStarted
+	ElectionProviderMultiPhase_SolutionStored       []Event_SolutionStored
+}

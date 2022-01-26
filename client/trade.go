@@ -15,7 +15,7 @@ type faucet struct {
 }
 type answer struct {
 	Err       string `json:"Err"`
-	AsInBlock string `json:"AsInBlock"`
+	AsInBlock bool   `json:"AsInBlock"`
 }
 
 func ObtainFromFaucet(pbk string) {
@@ -40,8 +40,15 @@ func ObtainFromFaucet(pbk string) {
 		logger.OutPutLogger.Sugar().Infof("[Error]Obtain from faucet fail:%s\n", res.Ans.Err)
 		return
 	}
-	fmt.Printf("[Success]Obtain from faucet success,AsInBlock is:%s\n", res.Ans.AsInBlock)
-	logger.OutPutLogger.Sugar().Infof("[Success]Obtain from faucet success,AsInBlock is:%s\n", res.Ans.AsInBlock)
+
+	if res.Ans.AsInBlock {
+		fmt.Printf("[Success]Obtain from faucet success\n")
+		logger.OutPutLogger.Sugar().Infof("[Success]Obtain from faucet success\n")
+	} else {
+		fmt.Printf("[Fail]Obtain from faucet fail,Please wait 24 hours to get it again\n")
+		logger.OutPutLogger.Sugar().Infof("[Fail]Obtain from faucet fail,Please wait 24 hours to get it again\n")
+	}
+
 }
 
 func Expansion(quantity, expected int) {
