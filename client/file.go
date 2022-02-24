@@ -1,10 +1,10 @@
 package client
 
 import (
-	"dapp_cess_client/conf"
-	"dapp_cess_client/internal/chain"
-	"dapp_cess_client/internal/logger"
-	"dapp_cess_client/tools"
+	"c-portal/conf"
+	"c-portal/internal/chain"
+	"c-portal/internal/logger"
+	"c-portal/tools"
 	"encoding/json"
 	"fmt"
 	"math/big"
@@ -49,7 +49,7 @@ func FileUpload(filepath, downloadfee string) {
 		"backupnum": "3",
 	}
 
-	status, err := tools.PostFile("", filepath, uploadinfo)
+	status, err := tools.PostFile("http://47.243.131.57/file/upload", filepath, uploadinfo)
 	if err != nil {
 		fmt.Printf("[Error]Post file to scheduler fail,error:\n", err)
 		return
@@ -104,7 +104,7 @@ func FileDownload(fileid string) {
 		string(data.Filehash),
 		string(data.Filename),
 	}
-	resp, err := tools.Post("", fd)
+	resp, err := tools.Post("http://47.243.131.57/file/download", fd)
 	if err != nil {
 		fmt.Printf("[Error]System error:%s\n", err)
 		logger.OutPutLogger.Sugar().Infof("[Error]System error:%s\n", err)

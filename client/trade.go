@@ -1,10 +1,10 @@
 package client
 
 import (
-	"dapp_cess_client/conf"
-	"dapp_cess_client/internal/chain"
-	"dapp_cess_client/internal/logger"
-	"dapp_cess_client/tools"
+	"c-portal/conf"
+	"c-portal/internal/chain"
+	"c-portal/internal/logger"
+	"c-portal/tools"
 	"encoding/json"
 	"fmt"
 )

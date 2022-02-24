@@ -1,4 +1,4 @@
-module dapp_cess_client
+module c-portal
 
 go 1.17
 

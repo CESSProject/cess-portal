@@ -1,7 +1,7 @@
 package ctl
 
 import (
-	"dapp_cess_client/command"
+	"c-portal/command"
 	"github.com/spf13/cobra"
 )
 

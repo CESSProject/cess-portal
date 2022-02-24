@@ -1,7 +1,7 @@
 package chain
 
 import (
-	"dapp_cess_client/conf"
+	"c-portal/conf"
 	"fmt"
 	gsrpc "github.com/centrifuge/go-substrate-rpc-client/v4"
 	"os"

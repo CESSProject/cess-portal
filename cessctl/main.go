@@ -1,7 +1,7 @@
 package main
 
 import (
-	"dapp_cess_client/cessctl/ctl"
+	"c-portal/cessctl/ctl"
 )
 
 func main() {

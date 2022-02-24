@@ -1,9 +1,9 @@
 package client
 
 import (
-	"dapp_cess_client/conf"
-	"dapp_cess_client/internal/chain"
-	"dapp_cess_client/internal/logger"
+	"c-portal/conf"
+	"c-portal/internal/chain"
+	"c-portal/internal/logger"
 	"fmt"
 )
 

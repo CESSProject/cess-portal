@@ -1,7 +1,7 @@
 package command
 
 import (
-	"dapp_cess_client/client"
+	"c-portal/client"
 	"github.com/spf13/cobra"
 )
 

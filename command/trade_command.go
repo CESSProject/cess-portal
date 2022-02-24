@@ -1,9 +1,9 @@
 package command
 
 import (
-	"dapp_cess_client/client"
-	"dapp_cess_client/conf"
-	"dapp_cess_client/internal/logger"
+	"c-portal/client"
+	"c-portal/conf"
+	"c-portal/internal/logger"
 	"fmt"
 	"github.com/spf13/cobra"
 	"os"

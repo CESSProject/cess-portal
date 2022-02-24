@@ -1,7 +1,7 @@
 package logger
 
 import (
-	"dapp_cess_client/conf"
+	"c-portal/conf"
 	"fmt"
 	"github.com/natefinch/lumberjack"
 	"go.uber.org/zap"
