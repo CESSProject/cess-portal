@@ -1,6 +1,17 @@
-# c-portal
+# **c-portal**
 
-**command：**
+c-portal is the client of the cess project. By using some simple commands of c-portal, you can easily realize a series of operations such as purchasing space, querying space, uploading/downloading files, and querying file information on the Linux system.
+
+
+
+# **Getting Started：**
+
+## Prerequisites:
+
+* :one: Centos 8 and above
+* :two: Dedicate IP
+
+## **Command group：**
 
 | command group name | subcommand name | features                                                     |
 | ------------------ | --------------- | ------------------------------------------------------------ |
@@ -14,7 +25,7 @@
 
 
 
-**global command：**
+## **Global command：**
 
 -h,--help：Get the specific operation method of the command line
 
@@ -22,7 +33,7 @@
 
 
 
-**configuration file：**
+## **Configuration file：**
 
 boardPath：Absolute path, the data kanban location of the result output; if not defined, output to: /etc/cess.d file.
 
@@ -38,7 +49,9 @@ walletAddress：The wallet public key address, the owner id of the file when upl
 
 
 
-## (A)Query storage unit price
+## **Operate example：**
+
+### (A)Query storage unit price
 
 * instruction：
 
@@ -54,7 +67,7 @@ walletAddress：The wallet public key address, the owner id of the file when upl
 
 
 
-## (B)Check remaining space
+### (B)Check remaining space
 
 * instruction：
 
@@ -70,7 +83,7 @@ walletAddress：The wallet public key address, the owner id of the file when upl
 
 
 
-## (C)Query file information
+### (C)Query file information
 
 * instruction：
 
@@ -90,7 +103,7 @@ walletAddress：The wallet public key address, the owner id of the file when upl
 
 
 
-## (D)Upload files
+### (D)Upload files
 
 * instruction：
 
@@ -110,7 +123,7 @@ walletAddress：The wallet public key address, the owner id of the file when upl
 
 
 
-## (E)Download file
+### (E)Download file
 
 * instruction：
 
@@ -128,7 +141,7 @@ walletAddress：The wallet public key address, the owner id of the file when upl
 
 
 
-## (F)Buy space
+### (F)Buy space
 
 * instruction：
 
@@ -150,7 +163,7 @@ walletAddress：The wallet public key address, the owner id of the file when upl
 
 
 
-## (Y)Tap to get tokens
+### (Y)Tap to get tokens
 
 * instruction：
 
@@ -165,3 +178,12 @@ walletAddress：The wallet public key address, the owner id of the file when upl
 * example：
 
   ​		cessctl obtain 0x2ed4a2c67291bf3eaa4de538ab120ba21b3de1b5704551864226d2fae8f87937 -c /root/cess_client.yaml
+
+# **Build Code**
+
+You can directly compile the code through go run under cessctl, or directly run the build.bat script file
+
+```go
+go build main.go
+```
+
