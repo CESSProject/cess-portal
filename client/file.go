@@ -49,7 +49,7 @@ func FileUpload(filepath, downloadfee string) {
 		"backupnum": "3",
 	}
 
-	status, err := tools.PostFile("http://47.243.131.57/file/upload", filepath, uploadinfo)
+	status, err := tools.PostFile("", filepath, uploadinfo)
 	if err != nil {
 		fmt.Printf("[Error]Post file to scheduler fail,error:\n", err)
 		return
@@ -104,7 +104,7 @@ func FileDownload(fileid string) {
 		string(data.Filehash),
 		string(data.Filename),
 	}
-	resp, err := tools.Post("http://47.243.131.57/file/download", fd)
+	resp, err := tools.Post("", fd)
 	if err != nil {
 		fmt.Printf("[Error]System error:%s\n", err)
 		logger.OutPutLogger.Sugar().Infof("[Error]System error:%s\n", err)
