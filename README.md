@@ -6,7 +6,7 @@ c-portal is the client of the cess project. By using some simple commands of c-p
 
 # **Getting Started**
 
-## Prerequisites:
+## Prerequisites
 
 * :one: Centos 8 and above
 * :two: Dedicate IP
