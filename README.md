@@ -4,14 +4,14 @@ c-portal is the client of the cess project. By using some simple commands of c-p
 
 
 
-# **Getting Started：**
+# **Getting Started**
 
 ## Prerequisites:
 
 * :one: Centos 8 and above
 * :two: Dedicate IP
 
-## **Command group：**
+## **Command group**
 
 | command group name | subcommand name | features                                                     |
 | ------------------ | --------------- | ------------------------------------------------------------ |
@@ -25,7 +25,7 @@ c-portal is the client of the cess project. By using some simple commands of c-p
 
 
 
-## **Global command：**
+## **Global command**
 
 -h,--help：Get the specific operation method of the command line
 
@@ -33,7 +33,7 @@ c-portal is the client of the cess project. By using some simple commands of c-p
 
 
 
-## **Configuration file：**
+## **Configuration file**
 
 boardPath：Absolute path, the data kanban location of the result output; if not defined, output to: /etc/cess.d file.
 
@@ -49,7 +49,7 @@ walletAddress：The wallet public key address, the owner id of the file when upl
 
 
 
-## **Operate example：**
+## **Operate example**
 
 ### (A)Query storage unit price
 
