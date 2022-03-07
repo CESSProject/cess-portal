@@ -6,6 +6,7 @@ var (
 	//trade
 	BuySpaceTransactionName   = "FileBank.buy_space"
 	UploadFileTransactionName = "FileBank.upload"
+	DeleteFileTransactionName = "FileBank.delete_file"
 
 	//find
 	PurchasedSpaceChainModule  = "FileBank"
@@ -58,10 +59,27 @@ type Event_SolutionStored struct {
 	Topics           []types.Hash
 }
 
+type Event_DeleteFile struct {
+	Phase  types.Phase
+	Acc    types.AccountID
+	Fileid types.Bytes
+	Topics []types.Hash
+}
+
+type Event_BuySpace struct {
+	Phase  types.Phase
+	Acc    types.AccountID
+	Size   types.U128
+	Fee    types.U128
+	Topics []types.Hash
+}
+
 type MyEventRecords struct {
 	types.EventRecords
 
-	//
+	DeleteFile []Event_DeleteFile
+	BuySpace   []Event_BuySpace
+
 	ElectionProviderMultiPhase_UnsignedPhaseStarted []Event_UnsignedPhaseStarted
 	ElectionProviderMultiPhase_SolutionStored       []Event_SolutionStored
 }

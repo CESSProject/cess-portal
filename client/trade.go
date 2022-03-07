@@ -51,7 +51,7 @@ func ObtainFromFaucet(pbk string) {
 
 }
 
-func Expansion(quantity, expected int) {
+func Expansion(quantity, duration, expected int) {
 	chain.Chain_Init()
 
 	var ci chain.CessInfo
@@ -59,11 +59,11 @@ func Expansion(quantity, expected int) {
 	ci.IdentifyAccountPhrase = conf.ClientConf.ChainData.IdAccountPhraseOrSeed
 	ci.TransactionName = chain.BuySpaceTransactionName
 
-	AsInBlock, err := ci.BuySpaceOnChain(quantity, expected)
+	err := ci.BuySpaceOnChain(quantity, duration, expected)
 	if err != nil {
 		fmt.Printf("[Error] Buy space on chain fail:%s\n", err)
 		logger.OutPutLogger.Sugar().Infof("[Error] Buy space on chain fail:%s\n", err)
 		return
 	}
-	fmt.Printf("Transaction chain block number is:%s\n", AsInBlock)
+	fmt.Printf("[Success]Obtain from faucet successful!\n")
 }

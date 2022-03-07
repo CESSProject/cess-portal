@@ -21,7 +21,7 @@ func Chain_Init() {
 
 	api.r, err = gsrpc.NewSubstrateAPI(conf.ClientConf.ChainData.CessRpcAddr)
 	if err != nil {
-		fmt.Printf("[Error]Problem with chain connection:%s\n", err)
+		fmt.Printf("[Error]Problem with chain rpc:%s\n", err)
 		os.Exit(conf.Exit_ChainErr)
 	}
 	go substrateAPIKeepAlive()

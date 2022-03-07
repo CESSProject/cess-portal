@@ -10,6 +10,7 @@ import (
 type CessClient struct {
 	BoardInfo BoardInfo `yaml:"boardInfo"`
 	ChainData ChainData `yaml:"chainData"`
+	KeyInfo   KeyInfo   `yaml:"keyInfo"`
 }
 
 type BoardInfo struct {
@@ -21,6 +22,9 @@ type ChainData struct {
 	IdAccountPhraseOrSeed string `yaml:"idAccountPhraseOrSeed"`
 	AccountPublicKey      string `yaml:"accountPublicKey"`
 	WalletAddress         string `yaml:"walletAddress"`
+}
+type KeyInfo struct {
+	KeyPath string `yaml:"keyPath"`
 }
 
 var ClientConf = new(CessClient)
