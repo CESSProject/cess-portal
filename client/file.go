@@ -60,7 +60,6 @@ func FileUpload(path, backups, PrivateKey string) {
 	blockinfo.BlockSize = int32(file.Size())
 	blockinfo.FileHash = filehash
 
-	block := make([]byte, 0)
 	blocksize := 2048
 	blocktotal := 0
 
@@ -146,6 +145,7 @@ func FileUpload(path, backups, PrivateKey string) {
 		var bar tools.Bar
 		bar.NewOption(0, int64(blocktotal))
 		for i := 0; i < blocks; i++ {
+			block := make([]byte, 0)
 			if blocks != i {
 				block = decodefile[i*blocksize : (i+1)*blocksize]
 				bar.Play(int64(i))
@@ -167,6 +167,7 @@ func FileUpload(path, backups, PrivateKey string) {
 		var bar tools.Bar
 		bar.NewOption(0, int64(blocktotal))
 		for i := 0; i < blocks; i++ {
+			block := make([]byte, 0)
 			if blocks != i {
 				block = filebyte[i*blocksize : (i+1)*blocksize]
 				bar.Play(int64(i))

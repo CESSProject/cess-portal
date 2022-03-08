@@ -3,6 +3,7 @@ module cess-portal
 go 1.17
 
 require (
+	github.com/bwmarrin/snowflake v0.3.0
 	github.com/centrifuge/go-substrate-rpc-client/v4 v4.0.0
 	github.com/deckarep/golang-set v1.7.1
 	github.com/ethereum/go-ethereum v1.10.12
@@ -18,7 +19,6 @@ require (
 
 require (
 	github.com/ChainSafe/go-schnorrkel v0.0.0-20210318173838-ccb5cd955283 // indirect
-	github.com/bwmarrin/snowflake v0.3.0 // indirect
 	github.com/cosmos/go-bip39 v1.0.0 // indirect
 	github.com/decred/base58 v1.0.3 // indirect
 	github.com/decred/dcrd/crypto/blake256 v1.0.0 // indirect
