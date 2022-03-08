@@ -1,8 +1,9 @@
 package command
 
 import (
-	"c-portal/client"
-	"c-portal/conf"
+	"cess-portal/client"
+	"cess-portal/conf"
+	"cess-portal/tools"
 	"fmt"
 	"github.com/spf13/cobra"
 	"os"
@@ -22,9 +23,9 @@ func NewFileCommand() *cobra.Command {
 
 func NewFileUploadCommand() *cobra.Command {
 	cc := &cobra.Command{
-		Use:   "upload <filepath> <downloadfee>",
+		Use:   "upload <filepath> <backups> <private key>",
 		Short: "upload refers to the upload file",
-		Long:  `Price command send local source files to scheduling nodes.`,
+		Long:  `Upload command send local source files to scheduling nodes.`,
 
 		Run: FileUploadCommandFunc,
 	}
@@ -35,11 +36,19 @@ func NewFileUploadCommand() *cobra.Command {
 func FileUploadCommandFunc(cmd *cobra.Command, args []string) {
 	InitComponents(cmd)
 	if len(args) < 2 {
-		fmt.Printf("Please enter correct parameters 'upload <filepath> <downloadfee>'\n")
+		fmt.Printf("Please enter correct parameters 'upload <filepath> <backups> <private key>'\n")
 		os.Exit(conf.Exit_CmdLineParaErr)
 	}
+	PrivateKey := ""
+	if len(args) < 3 {
+		fmt.Printf("%s[Warming] Do you want to upload your file without private key (it's means your file status is public)?%s\n", tools.Red, tools.Reset)
+		fmt.Printf("%sYou can type the 'private key' or enter with nothing to jump it:%s", tools.Red, tools.Reset)
+		fmt.Scanln(&PrivateKey)
+	} else {
+		PrivateKey = args[2]
+	}
 
-	client.FileUpload(args[0], args[1])
+	client.FileUpload(args[0], args[1], PrivateKey)
 }
 
 func NewFileDownloadCommand() *cobra.Command {
@@ -62,4 +71,26 @@ func FileDownloadCommandFunc(cmd *cobra.Command, args []string) {
 	}
 
 	client.FileDownload(args[0])
+}
+
+func NewFileDeleteCommand() *cobra.Command {
+	cc := &cobra.Command{
+		Use:   "delete <fileid>",
+		Short: "delete refers to the delete the file",
+		Long:  `Deleting a file means removing the file from CESS,But there may be a delay.`,
+
+		Run: FileDeleteCommandFunc,
+	}
+
+	return cc
+}
+
+func FileDeleteCommandFunc(cmd *cobra.Command, args []string) {
+	InitComponents(cmd)
+	if len(args) == 0 {
+		fmt.Printf("Please enter the fileid of the deleted file'delete <fileid>'\n")
+		os.Exit(conf.Exit_CmdLineParaErr)
+	}
+	client.FileDelete(args[0])
+
 }

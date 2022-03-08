@@ -1,7 +1,7 @@
 package command
 
 import (
-	"c-portal/client"
+	"cess-portal/client"
 	"github.com/spf13/cobra"
 )
 

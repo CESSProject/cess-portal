@@ -14,6 +14,27 @@ import (
 	"os"
 )
 
+var (
+	Black        = string([]byte{27, 91, 57, 48, 109})
+	Red          = string([]byte{27, 91, 57, 49, 109})
+	Green        = string([]byte{27, 91, 57, 50, 109})
+	Yellow       = string([]byte{27, 91, 57, 51, 109})
+	Blue         = string([]byte{27, 91, 57, 52, 109})
+	Magenta      = string([]byte{27, 91, 57, 53, 109})
+	Cyan         = string([]byte{27, 91, 57, 54, 109})
+	White        = string([]byte{27, 91, 57, 55, 59, 52, 48, 109})
+	Reset        = string([]byte{27, 91, 48, 109})
+	DisableColor = false
+)
+
+type Bar struct {
+	percent int64
+	cur     int64
+	total   int64
+	rate    string
+	graph   string
+}
+
 func Post(url string, para interface{}) ([]byte, error) {
 	body, err := json.Marshal(para)
 	if err != nil {
@@ -136,4 +157,33 @@ func GetGuid(num int64) (string, error) {
 
 	id := node.Generate()
 	return id.String(), nil
+}
+
+func (bar *Bar) NewOption(start, total int64) {
+	bar.cur = start
+	bar.total = total
+	if bar.graph == "" {
+		bar.graph = "█"
+	}
+	bar.percent = bar.getPercent()
+	for i := 0; i < int(bar.percent); i += 2 {
+		bar.rate += bar.graph
+	}
+}
+
+func (bar *Bar) getPercent() int64 {
+	return int64(float32(bar.cur) / float32(bar.total) * 100)
+}
+
+func (bar *Bar) Play(cur int64) {
+	bar.cur = cur
+	last := bar.percent
+	bar.percent = bar.getPercent()
+	if bar.percent != last && bar.percent%2 == 0 {
+		bar.rate += bar.graph
+	}
+	fmt.Printf("\r[%-50s]%3d%%  %8d/%d", bar.rate, bar.percent, bar.cur, bar.total)
+}
+func (bar *Bar) Finish() {
+	fmt.Println()
 }

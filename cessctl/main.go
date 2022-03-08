@@ -1,7 +1,7 @@
 package main
 
 import (
-	"c-portal/cessctl/ctl"
+	"cess-portal/cessctl/ctl"
 )
 
 func main() {

@@ -7,3 +7,6 @@ chainData:
   idAccountPhraseOrSeed : ""
   accountPublicKey: ""
   walletAddress : ""
+
+keyInfo:
+  keyPath: ""

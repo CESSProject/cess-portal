@@ -1,6 +1,6 @@
-# **c-portal**
+# **cess-portal**
 
-c-portal is the client of the cess project. By using some simple commands of c-portal, you can easily realize a series of operations such as purchasing space, querying space, uploading/downloading files, and querying file information on the Linux system.
+cess-portal is the client of the cess project. By using some simple commands of cess-portal, you can easily realize a series of operations such as purchasing space, querying space, uploading/downloading files, and querying file information on the Linux system.
 
 
 

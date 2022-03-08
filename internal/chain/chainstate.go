@@ -1,7 +1,7 @@
 package chain
 
 import (
-	"c-portal/conf"
+	"cess-portal/conf"
 	"fmt"
 	"github.com/centrifuge/go-substrate-rpc-client/v4/types"
 	"github.com/pkg/errors"

@@ -1,9 +1,9 @@
 package client
 
 import (
-	"c-portal/conf"
-	"c-portal/internal/chain"
-	"c-portal/internal/logger"
+	"cess-portal/conf"
+	"cess-portal/internal/chain"
+	"cess-portal/internal/logger"
 	"fmt"
 )
 

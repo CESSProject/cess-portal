@@ -1,7 +1,7 @@
 package logger
 
 import (
-	"c-portal/conf"
+	"cess-portal/conf"
 	"fmt"
 	"github.com/natefinch/lumberjack"
 	"go.uber.org/zap"
