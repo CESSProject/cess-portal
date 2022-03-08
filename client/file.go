@@ -1,12 +1,12 @@
 package client
 
 import (
-	"c-portal/conf"
-	"c-portal/internal/chain"
-	"c-portal/internal/logger"
-	"c-portal/internal/rpc"
-	"c-portal/module"
-	"c-portal/tools"
+	"cess-portal/conf"
+	"cess-portal/internal/chain"
+	"cess-portal/internal/logger"
+	"cess-portal/internal/rpc"
+	"cess-portal/module"
+	"cess-portal/tools"
 	"context"
 	"encoding/json"
 	"fmt"

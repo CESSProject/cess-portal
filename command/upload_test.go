@@ -1,8 +1,8 @@
 package command
 
 import (
-	"c-portal/client"
-	"c-portal/conf"
+	"cess-portal/client"
+	"cess-portal/conf"
 	"testing"
 )
 

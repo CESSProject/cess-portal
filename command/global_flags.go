@@ -1,8 +1,8 @@
 package command
 
 import (
-	"c-portal/conf"
-	"c-portal/internal/logger"
+	"cess-portal/conf"
+	"cess-portal/internal/logger"
 	"github.com/spf13/cobra"
 )
 

@@ -1,9 +1,9 @@
 package command
 
 import (
-	"c-portal/client"
-	"c-portal/conf"
-	"c-portal/tools"
+	"cess-portal/client"
+	"cess-portal/conf"
+	"cess-portal/tools"
 	"fmt"
 	"github.com/spf13/cobra"
 	"os"

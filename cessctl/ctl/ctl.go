@@ -1,7 +1,7 @@
 package ctl
 
 import (
-	"c-portal/command"
+	"cess-portal/command"
 	"github.com/spf13/cobra"
 )
 
