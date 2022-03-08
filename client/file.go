@@ -80,7 +80,7 @@ func FileUpload(path, backups, PrivateKey string) {
 	schedIp := ""
 
 	commit := func(num int, data []byte) {
-		blockinfo.BlockNum = int32(num)
+		blockinfo.BlockNum = int32(num) + 1
 		blockinfo.Data = data
 		info, err := proto.Marshal(&blockinfo)
 		if err != nil {
@@ -91,9 +91,9 @@ func FileUpload(path, backups, PrivateKey string) {
 		var reqmsg rpc.ReqMsg
 		reqmsg.Version = 0
 		reqmsg.Body = info
-		reqmsg.Method = "ctl_upload"
+		reqmsg.Method = module.UploadService
 		reqmsg.Id = uint64(num)
-		reqmsg.Service = "client"
+		reqmsg.Service = module.CtlServiceName
 
 		wsURL := "ws:" + schedIp
 		client, err := rpc.DialWebsocket(context.Background(), wsURL, "")

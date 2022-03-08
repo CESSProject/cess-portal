@@ -80,17 +80,17 @@ func NewTradeObtainCommand() *cobra.Command {
 func TradeObtainCommandFunc(cmd *cobra.Command, args []string) {
 	InitComponents(cmd)
 	if len(args) == 0 {
-		fmt.Printf("[Error]Please fill in the account public key! Usage: cessctl trade obtain <public key>\n")
+		fmt.Printf("[Error]Please fill in the account public key! Usage: cessctl trade obtain <public key>")
 		logger.OutPutLogger.Sugar().Infof("Please fill in the account public key! Usage: cessctl trade obtain <public key>\n")
 		os.Exit(conf.Exit_CmdLineParaErr)
 	}
 	if len(args[0]) != 66 {
-		fmt.Printf("[Error]Please enter the correct number of digits for the public key!\nThe way to get public key——>>https://polkadot.subscan.io/tools/ss58_transform\n")
+		fmt.Printf("[Error]Please enter the correct number of digits for the public key!\nThe way to get public key——>>https://polkadot.subscan.io/tools/ss58_transform")
 		logger.OutPutLogger.Sugar().Infof("[Error]Please enter the correct number of digits for the public key!\nThe way to get public key——>>https://polkadot.subscan.io/tools/ss58_transform\n")
 		os.Exit(conf.Exit_CmdLineParaErr)
 	}
 	if !strings.HasPrefix(args[0], "0x") {
-		fmt.Println("[Error]The public key you entered is not in the correct format!\nThe way to get public key——>>https://polkadot.subscan.io/tools/ss58_transform\n")
+		fmt.Println("[Error]The public key you entered is not in the correct format!\nThe way to get public key——>>https://polkadot.subscan.io/tools/ss58_transform")
 		logger.OutPutLogger.Sugar().Infof("[Error]The public key you entered is not in the correct format!\nThe way to get public key——>>https://polkadot.subscan.io/tools/ss58_transform\n")
 		os.Exit(conf.Exit_CmdLineParaErr)
 	}
