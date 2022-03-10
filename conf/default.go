@@ -14,4 +14,5 @@ const (
 	Exit_CmdLineParaErr = -1
 	Exit_ConfErr        = -2
 	Exit_ChainErr       = -3
+	Exit_SystemErr      = -4
 )

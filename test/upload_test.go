@@ -1,4 +1,4 @@
-package command
+package test
 
 import (
 	"cess-portal/client"
@@ -8,11 +8,12 @@ import (
 
 func TestFileUpload(t *testing.T) {
 	conf.ClientConf.ChainData.CessRpcAddr = ""
+	conf.ClientConf.BoardInfo.BoardPath = ""
 	path := ""
 	backups := ""
 	PrivateKey := ""
 
-	conf.ClientConf.KeyInfo.KeyPath = ""
+	conf.ClientConf.PathInfo.KeyPath = ""
 	conf.ClientConf.ChainData.IdAccountPhraseOrSeed = ""
 	client.FileUpload(path, backups, PrivateKey)
 }

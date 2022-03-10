@@ -3,7 +3,7 @@ package module
 const CtlServiceName = "client"
 const ScheduleServiceName = "schedule"
 
-const UploadService = "CtlUpload"
+const UploadService = "ctlupload"
 const DownloadService = "CtlDownload"
 
 type CtlService struct{}

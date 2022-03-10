@@ -15,9 +15,6 @@ type testService struct{}
 func (testService) HelloAction(body []byte) (proto.Message, error) {
 	return &Err{Msg: "test hello"}, nil
 }
-func (testService) FuckAction(body []byte) (proto.Message, error) {
-	return &Err{Msg: "fuck hello"}, nil
-}
 
 func TestDialWebsocket(t *testing.T) {
 	srv := NewServer()
@@ -36,10 +33,6 @@ func TestDialWebsocket(t *testing.T) {
 		Service: "test",
 		Method:  "hello",
 	}
-	req1 := &ReqMsg{
-		Service: "test",
-		Method:  "hello",
-	}
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	resp, err := client.Call(ctx, req)
 	if err != nil {
@@ -47,12 +40,4 @@ func TestDialWebsocket(t *testing.T) {
 	}
 	cancel()
 	fmt.Println(resp)
-
-	ctx1, cancel1 := context.WithTimeout(context.Background(), 10*time.Second)
-	resp1, err := client.Call(ctx1, req1)
-	if err != nil {
-		t.Fatal(err)
-	}
-	cancel1()
-	fmt.Println(resp1)
 }

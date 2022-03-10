@@ -17,6 +17,7 @@ func NewFileCommand() *cobra.Command {
 
 	fc.AddCommand(NewFileUploadCommand())
 	fc.AddCommand(NewFileDownloadCommand())
+	fc.AddCommand(NewFileDeleteCommand())
 
 	return fc
 }
