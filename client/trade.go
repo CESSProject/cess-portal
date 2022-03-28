@@ -18,6 +18,7 @@ type answer struct {
 	AsInBlock bool   `json:"AsInBlock"`
 }
 
+//ObtainFromFaucet means to obtain tCESS for transaction spending through the faucet
 func ObtainFromFaucet(pbk string) {
 	var ob = struct {
 		Address string `json:"Address"`
@@ -51,6 +52,7 @@ func ObtainFromFaucet(pbk string) {
 
 }
 
+//Expansion means the purchase of storage capacity for the current customer
 func Expansion(quantity, duration, expected int) {
 	chain.Chain_Init()
 

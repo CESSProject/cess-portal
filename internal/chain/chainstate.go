@@ -7,7 +7,7 @@ import (
 	"github.com/pkg/errors"
 )
 
-// Get all miner information on the cess chain
+//UserHoldSpaceDetails means to get specific information about user space
 func (ci *CessInfo) UserHoldSpaceDetails() (UserHoldSpaceDetails, error) {
 	var (
 		err  error
@@ -51,7 +51,7 @@ func (userinfo UserHoldSpaceDetails) String() string {
 	return ret
 }
 
-//Query the currently stored unit price.Calculation:(AvailableSpace - PurchasedSpace) / 1024 * 1000
+//GetPurchasedSpace means the size of the space purchased by all customers of the whole CESS system
 func (ci *CessInfo) GetPurchasedSpace() (types.U128, error) {
 	var (
 		err  error
@@ -82,7 +82,7 @@ func (ci *CessInfo) GetPurchasedSpace() (types.U128, error) {
 	return data, nil
 }
 
-//Query the currently stored unit price.Calculation:(AvailableSpace - PurchasedSpace) / 1024 * 1000
+//GetAvailableSpace Means the purchaseable space of the whole CESS system
 func (ci *CessInfo) GetAvailableSpace() (types.U128, error) {
 	var (
 		err  error
@@ -113,6 +113,7 @@ func (ci *CessInfo) GetAvailableSpace() (types.U128, error) {
 	return data, nil
 }
 
+//GetFileInfo means to get the specific information of the file through the current fileid
 func (ci *CessInfo) GetFileInfo(fileid string) (FileInfo, error) {
 	var (
 		err  error
@@ -145,6 +146,7 @@ func (ci *CessInfo) GetFileInfo(fileid string) (FileInfo, error) {
 	return data, nil
 }
 
+//GetFileList means to get a list of all files of the current user
 func (ci *CessInfo) GetFileList() ([][]byte, error) {
 	var (
 		err  error
@@ -190,6 +192,7 @@ func (fileinfo FileInfo) String() string {
 	return ret
 }
 
+//GetSchedulerInfo means to get all currently registered schedulers
 func (ci *CessInfo) GetSchedulerInfo() ([]SchedulerInfo, error) {
 	var (
 		err  error

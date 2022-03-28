@@ -150,6 +150,7 @@ func CalcFileHash(filepath string) (string, error) {
 	return hex.EncodeToString(h.Sum(nil)), nil
 }
 
+//Get file unique identifier
 func GetGuid(num int64) (string, error) {
 	node, err := snowflake.NewNode(num)
 	if err != nil {

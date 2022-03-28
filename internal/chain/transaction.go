@@ -10,6 +10,7 @@ import (
 	"time"
 )
 
+//BuySpaceOnChain means initiating a transaction to purchase data on the chain
 func (ci *CessInfo) BuySpaceOnChain(Quantity, Duration, Expected int) error {
 	var (
 		err         error
@@ -125,6 +126,7 @@ func (ci *CessInfo) BuySpaceOnChain(Quantity, Duration, Expected int) error {
 	}
 }
 
+//UploadFileMetaInformation means upload file metadata to the chain
 func (ci *CessInfo) UploadFileMetaInformation(fileid, filename, filehash string, ispublic bool, backups uint8, filesize, downloadfee *big.Int) (string, error) {
 	var (
 		err         error

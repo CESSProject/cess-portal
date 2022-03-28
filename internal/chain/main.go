@@ -16,6 +16,7 @@ type mySubstrateApi struct {
 
 var api mySubstrateApi
 
+//Initialize the chain connection handle
 func Chain_Init() {
 	var err error
 
