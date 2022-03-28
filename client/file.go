@@ -21,7 +21,12 @@ import (
 	"time"
 )
 
-//FileUpload means upload files to CESS system
+/*
+FileUpload means upload files to CESS system
+path:The absolute path of the file to be uploaded
+backups:Number of backups of files that need to be uploaded
+PrivateKey:Encrypted password for uploaded files
+*/
 func FileUpload(path, backups, PrivateKey string) {
 	chain.Chain_Init()
 	file, err := os.Stat(path)
@@ -241,7 +246,10 @@ func FileUpload(path, backups, PrivateKey string) {
 	}
 }
 
-//FileDownload means download file by file id
+/*
+FileDownload means download file by file id
+fileid:fileid of the file to download
+*/
 func FileDownload(fileid string) {
 	chain.Chain_Init()
 	var ci chain.CessInfo
@@ -411,7 +419,10 @@ func FileDownload(fileid string) {
 	return
 }
 
-//FileDelete means to delete the file from the CESS system by the file id
+/*
+FileDelete means to delete the file from the CESS system by the file id
+fileid:fileid of the file that needs to be deleted
+*/
 func FileDelete(fileid string) {
 	chain.Chain_Init()
 	var ci chain.CessInfo

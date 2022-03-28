@@ -18,7 +18,10 @@ type answer struct {
 	AsInBlock bool   `json:"AsInBlock"`
 }
 
-//ObtainFromFaucet means to obtain tCESS for transaction spending through the faucet
+/*
+ObtainFromFaucet means to obtain tCESS for transaction spending through the faucet
+pbk:wallet's public key
+*/
 func ObtainFromFaucet(pbk string) {
 	var ob = struct {
 		Address string `json:"Address"`
@@ -52,7 +55,12 @@ func ObtainFromFaucet(pbk string) {
 
 }
 
-//Expansion means the purchase of storage capacity for the current customer
+/*
+Expansion means the purchase of storage capacity for the current customer
+quantity:The amount of space to be purchased (1/G)
+duration:Market for space that needs to be purchased (1/month)
+expected:The expected number of prices when buying is required to prevent price fluctuations when buying. When it is 0, it means that any price can be accepted
+*/
 func Expansion(quantity, duration, expected int) {
 	chain.Chain_Init()
 

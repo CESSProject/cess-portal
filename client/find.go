@@ -8,7 +8,9 @@ import (
 	"fmt"
 )
 
-//FindPurchasedSpace means to query the space that the current user has purchased and the space that has been used
+/*
+FindPurchasedSpace means to query the space that the current user has purchased and the space that has been used
+*/
 func FindPurchasedSpace() {
 	chain.Chain_Init()
 
@@ -26,7 +28,9 @@ func FindPurchasedSpace() {
 	fmt.Println(userinfo)
 }
 
-//FindPrice means to get real-time price of storage space
+/*
+FindPrice means to get real-time price of storage space
+*/
 func FindPrice() {
 	chain.Chain_Init()
 
@@ -71,7 +75,10 @@ func FindPrice() {
 	return
 }
 
-//FindFile means to query the files uploaded by the current user
+/*
+FindFile means to query the files uploaded by the current user
+fileid:fileid of the file to look for
+*/
 func FindFile(fileid string) {
 	chain.Chain_Init()
 
