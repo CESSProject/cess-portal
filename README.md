@@ -9,7 +9,6 @@ First you need to download the cess-portal project from GitHub
 ```shell
 git clone https://github.com/CESSProject/cess-portal.git
 ```
-
 Then run the build.bat script file in the ‘install_ctl‘ folder，You can compile this project on any system
 
 ```shell
