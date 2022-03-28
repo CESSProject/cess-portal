@@ -27,35 +27,35 @@ path:The absolute path of the file to be uploaded
 backups:Number of backups of files that need to be uploaded
 PrivateKey:Encrypted password for uploaded files
 */
-func FileUpload(path, backups, PrivateKey string) {
+func FileUpload(path, backups, PrivateKey string) error {
 	chain.Chain_Init()
 	file, err := os.Stat(path)
 	if err != nil {
 		fmt.Printf("[Error]Please enter the correct file path!\n")
-		return
+		return err
 	}
 
 	if file.IsDir() {
 		fmt.Printf("[Error]Please do not upload the folder!\n")
-		return
+		return err
 	}
 
 	spares, err := strconv.Atoi(backups)
 	if err != nil {
 		fmt.Printf("[Error]Please enter a correct integer!\n")
-		return
+		return err
 	}
 
 	filehash, err := tools.CalcFileHash(path)
 	if err != nil {
 		fmt.Printf("[Error]There is a problem with the file, please replace it!\n")
-		return
+		return err
 	}
 
 	fileid, err := tools.GetGuid(1)
 	if err != nil {
 		fmt.Printf("[Error]Create snowflake fail! error:%s\n", err)
-		return
+		return err
 	}
 	var blockinfo module.FileUploadInfo
 	blockinfo.Backups = backups
@@ -69,13 +69,13 @@ func FileUpload(path, backups, PrivateKey string) {
 	f, err := os.Open(path)
 	if err != nil {
 		fmt.Println("[Error]This file was broken! ", err)
-		return
+		return err
 	}
 	defer f.Close()
 	filebyte, err := ioutil.ReadAll(f)
 	if err != nil {
 		fmt.Println("[Error]analyze this file error! ", err)
-		return
+		return err
 	}
 
 	var ci chain.CessInfo
@@ -85,7 +85,7 @@ func FileUpload(path, backups, PrivateKey string) {
 	schds, err := ci.GetSchedulerInfo()
 	if err != nil {
 		fmt.Println("[Error]Get scheduler randomly error! ", err)
-		return
+		return err
 	}
 	filesize := new(big.Int)
 	fee := new(big.Int)
@@ -103,7 +103,7 @@ func FileUpload(path, backups, PrivateKey string) {
 	AsInBlock, err := ci.UploadFileMetaInformation(fileid, file.Name(), filehash, PrivateKey == "", uint8(spares), filesize, fee)
 	if err != nil {
 		fmt.Printf("\n[Error]Upload file meta information error:%s\n", err)
-		return
+		return err
 	}
 	fmt.Printf("\nFile meta info upload:%s ,fileid is:%s\n", AsInBlock, fileid)
 
@@ -119,7 +119,7 @@ func FileUpload(path, backups, PrivateKey string) {
 			if i == len(schds)-1 {
 				fmt.Printf("%s[Error]All scheduler is offline!!!%s\n", tools.Red, tools.Reset)
 				logger.OutPutLogger.Sugar().Infof("\n%s[Error]All scheduler is offlien!!!%s\n", tools.Red, tools.Reset)
-				return
+				return err
 			}
 			continue
 		} else {
@@ -185,19 +185,19 @@ func FileUpload(path, backups, PrivateKey string) {
 		if err != nil {
 			fmt.Printf("%s[Error]:Failed to save key%s error:%s\n", tools.Red, tools.Reset, err)
 			logger.OutPutLogger.Sugar().Infof("%s[Error]:Failed to save key%s error:%s\n", tools.Red, tools.Reset, err)
-			return
+			return err
 		}
 		_, err = keyfile.WriteString(PrivateKey)
 		if err != nil {
 			fmt.Printf("%s[Error]:Failed to write key to file:%s%s error:%s", tools.Red, filepath.Join(conf.ClientConf.PathInfo.KeyPath, (file.Name()+".pem")), tools.Reset, err)
 			logger.OutPutLogger.Sugar().Infof("%s[Error]:Failed to write key to file:%s%s error:%s", tools.Red, filepath.Join(conf.ClientConf.PathInfo.KeyPath, (file.Name()+".pem")), tools.Reset, err)
-			return
+			return err
 		}
 
 		encodefile, err := tools.AesEncrypt(filebyte, []byte(PrivateKey))
 		if err != nil {
 			fmt.Println("[Error]Encode the file fail ,error! ", err)
-			return
+			return err
 		}
 		blocks := len(encodefile) / blocksize
 		if len(encodefile)%blocksize == 0 {
@@ -244,13 +244,14 @@ func FileUpload(path, backups, PrivateKey string) {
 		}
 		bar.Finish()
 	}
+	return nil
 }
 
 /*
 FileDownload means download file by file id
 fileid:fileid of the file to download
 */
-func FileDownload(fileid string) {
+func FileDownload(fileid string) error {
 	chain.Chain_Init()
 	var ci chain.CessInfo
 	ci.RpcAddr = conf.ClientConf.ChainData.CessRpcAddr
@@ -260,17 +261,17 @@ func FileDownload(fileid string) {
 	if err != nil {
 		fmt.Printf("%s[Error]Get file:%s info fail:%s%s\n", tools.Red, fileid, err, tools.Reset)
 		logger.OutPutLogger.Sugar().Infof("%s[Error]Get file:%s info fail:%s%s\n", tools.Red, fileid, err, tools.Reset)
-		return
+		return err
 	}
 	if string(fileinfo.FileState) != "active" {
 		fmt.Printf("%s[Tips]The file:%s has not been backed up, please try again later%s\n", tools.Yellow, fileid, tools.Reset)
 		logger.OutPutLogger.Sugar().Infof("%s[Tips]The file:%s has not been backed up, please try again later%s\n", tools.Yellow, fileid, tools.Reset)
-		return
+		return err
 	}
 	if fileinfo.File_Name == nil {
 		fmt.Printf("%s[Error]The fileid:%s used to find the file is incorrect, please try again%s\n", tools.Red, fileid, err, tools.Reset)
 		logger.OutPutLogger.Sugar().Infof("%s[Error]The fileid:%s used to find the file is incorrect, please try again%s\n", tools.Red, fileid, err, tools.Reset)
-		return
+		return err
 	}
 
 	_, err = os.Stat(conf.ClientConf.PathInfo.InstallPath)
@@ -292,7 +293,7 @@ func FileDownload(fileid string) {
 	if err != nil {
 		fmt.Printf("%s[Error]:Failed to save key error:%s%s", tools.Red, err, tools.Reset)
 		logger.OutPutLogger.Sugar().Infof("%s[Error]:Failed to save key error:%s%s", tools.Red, err, tools.Reset)
-		return
+		return err
 	}
 	defer installfile.Close()
 
@@ -302,7 +303,7 @@ func FileDownload(fileid string) {
 	schds, err := ci.GetSchedulerInfo()
 	if err != nil {
 		fmt.Printf("%s[Error]Get scheduler list error:%s%s\n ", tools.Red, err, tools.Reset)
-		return
+		return err
 	}
 
 	var client *rpc.Client
@@ -317,7 +318,7 @@ func FileDownload(fileid string) {
 			if i == len(schds)-1 {
 				fmt.Printf("%s[Error]All scheduler is offline!!!%s\n", tools.Red, tools.Reset)
 				//logger.OutPutLogger.Sugar().Infof("\n%s[Error]All scheduler is offlien!!!%s\n", tools.Red, tools.Reset)
-				return
+				return err
 			}
 			continue
 		} else {
@@ -342,7 +343,7 @@ func FileDownload(fileid string) {
 		if err != nil {
 			fmt.Printf("[Error]Marshal req file error:%s\n", err)
 			logger.OutPutLogger.Sugar().Infof("[Error]Marshal req file error:%s\n", err)
-			return
+			return err
 		}
 		req := sp.Get().(*rpc.ReqMsg)
 		req.Method = module.DownloadService
@@ -355,7 +356,7 @@ func FileDownload(fileid string) {
 		if err != nil {
 			fmt.Printf("[Error]Download file fail error:%s\n", err)
 			logger.OutPutLogger.Sugar().Infof("[Error]Download file fail error:%s\n", err)
-			return
+			return err
 		}
 
 		var respbody rpc.RespBody
@@ -363,21 +364,21 @@ func FileDownload(fileid string) {
 		if err != nil || respbody.Code != 0 {
 			fmt.Printf("[Error]Download file from CESS error:%s. reply message:%s\n", err, respbody.Msg)
 			logger.OutPutLogger.Sugar().Infof("[Error]Download file from CESS error:%s. reply message:%s\n", err, respbody.Msg)
-			return
+			return err
 		}
 		var blockData module.FileDownloadInfo
 		err = proto.Unmarshal(respbody.Data, &blockData)
 		if err != nil {
 			fmt.Printf("[Error]Download file from CESS error:%s\n", err)
 			logger.OutPutLogger.Sugar().Infof("[Error]Download file from CESS error:%s\n", err)
-			return
+			return err
 		}
 
 		_, err = installfile.Write(blockData.Data)
 		if err != nil {
 			fmt.Printf("%s[Error]:Failed to write file's block to file:%s%s error:%s\n", tools.Red, filepath.Join(conf.ClientConf.PathInfo.InstallPath, string(fileinfo.File_Name[:])), tools.Reset, err)
 			logger.OutPutLogger.Sugar().Infof("%s[Error]:Failed to write file's block to file:%s%s error:%s", tools.Red, filepath.Join(conf.ClientConf.PathInfo.InstallPath, string(fileinfo.File_Name[:])), tools.Reset, err)
-			return
+			return err
 		}
 
 		getAllBar.Do(func() {
@@ -404,26 +405,26 @@ func FileDownload(fileid string) {
 		if err != nil {
 			fmt.Printf("%s[Error]:Decode file:%s fail%s error:%s\n", tools.Red, filepath.Join(conf.ClientConf.PathInfo.InstallPath, string(fileinfo.File_Name[:])), tools.Reset, err)
 			logger.OutPutLogger.Sugar().Infof("%s[Error]:Decode file:%s fail%s error:%s\n", tools.Red, filepath.Join(conf.ClientConf.PathInfo.InstallPath, string(fileinfo.File_Name[:])), tools.Reset, err)
-			return
+			return err
 		}
 		decodefile, err := tools.AesDecrypt(encodefile, []byte(filePWD))
 		if err != nil {
 			fmt.Println("[Error]Dncode the file fail ,error! ", err)
-			return
+			return err
 		}
 		err = installfile.Truncate(0)
 		_, err = installfile.Seek(0, os.SEEK_SET)
 		_, err = installfile.Write(decodefile[:])
 	}
 
-	return
+	return nil
 }
 
 /*
 FileDelete means to delete the file from the CESS system by the file id
 fileid:fileid of the file that needs to be deleted
 */
-func FileDelete(fileid string) {
+func FileDelete(fileid string) error {
 	chain.Chain_Init()
 	var ci chain.CessInfo
 	ci.RpcAddr = conf.ClientConf.ChainData.CessRpcAddr
@@ -434,11 +435,11 @@ func FileDelete(fileid string) {
 	if err != nil {
 		fmt.Printf("%s[Error]Delete file error:%s%s\n", tools.Red, tools.Reset, err)
 		logger.OutPutLogger.Sugar().Infof("%s[Error]Delete file error:%s%s\n", tools.Red, tools.Reset, err)
-		return
+		return err
 	} else {
 		fmt.Printf("%s[OK]Delete fileid:%s success!%s\n", tools.Green, fileid, tools.Reset)
 		logger.OutPutLogger.Sugar().Infof("%s[OK]Delete fileid:%s success!%s\n", tools.Green, fileid, tools.Reset)
-		return
+		return err
 	}
 
 }

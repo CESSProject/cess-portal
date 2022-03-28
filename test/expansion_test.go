@@ -6,16 +6,16 @@ import (
 	"testing"
 )
 
-func TestDownload(t *testing.T) {
+func TestExpansion(t *testing.T) {
 	//config file
 	conf.ClientConf.ChainData.CessRpcAddr = ""
+	conf.ClientConf.ChainData.IdAccountPhraseOrSeed = ""
 	conf.ClientConf.BoardInfo.BoardPath = ""
-	conf.ClientConf.PathInfo.InstallPath = ""
-	conf.ClientConf.ChainData.AccountPublicKey = ""
 
 	//param
-	fileid := ""
-
-	err := client.FileDownload(fileid)
+	quantity := 1
+	duration := 1
+	expected := 0
+	err := client.Expansion(quantity, duration, expected)
 	t.Fatal(err)
 }

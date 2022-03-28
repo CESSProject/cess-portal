@@ -18,5 +18,6 @@ func TestFileUpload(t *testing.T) {
 	path := ""
 	backups := ""
 	PrivateKey := ""
-	client.FileUpload(path, backups, PrivateKey)
+	err := client.FileUpload(path, backups, PrivateKey)
+	t.Fatal(err)
 }

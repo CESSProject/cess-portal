@@ -11,7 +11,7 @@ import (
 /*
 FindPurchasedSpace means to query the space that the current user has purchased and the space that has been used
 */
-func FindPurchasedSpace() {
+func FindPurchasedSpace() error {
 	chain.Chain_Init()
 
 	var ci chain.CessInfo
@@ -23,15 +23,16 @@ func FindPurchasedSpace() {
 	if err != nil {
 		fmt.Printf("[Error]Get user data fail:%s\n", err)
 		logger.OutPutLogger.Sugar().Infof("[Error]Get user data fail:%s\n", err)
-		return
+		return err
 	}
 	fmt.Println(userinfo)
+	return nil
 }
 
 /*
 FindPrice means to get real-time price of storage space
 */
-func FindPrice() {
+func FindPrice() error {
 	chain.Chain_Init()
 
 	var ci chain.CessInfo
@@ -43,7 +44,7 @@ func FindPrice() {
 	if err != nil {
 		fmt.Printf("[Error]Get all purchased fail:%s\n", err)
 		logger.OutPutLogger.Sugar().Infof("[Error]Get all purchased fail::%s\n", err)
-		return
+		return err
 	}
 
 	ci.ChainModuleMethod = chain.FindPriceModuleMethod[1]
@@ -51,7 +52,7 @@ func FindPrice() {
 	if err != nil {
 		fmt.Printf("[Error]Get all available fail:%s\n", err)
 		logger.OutPutLogger.Sugar().Infof("[Error]Get all available fail::%s\n", err)
-		return
+		return err
 	}
 
 	var purc int64
@@ -65,21 +66,21 @@ func FindPrice() {
 	if purc == ava {
 		fmt.Printf("[Success]All space has been bought,The current storage price is:+∞ per (MB)\n")
 		logger.OutPutLogger.Sugar().Infof("[Success]All space has been bought,The current storage price is:+∞ per (MB)\n")
-		return
+		return err
 	}
 
 	result := (1024 / float64((ava - purc))) * 1000
 
 	fmt.Printf("[Success]The current storage price is:%f per (MB)\n", result)
 	logger.OutPutLogger.Sugar().Infof("[Success]The current storage price is:%f per (MB)\n", result)
-	return
+	return nil
 }
 
 /*
 FindFile means to query the files uploaded by the current user
 fileid:fileid of the file to look for
 */
-func FindFile(fileid string) {
+func FindFile(fileid string) error {
 	chain.Chain_Init()
 
 	var ci chain.CessInfo
@@ -92,7 +93,7 @@ func FindFile(fileid string) {
 		if err != nil {
 			fmt.Printf("[Error]Get file:%s info fail:%s\n", fileid, err)
 			logger.OutPutLogger.Sugar().Infof("[Error]Get file:%s info fail:%s\n", fileid, err)
-			return
+			return err
 		}
 		fmt.Println(data)
 		if len(data.File_Name) == 0 {
@@ -104,10 +105,11 @@ func FindFile(fileid string) {
 		if err != nil {
 			fmt.Printf("[Error]Get file list fail:%s\n", err)
 			logger.OutPutLogger.Sugar().Infof("[Error]Get file list fail:%s\n", err)
-			return
+			return err
 		}
 		for _, fileinfo := range data {
 			fmt.Printf("%s\n", string(fileinfo))
 		}
 	}
+	return nil
 }

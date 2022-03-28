@@ -6,12 +6,15 @@ import (
 	"testing"
 )
 
-func TestFindPrice(t *testing.T) {
+func TestFindFile(t *testing.T) {
 	//config file
 	conf.ClientConf.ChainData.CessRpcAddr = ""
 	conf.ClientConf.ChainData.AccountPublicKey = ""
 	conf.ClientConf.BoardInfo.BoardPath = ""
 
-	err := client.FindPrice()
+	//param
+	fileid := ""
+
+	err := client.FindFile(fileid)
 	t.Fatal(err)
 }
