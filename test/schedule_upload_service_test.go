@@ -14,7 +14,7 @@ type clientService struct {
 
 func (clientService) CtluploadAction(body []byte) (proto.Message, error) {
 	var blockinfo module.FileUploadInfo
-	var Err rpc.Err
+	var Err rpc.RespBody
 	err := proto.Unmarshal(body, &blockinfo)
 	if err != nil {
 		Err.Code = -1

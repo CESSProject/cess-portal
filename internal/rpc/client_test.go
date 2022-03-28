@@ -13,7 +13,7 @@ import (
 type testService struct{}
 
 func (testService) HelloAction(body []byte) (proto.Message, error) {
-	return &Err{Msg: "test hello"}, nil
+	return &RespBody{Msg: "test hello"}, nil
 }
 
 func TestDialWebsocket(t *testing.T) {

@@ -1,10 +1,12 @@
 package module
 
-const CtlServiceName = "client"
+const SchedulerPort = "8081"
+
+const CtlServiceName = "wservice"
 const ScheduleServiceName = "schedule"
 
-const UploadService = "ctlupload"
-const DownloadService = "CtlDownload"
+const UploadService = "writefile"
+const DownloadService = "readfile"
 
 type CtlService struct{}
 type ScheduleService struct{}

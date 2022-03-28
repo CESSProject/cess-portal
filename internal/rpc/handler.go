@@ -30,8 +30,9 @@ func (s *Server) callMethod(msg *ReqMsg) *RespMsg {
 	handler := s.router.lookup(msg.Service, msg.Method)
 	if handler == nil {
 		err := &methodNotFoundError{msg.Service + "." + msg.Method}
-		answer := errorMessage(err)
+		answer := responseMessage(err)
 		answer.Id = msg.Id
+		return answer
 	}
 	answer := handler(msg.Id, msg.Body)
 	return answer

@@ -17,7 +17,8 @@ message RespMsg {
     bytes   body = 2;
 }
 
-message Err {
-    int32    code = 1;
-    string   msg = 2;
+message RespBody {
+    int32   code = 1;
+    string  msg = 2;
+    bytes   data = 3;
 }

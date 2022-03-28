@@ -3,6 +3,7 @@ module cess-portal
 go 1.17
 
 require (
+	github.com/btcsuite/btcutil v1.0.2
 	github.com/bwmarrin/snowflake v0.3.0
 	github.com/centrifuge/go-substrate-rpc-client/v4 v4.0.0
 	github.com/deckarep/golang-set v1.7.1

@@ -1,13 +1,13 @@
 boardInfo:
-  boardPath: ""
+  boardPath : ""
 
 chainData:
-  cessRpcAddr: ""
-  faucetAddress: ""
+  cessRpcAddr : ""
+  faucetAddress : ""
   idAccountPhraseOrSeed : ""
-  accountPublicKey: ""
+  accountPublicKey : ""
   walletAddress : ""
 
 pathInfo:
-  keyPath: ""
-  installPath: ""
+  keyPath : ""
+  installPath : ""

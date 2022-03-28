@@ -65,5 +65,5 @@ func Expansion(quantity, duration, expected int) {
 		logger.OutPutLogger.Sugar().Infof("[Error] Buy space on chain fail:%s\n", err)
 		return
 	}
-	fmt.Printf("[Success]Obtain from faucet successful!\n")
+	fmt.Printf("[Success]Buy space on chain success!\n")
 }

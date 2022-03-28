@@ -18,7 +18,7 @@ func (c *SrvConn) readLoop() {
 		msg := ReqMsg{}
 		err := c.codec.read(&msg)
 		if _, ok := err.(*proto.ParseError); ok {
-			c.codec.WriteMsg(context.Background(), errorMessage(&parseError{err.Error()}))
+			c.codec.WriteMsg(context.Background(), responseMessage(&parseError{err.Error()}))
 			continue
 		}
 

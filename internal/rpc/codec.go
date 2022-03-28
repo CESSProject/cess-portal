@@ -9,7 +9,7 @@ import (
 
 type protoCodec struct {
 	conn     *websocket.Conn
-	closedCh chan struct{}
+	closedCh chan struct{} //protocol连接关闭的检测管道
 }
 
 func (p *protoCodec) closed() <-chan struct{} {
@@ -59,10 +59,10 @@ func (p *protoCodec) getConn() *websocket.Conn {
 	return p.conn
 }
 
-func errorMessage(err error) *RespMsg {
+func responseMessage(err error) *RespMsg {
 	msg := &RespMsg{}
 	ec, ok := err.(Error)
-	errMsg := &Err{
+	errMsg := &RespBody{
 		Code: defaultErrorCode,
 		Msg:  err.Error(),
 	}

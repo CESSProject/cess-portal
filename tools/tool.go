@@ -28,11 +28,12 @@ var (
 )
 
 type Bar struct {
-	percent int64
-	cur     int64
-	total   int64
-	rate    string
-	graph   string
+	percent   int64
+	cur       int64
+	total     int64
+	rate      string
+	graph     string
+	calibrate float64
 }
 
 func Post(url string, para interface{}) ([]byte, error) {
@@ -179,8 +180,18 @@ func (bar *Bar) Play(cur int64) {
 	bar.cur = cur
 	last := bar.percent
 	bar.percent = bar.getPercent()
-	if bar.percent != last && bar.percent%2 == 0 {
-		bar.rate += bar.graph
+	if bar.percent != last {
+		add := (float64(int(bar.percent-last)) / 100) * 50
+		bar.calibrate += add - float64(int(add))
+		for i := 0; i < int(add); i++ {
+			bar.rate += bar.graph
+		}
+		if int(bar.calibrate) > 0 {
+			for i := 0; i < int(bar.calibrate); i++ {
+				bar.rate += bar.graph
+			}
+			bar.calibrate = 0
+		}
 	}
 	fmt.Printf("\r[%-50s]%3d%%  %8d/%d", bar.rate, bar.percent, bar.cur, bar.total)
 }

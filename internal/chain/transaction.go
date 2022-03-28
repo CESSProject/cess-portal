@@ -63,9 +63,7 @@ func (ci *CessInfo) BuySpaceOnChain(Quantity, Duration, Expected int) error {
 
 	keye, err := types.CreateStorageKey(meta, "System", "Events", nil)
 	if err != nil {
-		if err != nil {
-			return errors.Wrap(err, "CreateStorageKey Events err")
-		}
+		return errors.Wrap(err, "CreateStorageKey Events err")
 	}
 
 	ok, err := api.r.RPC.State.GetStorageLatest(key, &accountInfo)
@@ -111,13 +109,12 @@ func (ci *CessInfo) BuySpaceOnChain(Quantity, Duration, Expected int) error {
 				}
 				err = types.EventRecordsRaw(*h).DecodeEventRecords(meta, &events)
 				if err != nil {
-					fmt.Println("+++ DecodeEvent err: ", err)
 					return err
 				}
-				if events.BuySpace != nil {
+				if events.FileBank_BuySpace != nil {
 					return nil
 				} else {
-					return errors.Wrap(err, "Buy space on chain fail!")
+					return errors.New("Buy space on chain fail!")
 				}
 			}
 		case <-timeout:
@@ -128,7 +125,7 @@ func (ci *CessInfo) BuySpaceOnChain(Quantity, Duration, Expected int) error {
 	}
 }
 
-func (ci *CessInfo) UploadFileMetaInformation(fileid, filename, filehash string, backups uint8, filesize, downloadfee *big.Int) (string, error) {
+func (ci *CessInfo) UploadFileMetaInformation(fileid, filename, filehash string, ispublic bool, backups uint8, filesize, downloadfee *big.Int) (string, error) {
 	var (
 		err         error
 		accountInfo types.AccountInfo
@@ -158,6 +155,7 @@ func (ci *CessInfo) UploadFileMetaInformation(fileid, filename, filehash string,
 		types.NewBytes([]byte(filename)),
 		types.NewBytes([]byte(fileid)),
 		types.NewBytes([]byte(filehash)),
+		types.NewBool(ispublic),
 		types.NewU8(backups),
 		types.NewU128(*filesize),
 		types.NewU128(*downloadfee),
@@ -184,6 +182,11 @@ func (ci *CessInfo) UploadFileMetaInformation(fileid, filename, filehash string,
 	key, err := types.CreateStorageKey(meta, "System", "Account", keyring.PublicKey)
 	if err != nil {
 		return "", errors.Wrap(err, "CreateStorageKey err")
+	}
+
+	keye, err := types.CreateStorageKey(meta, "System", "Events", nil)
+	if err != nil {
+		return "", errors.Wrap(err, "CreateStorageKey Events err")
 	}
 
 	ok, err := api.r.RPC.State.GetStorageLatest(key, &accountInfo)
@@ -222,10 +225,23 @@ func (ci *CessInfo) UploadFileMetaInformation(fileid, filename, filehash string,
 		select {
 		case status := <-sub.Chan():
 			if status.IsInBlock {
-				return fmt.Sprintf("%#x", status.AsInBlock), nil
+				events := MyEventRecords{}
+				h, err := api.r.RPC.State.GetStorageRaw(keye, status.AsInBlock)
+				if err != nil {
+					return "", err
+				}
+				err = types.EventRecordsRaw(*h).DecodeEventRecords(meta, &events)
+				if err != nil {
+					return "", err
+				}
+				if events.FileBank_FileUpload != nil {
+					return "success!", nil
+				} else {
+					return "fail", errors.New("upload file fail")
+				}
 			}
 		case <-timeout:
-			return "", errors.Errorf("[%v] tx timeout", ci.TransactionName)
+			return "", errors.New("upload file meta info timeout,please check your Internet!")
 		default:
 			time.Sleep(time.Second)
 		}
@@ -282,9 +298,7 @@ func (ci *CessInfo) DeleteFileOnChain(fileid string) error {
 
 	keye, err := types.CreateStorageKey(meta, "System", "Events", nil)
 	if err != nil {
-		if err != nil {
-			return errors.Wrap(err, "CreateStorageKey Events err")
-		}
+		return errors.Wrap(err, "CreateStorageKey Events err")
 	}
 
 	ok, err := api.r.RPC.State.GetStorageLatest(key, &accountInfo)
@@ -333,10 +347,10 @@ func (ci *CessInfo) DeleteFileOnChain(fileid string) error {
 					fmt.Println("+++ DecodeEvent err: ", err)
 					return err
 				}
-				if events.DeleteFile != nil {
+				if events.FileBank_DeleteFile != nil {
 					return nil
 				} else {
-					return errors.Wrap(err, "Delete file info on chain fail!")
+					return errors.Errorf("Delete file info on chain fail!")
 				}
 			}
 		case <-timeout:

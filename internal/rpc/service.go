@@ -88,7 +88,7 @@ func suitableHandlers(receiver reflect.Value) map[string]handleWrapper {
 
 				if !results[1].IsNil() {
 					err = results[1].Interface().(error)
-					resp := errorMessage(err)
+					resp := responseMessage(err)
 					resp.Id = uint64(id)
 					return resp
 				}

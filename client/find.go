@@ -4,6 +4,7 @@ import (
 	"cess-portal/conf"
 	"cess-portal/internal/chain"
 	"cess-portal/internal/logger"
+	"cess-portal/tools"
 	"fmt"
 )
 
@@ -47,14 +48,25 @@ func FindPrice() {
 		return
 	}
 
-	purc := AllPurchased.Int64()
-	ava := AllAvailable.Int64()
+	var purc int64
+	var ava int64
+	if AllPurchased.Int != nil {
+		purc = AllPurchased.Int64()
+	}
+	if AllAvailable.Int != nil {
+		ava = AllAvailable.Int64()
+	}
+	if purc == ava {
+		fmt.Printf("[Success]All space has been bought,The current storage price is:+∞ per (MB)\n")
+		logger.OutPutLogger.Sugar().Infof("[Success]All space has been bought,The current storage price is:+∞ per (MB)\n")
+		return
+	}
 
-	result := float64((ava - purc)) / 1024 * 1000
+	result := (1024 / float64((ava - purc))) * 1000
 
-	fmt.Printf("[successful]The current storage price is:%f per (MB)\n", result)
-	logger.OutPutLogger.Sugar().Infof("[successful]The current storage price is:%f per (MB)\n", result)
-
+	fmt.Printf("[Success]The current storage price is:%f per (MB)\n", result)
+	logger.OutPutLogger.Sugar().Infof("[Success]The current storage price is:%f per (MB)\n", result)
+	return
 }
 
 func FindFile(fileid string) {
@@ -73,6 +85,9 @@ func FindFile(fileid string) {
 			return
 		}
 		fmt.Println(data)
+		if len(data.File_Name) == 0 {
+			fmt.Printf("%s[Tips]This file:%s may have been deleted by someone%s\n", tools.Yellow, fileid, tools.Reset)
+		}
 	} else {
 		ci.ChainModuleMethod = chain.FindFileModuleMethod[1]
 		data, err := ci.GetFileList()
