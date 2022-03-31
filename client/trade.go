@@ -72,8 +72,8 @@ func Expansion(quantity, duration, expected int) error {
 
 	err := ci.BuySpaceOnChain(quantity, duration, expected)
 	if err != nil {
-		fmt.Printf("[Error] Buy space on chain fail:%s\n", err)
-		logger.OutPutLogger.Sugar().Infof("[Error] Buy space on chain fail:%s\n", err)
+		fmt.Printf("[Error] Failed to buy space, please check if you have enough money\n")
+		logger.OutPutLogger.Sugar().Infof("[Error] Failed to buy space, please check if you have enough money\n")
 		return err
 	}
 	fmt.Printf("[Success]Buy space on chain success!\n")
