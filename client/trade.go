@@ -70,6 +70,7 @@ func Expansion(quantity, duration, expected int) error {
 	ci.IdentifyAccountPhrase = conf.ClientConf.ChainData.IdAccountPhraseOrSeed
 	ci.TransactionName = chain.BuySpaceTransactionName
 
+	//Buying space on-chain, failure could mean running out of money
 	err := ci.BuySpaceOnChain(quantity, duration, expected)
 	if err != nil {
 		fmt.Printf("[Error] Failed to buy space, please check if you have enough money\n")
