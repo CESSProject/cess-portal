@@ -99,9 +99,9 @@ func FileDeleteCommandFunc(cmd *cobra.Command, args []string) {
 
 func NewFileDecodeCommand() *cobra.Command {
 	cc := &cobra.Command{
-		Use:   "decode <fileid>",
+		Use:   "decode <filepath>",
 		Short: "decode refers to the decode the file",
-		Long:  `File decode means that if the file is not decrypted when you download it, it can be decode by this method.`,
+		Long:  `File decode means that if the file is not decrypted when you download it, it can be decode by this method.Please enter absolute path.`,
 
 		Run: FileDecodeCommandFunc,
 	}
@@ -112,5 +112,9 @@ func NewFileDecodeCommand() *cobra.Command {
 func FileDecodeCommandFunc(cmd *cobra.Command, args []string) {
 	InitComponents(cmd)
 
-	client.FileDecode()
+	if len(args) == 0 {
+		fmt.Printf("Please enter the fileid of the deleted file'delete <fileid>'\n")
+		os.Exit(conf.Exit_CmdLineParaErr)
+	}
+	client.FileDecode(args[0])
 }

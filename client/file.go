@@ -11,6 +11,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/btcsuite/btcutil/base58"
+	"github.com/howeyc/gopass"
 	"google.golang.org/protobuf/proto"
 	"io/ioutil"
 	"math/big"
@@ -447,7 +448,50 @@ func FileDelete(fileid string) error {
 /*
 When you download the file if it is not decode, you can decode it this way
 */
-func FileDecode() error {
-	//todo content
+func FileDecode(path string) error {
+	_, err := os.Stat(path)
+	if err != nil {
+		fmt.Printf("%s[Error]There is no such file, please confirm the correct location of the file, please enter the absolute path of the file%s\n", tools.Red, tools.Reset)
+		logger.OutPutLogger.Sugar().Infof("%s[Error]There is no such file, please confirm the correct location of the file, please enter the absolute path of the file%s\n", tools.Red, tools.Reset)
+		return err
+	}
+
+	fmt.Println("Please enter the file's password:")
+	fmt.Print(">")
+	psw, _ := gopass.GetPasswdMasked()
+	encodefile, err := ioutil.ReadFile(path)
+	if err != nil {
+		fmt.Printf("%s[Error]Failed to read file, please check file integrity%s\n", tools.Red, tools.Reset)
+		logger.OutPutLogger.Sugar().Infof("%s[Error]Failed to read file, please check file integrity%s\n", tools.Red, tools.Reset)
+		return err
+	}
+
+	decodefile, err := tools.AesDecrypt(encodefile, psw)
+	if err != nil {
+		fmt.Printf("%s[Error]File decode failed, please check your password! error:%s%s ", tools.Red, err, tools.Reset)
+		return err
+	}
+	filename := filepath.Base(path)
+	if path == filepath.Join(conf.ClientConf.PathInfo.InstallPath, filename) {
+		err = os.RemoveAll(path)
+		if err != nil {
+			fmt.Printf("%s[Error]An error occurred while saving the decoded file! error:%s%s ", tools.Red, err, tools.Reset)
+			return err
+		}
+	}
+	fileinfo, err := os.Create(filepath.Join(conf.ClientConf.PathInfo.InstallPath, filename))
+	if err != nil {
+		fmt.Printf("%s[Error]An error occurred while saving the decoded file! error:%s%s ", tools.Red, err, tools.Reset)
+		return err
+	}
+	defer fileinfo.Close()
+	_, err = fileinfo.Write(decodefile)
+	if err != nil {
+		fmt.Printf("%s[Error]Failed to save decrypted content to file! error:%s%s ", tools.Red, err, tools.Reset)
+		return err
+	}
+
+	fmt.Printf("%s[Success]The file was decrypted successfully and the file has been saved to:%s%s ", tools.Green, filepath.Join(conf.ClientConf.PathInfo.InstallPath, filename), tools.Reset)
+
 	return nil
 }

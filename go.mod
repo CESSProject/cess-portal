@@ -10,6 +10,7 @@ require (
 	github.com/ethereum/go-ethereum v1.10.12
 	github.com/golang/protobuf v1.5.2
 	github.com/gorilla/websocket v1.4.2
+	github.com/howeyc/gopass v0.0.0-20210920133722-c8aef6fb66ef
 	github.com/natefinch/lumberjack v2.0.0+incompatible
 	github.com/pkg/errors v0.9.1
 	github.com/spf13/cobra v1.3.0
@@ -36,6 +37,7 @@ require (
 	go.uber.org/multierr v1.6.0 // indirect
 	golang.org/x/crypto v0.0.0-20210817164053-32db794688a5 // indirect
 	golang.org/x/sys v0.0.0-20211205182925-97ca703d548d // indirect
+	golang.org/x/term v0.0.0-20201126162022-7de9c90e9dd1 // indirect
 	gopkg.in/natefinch/lumberjack.v2 v2.0.0 // indirect
 	gopkg.in/natefinch/npipe.v2 v2.0.0-20160621034901-c1b8fa8bdcce // indirect
 )
