@@ -18,6 +18,7 @@ func NewFileCommand() *cobra.Command {
 	fc.AddCommand(NewFileUploadCommand())
 	fc.AddCommand(NewFileDownloadCommand())
 	fc.AddCommand(NewFileDeleteCommand())
+	fc.AddCommand(NewFileDecodeCommand())
 
 	return fc
 }
@@ -94,4 +95,22 @@ func FileDeleteCommandFunc(cmd *cobra.Command, args []string) {
 	}
 	client.FileDelete(args[0])
 
+}
+
+func NewFileDecodeCommand() *cobra.Command {
+	cc := &cobra.Command{
+		Use:   "decode <fileid>",
+		Short: "decode refers to the decode the file",
+		Long:  `File decode means that if the file is not decrypted when you download it, it can be decode by this method.`,
+
+		Run: FileDecodeCommandFunc,
+	}
+
+	return cc
+}
+
+func FileDecodeCommandFunc(cmd *cobra.Command, args []string) {
+	InitComponents(cmd)
+
+	//todo file decode
 }
