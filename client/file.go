@@ -472,6 +472,7 @@ func FileDecode(path string) error {
 		return err
 	}
 	filename := filepath.Base(path)
+	//The decoded file is saved to the download folder, if the name is the same, the original file will be deleted
 	if path == filepath.Join(conf.ClientConf.PathInfo.InstallPath, filename) {
 		err = os.RemoveAll(path)
 		if err != nil {
