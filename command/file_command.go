@@ -112,5 +112,5 @@ func NewFileDecodeCommand() *cobra.Command {
 func FileDecodeCommandFunc(cmd *cobra.Command, args []string) {
 	InitComponents(cmd)
 
-	//todo file decode
+	client.FileDecode()
 }

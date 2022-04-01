@@ -443,3 +443,11 @@ func FileDelete(fileid string) error {
 	}
 
 }
+
+/*
+When you download the file if it is not decode, you can decode it this way
+*/
+func FileDecode() error {
+	//todo content
+	return nil
+}
