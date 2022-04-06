@@ -132,14 +132,14 @@ func FileUpload(path, backups, PrivateKey string) error {
 			return &rpc.ReqMsg{}
 		},
 	}
-	commit := func(num int, data []byte) {
+	commit := func(num int, data []byte) error {
 		blockinfo.BlockNum = int32(num) + 1
 		blockinfo.Data = data
 		info, err := proto.Marshal(&blockinfo)
 		if err != nil {
 			fmt.Println("[Error]Serialization error, please upload again! ", err)
 			logger.OutPutLogger.Sugar().Infof("[Error]Serialization error, please upload again! ", err)
-			return
+			return err
 		}
 		reqmsg := sp.Get().(*rpc.ReqMsg)
 		reqmsg.Body = info
@@ -152,7 +152,7 @@ func FileUpload(path, backups, PrivateKey string) error {
 		if err != nil {
 			fmt.Printf("\n%s[Error]Failed to transfer file to scheduler,error:%s%s\n", tools.Red, err, tools.Reset)
 			logger.OutPutLogger.Sugar().Infof("%s[Error]Failed to transfer file to scheduler,error:%s%s\n", tools.Red, err, tools.Reset)
-			os.Exit(conf.Exit_SystemErr)
+			return err
 		}
 
 		var res rpc.RespBody
@@ -160,7 +160,7 @@ func FileUpload(path, backups, PrivateKey string) error {
 		if err != nil {
 			fmt.Printf("\n[Error]Error getting reply from schedule, transfer failed! ", err)
 			logger.OutPutLogger.Sugar().Infof("[Error]Error getting reply from schedule, transfer failed! ", err)
-			os.Exit(conf.Exit_SystemErr)
+			return err
 		}
 		if res.Code != 0 {
 			fmt.Printf("\n[Error]Upload file fail!scheduler problem:%s\n", res.Msg)
@@ -168,6 +168,7 @@ func FileUpload(path, backups, PrivateKey string) error {
 			os.Exit(conf.Exit_SystemErr)
 		}
 		sp.Put(reqmsg)
+		return nil
 	}
 
 	if len(PrivateKey) != 0 {
@@ -218,7 +219,12 @@ func FileUpload(path, backups, PrivateKey string) error {
 				block = encodefile[i*blocksize:]
 				bar.Play(int64(i + 1))
 			}
-			commit(i, block)
+			err = commit(i, block)
+			if err != nil {
+				bar.Finish()
+				fmt.Printf("%s[Error]:Failed to upload the file%s error:%s\n", tools.Red, tools.Reset, err)
+				return err
+			}
 		}
 		bar.Finish()
 	} else {
@@ -241,7 +247,12 @@ func FileUpload(path, backups, PrivateKey string) error {
 				block = filebyte[i*blocksize:]
 				bar.Play(int64(i + 1))
 			}
-			commit(i, block)
+			err = commit(i, block)
+			if err != nil {
+				bar.Finish()
+				fmt.Printf("%s[Error]:Failed to upload the file%s error:%s\n", tools.Red, tools.Reset, err)
+				return err
+			}
 		}
 		bar.Finish()
 	}
