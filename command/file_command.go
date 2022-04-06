@@ -5,6 +5,7 @@ import (
 	"cess-portal/conf"
 	"cess-portal/tools"
 	"fmt"
+	"github.com/howeyc/gopass"
 	"github.com/spf13/cobra"
 	"os"
 )
@@ -41,16 +42,12 @@ func FileUploadCommandFunc(cmd *cobra.Command, args []string) {
 		fmt.Printf("Please enter correct parameters 'upload <filepath> <backups> <private key>'\n")
 		os.Exit(conf.Exit_CmdLineParaErr)
 	}
-	PrivateKey := ""
-	if len(args) < 3 {
-		fmt.Printf("%s[Warming] Do you want to upload your file without private key (it's means your file status is public)?%s\n", tools.Red, tools.Reset)
-		fmt.Printf("%sYou can type the 'private key' or enter with nothing to jump it:%s", tools.Red, tools.Reset)
-		fmt.Scanln(&PrivateKey)
-	} else {
-		PrivateKey = args[2]
-	}
 
-	client.FileUpload(args[0], args[1], PrivateKey)
+	fmt.Printf("%s[Warming] Do you want to upload your file without private key (it's means your file status is public)?%s\n", tools.Red, tools.Reset)
+	fmt.Printf("%sYou can type the 'private key' or enter with nothing to jump it:%s", tools.Red, tools.Reset)
+	psw, _ := gopass.GetPasswdMasked()
+
+	client.FileUpload(args[0], args[1], string(psw))
 }
 
 func NewFileDownloadCommand() *cobra.Command {
