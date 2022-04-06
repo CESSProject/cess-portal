@@ -400,15 +400,14 @@ func FileDownload(fileid string) error {
 	if !fileinfo.Public {
 		fmt.Printf("%s[Warm]This is a private file, please enter the file password:%s\n", tools.Green, tools.Reset)
 		fmt.Printf("Password:")
-		filePWD := ""
-		fmt.Scanln(&filePWD)
+		filePWD, _ := gopass.GetPasswdMasked()
 		encodefile, err := ioutil.ReadFile(filepath.Join(conf.ClientConf.PathInfo.InstallPath, string(fileinfo.File_Name[:])))
 		if err != nil {
 			fmt.Printf("%s[Error]:Decode file:%s fail%s error:%s\n", tools.Red, filepath.Join(conf.ClientConf.PathInfo.InstallPath, string(fileinfo.File_Name[:])), tools.Reset, err)
 			logger.OutPutLogger.Sugar().Infof("%s[Error]:Decode file:%s fail%s error:%s\n", tools.Red, filepath.Join(conf.ClientConf.PathInfo.InstallPath, string(fileinfo.File_Name[:])), tools.Reset, err)
 			return err
 		}
-		decodefile, err := tools.AesDecrypt(encodefile, []byte(filePWD))
+		decodefile, err := tools.AesDecrypt(encodefile, filePWD)
 		if err != nil {
 			fmt.Println("[Error]Dncode the file fail ,error! ", err)
 			return err
