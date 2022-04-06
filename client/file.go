@@ -245,6 +245,7 @@ func FileUpload(path, backups, PrivateKey string) error {
 		}
 		bar.Finish()
 	}
+	fmt.Printf("%s[Success]%s:upload file:%s successful!", tools.Green, tools.Reset, path)
 	return nil
 }
 
