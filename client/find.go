@@ -42,8 +42,8 @@ func FindPrice() error {
 	ci.ChainModuleMethod = chain.FindPriceModuleMethod[0]
 	AllPurchased, err := ci.GetPurchasedSpace()
 	if err != nil {
-		fmt.Printf("[Error]Get all purchased fail:%s\n", err)
-		logger.OutPutLogger.Sugar().Infof("[Error]Get all purchased fail::%s\n", err)
+		fmt.Printf("%s[Error]%sGet all purchased fail:%s\n", tools.Red, tools.Reset, err)
+		logger.OutPutLogger.Sugar().Infof("%s[Error]%sGet all purchased fail::%s\n", tools.Red, tools.Reset, err)
 		return err
 	}
 
