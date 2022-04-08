@@ -51,7 +51,7 @@ func FindPrice() error {
 	AllAvailable, err := ci.GetAvailableSpace()
 	if err != nil {
 		fmt.Printf("[Error]Get all available fail:%s\n", err)
-		logger.OutPutLogger.Sugar().Infof("[Error]Get all available fail::%s\n", err)
+		logger.OutPutLogger.Sugar().Infof("[Error]Get all available fail:%s\n", err)
 		return err
 	}
 
