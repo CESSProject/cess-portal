@@ -451,7 +451,7 @@ func FileDelete(fileid string) error {
 	} else {
 		fmt.Printf("%s[OK]Delete fileid:%s success!%s\n", tools.Green, fileid, tools.Reset)
 		logger.OutPutLogger.Sugar().Infof("%s[OK]Delete fileid:%s success!%s\n", tools.Green, fileid, tools.Reset)
-		return err
+		return nil
 	}
 
 }
