@@ -6,8 +6,8 @@ require (
 	github.com/btcsuite/btcutil v1.0.2
 	github.com/bwmarrin/snowflake v0.3.0
 	github.com/centrifuge/go-substrate-rpc-client/v4 v4.0.0
-	github.com/deckarep/golang-set v1.7.1
-	github.com/ethereum/go-ethereum v1.10.12
+	github.com/deckarep/golang-set v1.8.0
+	github.com/ethereum/go-ethereum v1.10.17
 	github.com/golang/protobuf v1.5.2
 	github.com/gorilla/websocket v1.4.2
 	github.com/howeyc/gopass v0.0.0-20210920133722-c8aef6fb66ef
