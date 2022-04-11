@@ -62,13 +62,13 @@ func NewFindFileCommand() *cobra.Command {
 		Short: "File refers to the query storage file",
 		Long:  `File command chain query file information ,If <fileId> is null then show the file list`,
 
-		Run: FindFindFileCommand,
+		Run: FindFileCommand,
 	}
 
 	return cc
 }
 
-func FindFindFileCommand(cmd *cobra.Command, args []string) {
+func FindFileCommand(cmd *cobra.Command, args []string) {
 	InitComponents(cmd)
 	fileid := ""
 	if len(args) != 0 {
