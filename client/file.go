@@ -88,16 +88,16 @@ func FileUpload(path, backups, PrivateKey string) error {
 		fmt.Println("[Error]Get scheduler randomly error! ", err)
 		return err
 	}
-	filesize := new(big.Int)
+	var filesize uint64
 	fee := new(big.Int)
 
 	ci.IdentifyAccountPhrase = conf.ClientConf.ChainData.IdAccountPhraseOrSeed
 	ci.TransactionName = chain.UploadFileTransactionName
 
 	if file.Size()/1024 == 0 {
-		filesize.SetInt64(1)
+		filesize = 1
 	} else {
-		filesize.SetInt64(file.Size() / 1024)
+		filesize = uint64(file.Size() / 1024)
 	}
 	fee.SetInt64(int64(0))
 

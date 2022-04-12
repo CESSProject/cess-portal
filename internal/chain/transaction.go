@@ -127,7 +127,7 @@ func (ci *CessInfo) BuySpaceOnChain(Quantity, Duration, Expected int) error {
 }
 
 //UploadFileMetaInformation means upload file metadata to the chain
-func (ci *CessInfo) UploadFileMetaInformation(fileid, filename, filehash string, ispublic bool, backups uint8, filesize, downloadfee *big.Int) (string, error) {
+func (ci *CessInfo) UploadFileMetaInformation(fileid, filename, filehash string, ispublic bool, backups uint8, filesize uint64, downloadfee *big.Int) (string, error) {
 	var (
 		err         error
 		accountInfo types.AccountInfo
@@ -159,7 +159,7 @@ func (ci *CessInfo) UploadFileMetaInformation(fileid, filename, filehash string,
 		types.NewBytes([]byte(filehash)),
 		types.NewBool(ispublic),
 		types.NewU8(backups),
-		types.NewU128(*filesize),
+		types.NewU64(filesize),
 		types.NewU128(*downloadfee),
 	)
 	if err != nil {
