@@ -276,14 +276,14 @@ func FileDownload(fileid string) error {
 		logger.OutPutLogger.Sugar().Infof("%s[Error]Get file:%s info fail:%s%s\n", tools.Red, fileid, err, tools.Reset)
 		return err
 	}
-	if string(fileinfo.FileState) != "active" {
-		fmt.Printf("%s[Tips]The file:%s has not been backed up, please try again later%s\n", tools.Yellow, fileid, tools.Reset)
-		logger.OutPutLogger.Sugar().Infof("%s[Tips]The file:%s has not been backed up, please try again later%s\n", tools.Yellow, fileid, tools.Reset)
-		return err
-	}
 	if fileinfo.File_Name == nil {
 		fmt.Printf("%s[Error]The fileid:%s used to find the file is incorrect, please try again%s\n", tools.Red, fileid, err, tools.Reset)
 		logger.OutPutLogger.Sugar().Infof("%s[Error]The fileid:%s used to find the file is incorrect, please try again%s\n", tools.Red, fileid, err, tools.Reset)
+		return err
+	}
+	if string(fileinfo.FileState) != "active" {
+		fmt.Printf("%s[Tips]The file:%s has not been backed up, please try again later%s\n", tools.Yellow, fileid, tools.Reset)
+		logger.OutPutLogger.Sugar().Infof("%s[Tips]The file:%s has not been backed up, please try again later%s\n", tools.Yellow, fileid, tools.Reset)
 		return err
 	}
 
@@ -410,9 +410,12 @@ func FileDownload(fileid string) error {
 	//logger.OutPutLogger.Sugar().Infof("%s[OK]:File '%s' has been downloaded to the directory :%s%s", tools.Green,string(fileinfo.Filename),filepath.Join(conf.ClientConf.PathInfo.InstallPath,string(fileinfo.Filename[:])), tools.Reset)
 
 	if !fileinfo.Public {
-		fmt.Printf("%s[Warm]This is a private file, please enter the file password:%s\n", tools.Green, tools.Reset)
+		fmt.Printf("%s[Warm]This is a private file, please enter the file password(If you don't want to decrypt, just press enter):%s\n", tools.Green, tools.Reset)
 		fmt.Printf("Password:")
 		filePWD, _ := gopass.GetPasswdMasked()
+		if len(filePWD) == 0 {
+			return nil
+		}
 		encodefile, err := ioutil.ReadFile(filepath.Join(conf.ClientConf.PathInfo.InstallPath, string(fileinfo.File_Name[:])))
 		if err != nil {
 			fmt.Printf("%s[Error]:Decode file:%s fail%s error:%s\n", tools.Red, filepath.Join(conf.ClientConf.PathInfo.InstallPath, string(fileinfo.File_Name[:])), tools.Reset, err)
