@@ -4,6 +4,12 @@ cess-portal is the client of the cess project. By using some simple commands of 
 
 # **Build Code**
 
+If you don't have git software on your machine, please install it first
+
+```shell
+yum install git -y
+```
+
 First you need to download the cess-portal project from GitHub
 
 ```shell
@@ -13,19 +19,20 @@ Then run the build.sh(On Linux) or build.bat(On Windows) script file in the ‘i
 
 ```shell
 ##Compile with script
-cd install_ctl
+cd /cess-portal/install_ctl
 
-##run it on windows platform
+##Run it on windows platform
 ./build.bat
-##run it on linux platform
+##Run it on linux platform
 sh build.sh
 ```
 
-Finally, please place the 'install_ctl' folder in your Linux environment
+Finally, you can place the 'install_ctl' folder in your Linux environment,you can also operate directly in this folder
 
 # **Install On Linux**
 
 ```shell
+#If you are not in the install_ctl folder, please enter first
 cd install_ctl
 ##Provide run permission
 chmod 777 install-cessctl.sh
@@ -64,8 +71,8 @@ Please edit the configuration of the above file, press the ESC key on the keyboa
 
 ## Prerequisites
 
-* :one: Centos 8 and above
-* :two: Dedicate IP
+* :one: Centos
+* :two: Go 1.17 and above
 
 ## **Command group**
 
