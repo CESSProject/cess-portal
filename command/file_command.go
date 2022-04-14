@@ -110,7 +110,7 @@ func FileDecodeCommandFunc(cmd *cobra.Command, args []string) {
 	InitComponents(cmd)
 
 	if len(args) == 0 {
-		fmt.Printf("Please enter the fileid of the deleted file'delete <fileid>'\n")
+		fmt.Printf("Please enter the path of the file to be decoded'\n")
 		os.Exit(conf.Exit_CmdLineParaErr)
 	}
 	client.FileDecode(args[0])
