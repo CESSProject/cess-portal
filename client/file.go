@@ -457,6 +457,7 @@ func FileDelete(fileid string) error {
 }
 
 /*
+FileDecode means that if the file is not decrypted when downloading the file, it can be decrypted by this method
 When you download the file if it is not decode, you can decode it this way
 */
 func FileDecode(path string) error {
