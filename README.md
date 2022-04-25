@@ -232,7 +232,9 @@ File meta info upload:success! ,fileid is:1517061233797238784
 
 ### **(E)Query file information and file list**
 
-* instruction：Query file information and file list
+* instruction：
+  
+  ​	  Query file information and file list
   
 * usage：
 
