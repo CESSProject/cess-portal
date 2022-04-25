@@ -110,6 +110,16 @@ hardware requirement:
 
 -c,--config：Absolute path, the address of the configuration file; used when not defined:/etc/cess.d/cess_client.yaml
 
+## **Tap to obtain tokens**
+
+* usage:
+  ​   cessctl trade obtain <public key>
+  
+* example：
+  ​   cessctl trade obtain 0x2ed4a2c67291bf3eaa4de538ab120ba21b3de1b5704551864226d2fae8f87937
+  
+  
+
 ## **Command group**
 
 | command group name | subcommand name | features                                                     |
@@ -127,8 +137,10 @@ hardware requirement:
 
 
 ## **Operate example**
-Tips：
 
+  
+
+  
 ### (A)Query storage unit price
 
 * instruction：
@@ -141,7 +153,13 @@ Tips：
 
 * example：
 
-  ​		cessctl find price 
+ 
+[root@iZbp18tsw8ozfwv5y1z6avZ ~]# cessctl find price
+  
+2022/04/25 14:06:23 Connecting to ws://106.15.44.155:9949/...
+  
+[Success]The current storage price is:8.342023 per (MB)
+
 
 
 ### (B)Buy storage space
@@ -156,9 +174,11 @@ Tips：
 
 * example：
 
-  ​		cessctl trade exp 1 20
-      2022/04/21 16:05:14 Connecting to ws://106.15.44.155:9949/...
-      [Success]Buy space on chain success!
+ cessctl trade exp 1 20
+  
+ 2022/04/21 16:05:14 Connecting to ws://106.15.44.155:9949/...
+  
+ [Success]Buy space on chain success!
   
 
 
@@ -174,14 +194,13 @@ Tips：
   ​		cessctl find space
 
 * example：
+  
 
-  ​	  [root@iZbp18tsw8ozfwv5y1z6avZ admin]# cessctl find space
-2022/04/21 16:09:55 Connecting to ws://106.15.44.155:9949/...
-———————————————————You Purchased Space———————————————————
-                   PurchasedSpace:3145728(KB)
-                   UsedSpace:24582(KB)
-                   RemainingSpace:3121146(KB)
-—————————————————————————————————————————————————————————
+  [root@iZbp18tsw8ozfwv5y1z6avZ admin]# cessctl find space
+  
+  2022/04/21 16:09:55 Connecting to ws://106.15.44.155:9949/...
+      
+  You Purchased Space—PurchasedSpace:3145728(KB) UsedSpace:24582(KB) RemainingSpace:3121146(KB)
 
 
 
@@ -197,9 +216,12 @@ Tips：
 
 * example：
 
-  ​		[root@iZbp18tsw8ozfwv5y1z6avZ admin]# cessctl file upload /root/test.txt 3 1234567887654321
+[root@iZbp18tsw8ozfwv5y1z6avZ admin]# cessctl file upload /root/test.txt 3 1234567887654321
+  
 [Warming] Do you want to upload your file without private key (it's means your file status is public)?
+  
 You can type the 'private key' or enter with nothing to jump it:
+  
 2022/04/21 16:42:38 Connecting to ws://106.15.44.155:9949/...
 
 File meta info upload:success! ,fileid is:1517061233797238784
@@ -210,7 +232,7 @@ File meta info upload:success! ,fileid is:1517061233797238784
 
 ### **(E)Query file information and file list**
 
-* instruction：
+* instruction：Query file information and file list
   
 * usage：
 
@@ -218,34 +240,49 @@ File meta info upload:success! ,fileid is:1517061233797238784
 
 * example：
 
-  ​		[root@iZbp18tsw8ozfwv5y1z6avZ admin]# cessctl find file
+[root@iZbp18tsw8ozfwv5y1z6avZ admin]# cessctl find file
+  
 No parameter query, return a list of all files
+  
 2022/04/21 16:51:24 Connecting to ws://106.15.44.155:9949/...
+  
 1508613791951097856
+  
 1514438232262053888
+  
 1514771263174742016
+  
 1517061233797238784
+  
 [root@iZbp18tsw8ozfwv5y1z6avZ admin]#
   
-   ​	[root@iZbp18tsw8ozfwv5y1z6avZ admin]# cessctl find file 1517061233797238784
+[root@iZbp18tsw8ozfwv5y1z6avZ admin]# cessctl find file 1517061233797238784
+  
 2022/04/21 16:55:06 Connecting to ws://106.15.44.155:9949/...
+  
 ———————————————————File Information———————————————————
-                  Filename:test.txt
-                  Public:true
-                  Filehash:33d00beb6ddaf0d7dc0e558366a73f7bf2088f8c7b685a9a2c030cf4e1d1ca21
-                  Backups:3
-                  Filesize:1
-                  Downloadfee:0
+                 
+  Filename:test.txt
+  
+  Public:true
+  
+  Filehash:33d00beb6ddaf0d7dc0e558366a73f7bf2088f8c7b685a9a2c030cf4e1d1ca21
+  
+  Backups:3
+  
+  Filesize:1
+  
+  Downloadfee:0
 
 [root@iZbp18tsw8ozfwv5y1z6avZ admin]#
 
 
 
-### **(F)download file**
+### **(F)download the file**
 
 * instruction：
 
-  ​		download file
+  ​		download the file
 
 * usage：
 
@@ -253,18 +290,21 @@ No parameter query, return a list of all files
 
 * example：
 
-  ​	  [root@iZbp18tsw8ozfwv5y1z6avZ admin]# cessctl file download 1517061233797238784
+[root@iZbp18tsw8ozfwv5y1z6avZ admin]# cessctl file download 1517061233797238784
+  
 2022/04/21 16:58:39 Connecting to ws://106.15.44.155:9949/...
+  
 [██████████████████████████████████████████████████]100%         1/1
+  
 [OK]:File 'test.txt' has been downloaded to the directory :/root/installpath/test.txt
 
 
 
-### **(Y)Delete file**
+### **(G)Delete the file**
 
 * instruction：
 
-  ​		delete file
+  ​		delete the file
  
 * usage：
 
@@ -272,9 +312,9 @@ No parameter query, return a list of all files
 
 * example：
 
-  ​	  [root@iZbp18tsw8ozfwv5y1z6avZ admin]# cessctl file delete 1517061233797238784
+[root@iZbp18tsw8ozfwv5y1z6avZ admin]# cessctl file delete 1517061233797238784
+  
 2022/04/21 17:02:57 Connecting to ws://106.15.44.155:9949/...
+  
 [OK]Delete fileid:1517061233797238784 success!
 
-
-Summary:
