@@ -1,6 +1,14 @@
 # **CESS-Portal**
 
-cess-portal is the client of the cess project. By using some simple commands of cess-portal, you can easily realize a series of operations such as purchasing space, querying space, uploading/downloading files, and querying file information on the Linux system.
+CESS-Portal is the client of the CESS project. By using some simple commands of CESS-Portal, you can easily realize a series of operations such as purchasing space, querying space, uploading/downloading files, and querying file information on the Linux system.
+
+CESS-Portal  characteristics of operation function is shown below:
+
+- provides space storage service
+- low data redundancy during storage
+- high data security
+- Supports enterprise-level commercial storage service
+- Efficient data retrieval and return ability
 
 # **Build Code**
 
@@ -42,6 +50,22 @@ vim install-cessctl.sh
 
 Let me introduce the content of the configuration file of the one-click installation script.
 
+
+## **Configuration file**
+
+boardPath：Absolute path, the data kanban location of the result output; if not defined, output to: /etc/cess.d file.
+
+cessRpcAddr：Chain interaction address, the address that interacts with the chain.
+
+faucetAddress：Faucet address, the address to get coins from the faucet.
+
+idAccountPhraseOrSeed：Account private key, which is used as the user's mnemonic when signing transactions.
+
+accountPublicKey：The publicKey of public key conversion, used to query data on the chain, and the conversion address: https://polkadot.subscan.io/tools/ss58_transform.
+
+walletAddress：The wallet public key address, the owner id of the file when uploading the file metadata.
+
+
 ```shell
 ##The log file of the client's operation output, your operation results will be recorded in the output.log file under this file
 boardPath='/root'
@@ -71,22 +95,13 @@ Please edit the configuration of the above file, press the ESC key on the keyboa
 
 ## Prerequisites
 
+**Software requirement:**
 * :one: Centos
 * :two: Go 1.17 and above
 
-## **Command group**
-
-| command group name | subcommand name | features                                                     |
-| ------------------ | --------------- | ------------------------------------------------------------ |
-| find               | price           | Query the current storage price per MB                       |
-| find               | space           | Query currently used space, purchased space, remaining space |
-| find               | file            | Query file or file list                                      |
-| file               | upload          | upload files                                                 |
-| file               | download        | download file                                                |
-| trade              | exp             | buy storage                                                  |
-| trade              | obtain          | Get coins from the faucet                                    |
-| file               | delete          | delete file                                                  |
-
+**Hardware requirement:**
+* :one: Memory 8GB and above
+* :two: internet
 
 
 ## **Global command**
@@ -97,19 +112,25 @@ Please edit the configuration of the above file, press the ESC key on the keyboa
 
 
 
-## **Configuration file**
+## **Command group**
 
-boardPath：Absolute path, the data kanban location of the result output; if not defined, output to: /etc/cess.d file.
+| command group name | subcommand name | features                                                     |
+| ------------------ | --------------- | ------------------------------------------------------------ |
+| find               | price           | Query the current storage price per MB                       |
+| find               | space           | Query real-time storage space information                    |
+| find               | file            | Query the uploaded files information                         |
+| file               | upload          | Upload the specific files                                    |
+| file               | download        | Download the specific file                                   |
+| trade              | exp             | Buy CESS storage space                                       |
+| trade              | obtain          | Top up tokens from the faucet                                |
+| file               | delete          | Delete the specifc file                                      |
 
-cessRpcAddr：Chain interaction address, the address that interacts with the chain.
 
-faucetAddress：Faucet address, the address to get coins from the faucet.
 
-idAccountPhraseOrSeed：Account private key, which is used as the user's mnemonic when signing transactions.
 
-accountPublicKey：The publicKey of public key conversion, used to query data on the chain, and the conversion address: https://polkadot.subscan.io/tools/ss58_transform.
 
-walletAddress：The wallet public key address, the owner id of the file when uploading the file metadata.
+
+
 
 
 
@@ -119,51 +140,75 @@ walletAddress：The wallet public key address, the owner id of the file when upl
 
 * instruction：
 
-  ​		Chain query and displays the current lease storage space Price (Unit: Cess / MB)
+  ​		Query the current storage price per MB(Unit: TCESS / MB)
 
 * usage：
 
-  ​		cessctl find price
 
+  ```shell
+  ​		cessctl find price
+  ```
+      
 * example：
 
-  ​		cessctl find price -c /root/cess_client.yaml
+  [root@iZbp18tsw8ozfwv5y1z6avZ ~]# cessctl find price
+  
+  
+
+  2022/04/25 14:06:23 Connecting to *** . ** . ** . *** : ****...
+
+
+  [Success]The current storage price is:8.342023 per (MB)
 
 
 
-### (B)Check remaining space
+### (B)Buy CESS storage space 
 
 * instruction：
 
-  ​		Chain query current account purchased storage space usage (used and remaining)
+  ​		buy the storage space
+  
+* usage：
+
+  ​		cessctl trade exp <quantity><duration>
+
+* example：
+
+  cessctl trade exp 1 20
+  
+  2022/04/21 16:05:14 Connecting to ws://*** .** .** .***:****/...
+  
+  [Success]Buy space on chain success!
+
+
+
+### (C)Query real-time storage space information 
+
+* instruction：
+
+  ​		Query storage space information include storage space, purchased storage space, and remaining storage space
 
 * usage：
 
   ​		cessctl find space
 
-* example：
-
-  ​		cessctl find space -c /root/cess_client.yaml
-
-
-
-### (C)Query file information
-
-* instruction：
-
-  ​		Chain query all file information that has been uploaded by the current account (sorting, keyword retrieval...)
-
-* usage：
-
-  ​		cessctl find file <fileid>
-
-  ​		If fileid is vaild, output all file list information
 
 * example：
+  
+[root@iZbp18tsw8ozfwv5y1z6avZ admin]# cessctl find space
+  
+  
+2022/04/21 16:09:55 Connecting to ws://*** .** .** .*** :****/...
 
-  ​		Query single file information:cessctl find file 1483720947931287552 -c /root/cess_client.yaml
+  ——You Purchased Space——
+  
+  PurchasedSpace:3145728(KB)
+  
+  UsedSpace:24582(KB)
+  
+  RemainingSpace:3121146(KB)
+  
 
-  ​		Query file list information:cessctl find file -c /root/cess_client.yaml
 
 
 
