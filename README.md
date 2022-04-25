@@ -125,13 +125,13 @@ hardware requirement:
 | command group name | subcommand name | features                                                     |
 | ------------------ | --------------- | ------------------------------------------------------------ |
 | find               | price           | Query the current storage price per MB                       |
-| find               | space           | Query currently used space, purchased space, remaining space |
-| find               | file            | Query file information and file list                         |
-| file               | upload          | upload files                                                 |
-| file               | download        | download file                                                |
-| trade              | exp             | buy storage                                                  |
-| trade              | obtain          | Get coins from the faucet                                    |
-| file               | delete          | delete file                                                  |
+| find               | space           | Query the storage space information in real-time             |
+| find               | file            | Query the file specific information                          |
+| file               | upload          | Upload the specific file                                     |
+| file               | download        | Download the specific file                                   |
+| trade              | exp             | Buy the CESS storage space                                   |
+| trade              | obtain          | Top up tokens from the faucet                                |
+| file               | delete          | Delete the specific file                                     |
 
 
 
@@ -145,18 +145,20 @@ hardware requirement:
 
 * instruction：
 
-  ​		Query the current storage price per MB(Unit: Cess / MB)
+  ​		Query the current storage price per MB(Unit: TCESS / MB)
 
 * usage：
-
+  
+ ```shell
   ​		cessctl find price
-
+ ```
+  
 * example：
 
  
 [root@iZbp18tsw8ozfwv5y1z6avZ ~]# cessctl find price
   
-2022/04/25 14:06:23 Connecting to ws://106.15.44.155:9949/...
+2022/04/25 14:06:23 Connecting to ws://***.**.**.***:****/...
   
 [Success]The current storage price is:8.342023 per (MB)
 
@@ -170,13 +172,15 @@ hardware requirement:
 
 * usage：
 
+   ```shell
   ​		cessctl trade exp <quantity><duration>
-
+   ```
+  
 * example：
 
  cessctl trade exp 1 20
   
- 2022/04/21 16:05:14 Connecting to ws://106.15.44.155:9949/...
+ 2022/04/21 16:05:14 Connecting to ws://***.**.**.***:****/...
   
  [Success]Buy space on chain success!
   
@@ -191,14 +195,16 @@ hardware requirement:
 
 * usage：
 
+  ```shell
   ​		cessctl find space
-
+  ```
+  
 * example：
   
 
   [root@iZbp18tsw8ozfwv5y1z6avZ admin]# cessctl find space
   
-  2022/04/21 16:09:55 Connecting to ws://106.15.44.155:9949/...
+  2022/04/21 16:09:55 Connecting to ws://***.**.**.***:****/...
       
   You Purchased Space—PurchasedSpace:3145728(KB) UsedSpace:24582(KB) RemainingSpace:3121146(KB)
 
@@ -212,8 +218,10 @@ hardware requirement:
 
 * usage：
 
+  ```shell
   ​		cessctl upload file <filepath><backups><private key>
-
+  ```
+  
 * example：
 
 [root@iZbp18tsw8ozfwv5y1z6avZ admin]# cessctl file upload /root/test.txt 3 1234567887654321
@@ -222,7 +230,7 @@ hardware requirement:
   
 You can type the 'private key' or enter with nothing to jump it:
   
-2022/04/21 16:42:38 Connecting to ws://106.15.44.155:9949/...
+2022/04/21 16:42:38 Connecting to ws://***.**.**.***:****/...
 
 File meta info upload:success! ,fileid is:1517061233797238784
 [██████████████████████████████████████████████████]100%         1/1
@@ -238,15 +246,17 @@ File meta info upload:success! ,fileid is:1517061233797238784
   
 * usage：
 
+  ```shell
   ​		cessctl find file
-
+  ```
+  
 * example：
 
 [root@iZbp18tsw8ozfwv5y1z6avZ admin]# cessctl find file
   
 No parameter query, return a list of all files
   
-2022/04/21 16:51:24 Connecting to ws://106.15.44.155:9949/...
+2022/04/21 16:51:24 Connecting to ws://***.**.**.***:****/...
   
 1508613791951097856
   
@@ -260,7 +270,7 @@ No parameter query, return a list of all files
   
 [root@iZbp18tsw8ozfwv5y1z6avZ admin]# cessctl find file 1517061233797238784
   
-2022/04/21 16:55:06 Connecting to ws://106.15.44.155:9949/...
+2022/04/21 16:55:06 Connecting to ws://***.**.**.***:****/...
   
 ———————————————————File Information———————————————————
                  
@@ -288,13 +298,15 @@ No parameter query, return a list of all files
 
 * usage：
 
+  ```shell
   ​		cessctl file download <fileid>
-
+  ```
+  
 * example：
 
 [root@iZbp18tsw8ozfwv5y1z6avZ admin]# cessctl file download 1517061233797238784
   
-2022/04/21 16:58:39 Connecting to ws://106.15.44.155:9949/...
+2022/04/21 16:58:39 Connecting to ws://***.**.**.***:****/...
   
 [██████████████████████████████████████████████████]100%         1/1
   
@@ -310,13 +322,15 @@ No parameter query, return a list of all files
  
 * usage：
 
+  ```shell
   ​		cessctl file delete <fileid>
-
+  ```
+  
 * example：
 
 [root@iZbp18tsw8ozfwv5y1z6avZ admin]# cessctl file delete 1517061233797238784
   
-2022/04/21 17:02:57 Connecting to ws://106.15.44.155:9949/...
+2022/04/21 17:02:57 Connecting to ws://***.**.**.***:****/...
   
 [OK]Delete fileid:1517061233797238784 success!
 
