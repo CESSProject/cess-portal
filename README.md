@@ -1,14 +1,14 @@
 # **CESS-Portal**
 
-CESS-Portal is the client of the CESS project. By using some simple commands of CESS-Portal, you can easily realize a series of operations such as purchasing space, querying space, uploading/downloading files, and querying file information on the Linux system.
+CESS-Portal is the storage client of the CESS project. By using some simple commands of CESS-Portal, you can easily realize a series of operations such as purchasing space, querying space, uploading/downloading files, and querying file information on the Linux system.
 
-CESS-Portal  characteristics of operation function is shown below:
+CESS-Portal characteristics of operation function is shown below:
 
-- provides space storage service
-- low data redundancy during storage
-- high data security
 - Supports enterprise-level commercial storage service
 - Efficient data retrieval and return ability
+- low data redundancy during storage
+- provides space storage service
+- high data security
 
 # **Build Code**
 
@@ -108,7 +108,7 @@ Please edit the configuration of the above file, press the ESC key on the keyboa
 
 -h,--help：Get the specific operation method of the command line
 
--c,--config：Absolute path, the address of the configuration file; used when not defined:/etc/cess.d/cess_client.yaml
+-c,--config：Absolute path, the address of the configuration file
 
 
 
@@ -127,16 +127,29 @@ Please edit the configuration of the above file, press the ESC key on the keyboa
 
 
 
+## Top up tokens from the faucet
+
+* instruction：
+
+  ​		Get a certain amount of tokens through the faucet service
+
+* usage：
+
+  ```shell
+  ​		cessctl trade obtain <public key>
+  ```
+  
+* example：
+
+  cessctl trade obtain 0x2ed4a2c67291bf3eaa4de538ab120ba21b3de1b5704551864226d2fae8f87937 
 
 
 
 
 
+## **Operate example on Linux**
 
-
-## **Operate example**
-
-### (A)Query storage unit price
+### (A)Query the current storage price per MB
 
 * instruction：
 
@@ -155,7 +168,7 @@ Please edit the configuration of the above file, press the ESC key on the keyboa
   
   
 
-  2022/04/25 14:06:23 Connecting to *** . ** . ** . *** : ****...
+  2022/04/25 14:06:23 Connecting to ws://
 
 
   [Success]The current storage price is:8.342023 per (MB)
@@ -170,15 +183,23 @@ Please edit the configuration of the above file, press the ESC key on the keyboa
   
 * usage：
 
+  ```shell
   ​		cessctl trade exp <quantity><duration>
-
+  ```
+  
 * example：
 
   cessctl trade exp 1 20
   
-  2022/04/21 16:05:14 Connecting to ws://*** .** .** .***:****/...
+  2022/04/21 16:05:14 Connecting to ws://
   
   [Success]Buy space on chain success!
+
+
+  Tips: 
+  
+  [quantity] - The amount of space you want to buy, the unit is GB   
+  [duration] - The Time of storage space you want to use, the unit is month
 
 
 
@@ -190,15 +211,16 @@ Please edit the configuration of the above file, press the ESC key on the keyboa
 
 * usage：
 
+  ```shell
   ​		cessctl find space
-
+  ```
 
 * example：
   
 [root@iZbp18tsw8ozfwv5y1z6avZ admin]# cessctl find space
   
   
-2022/04/21 16:09:55 Connecting to ws://*** .** .** .*** :****/...
+2022/04/21 16:09:55 Connecting to ws://
 
   ——You Purchased Space——
   
@@ -220,15 +242,25 @@ Please edit the configuration of the above file, press the ESC key on the keyboa
 
 * usage：
 
-  ​		cessctl upload file <filepath> <downloadfee>
-
-  ​		filepath：The absolute path of the file, not a folder
-
-  ​		downloadfee：The cost of downloading the file, in cess
-
+  ```shell
+  ​		cessctl upload file <filepath><backups><private key>
+  ```
+  
 * example：
 
-  ​		cessctl upload file /root/cess_client.yaml 10 -c /root/cess_client.yaml
+  [root@iZbp18tsw8ozfwv5y1z6avZ admin]# cessctl file upload /root/test.txt 3 1234567887654321
+  
+  [Warming] Do you want to upload your file without private key (it's means your file status is public)?
+  
+  You can type the 'private key' or enter with nothing to jump it:
+  
+  2022/04/21 16:42:38 Connecting to ws://
+
+  File meta info upload:success! ,fileid is:1517061233797238784
+  
+  [██████████████████████████████████████████████████]100%         1/1
+  
+  [Success]:upload file:/root/test.txt successful![root@iZbp18tsw8ozfwv5y1z6avZ admin]#
 
 
 
@@ -236,72 +268,44 @@ Please edit the configuration of the above file, press the ESC key on the keyboa
 
 * instruction：
 
-  ​		Download file based on fileid
+  ​		Download specific file based on fileid
 
 * usage：
 
-  ​		cessctl download <fileid>
-
-  ​		fileid：The unique id of the file
-
+  ```shell
+  ​		cessctl file download <fileid>
+  ```
+  
 * example：
 
-  ​		cessctl download file 1483720947931287552 -c /root/cess_client.yaml
+    [root@iZbp18tsw8ozfwv5y1z6avZ admin]# cessctl file download 1517061233797238784
+  
+    2022/04/21 16:58:39 Connecting to ws://
+  
+    [██████████████████████████████████████████████████]100%         1/1
+  
+    [OK]:File 'test.txt' has been downloaded to the directory :/root/installpath/test.txt
 
 
 
-### (F)Buy space
+### (F)Delete file
 
 * instruction：
 
-  ​		Send on-chain transactions, buy space
+  ​		Delete the specific file meta information
 
 * usage：
 
-  ​		download exp <spacequantity> <expected price>
-
-  ​		spacequantity：The number of expansion capacity, unit: 1/512MB
-
-  ​		expected price：The maximum acceptable price for buying space, in cess; if it is empty, all prices are accepted
-
-* example：
-
-  ​		expected price 20cess：download exp 1 20 -c /root/cess_client.yaml
-
-  ​		All price accepted：download exp 1 -c /root/cess_client.yaml
-
-
-
-### (Y)Tap to get tokens
-
-* instruction：
-
-  ​		Get a certain amount of tokens through the faucet service
-
-* usage：
-
-  ​		cessctl obtain <address>
-
-  ​		address：publickey of the account
-
-* example：
-
-  ​		cessctl obtain 0x2ed4a2c67291bf3eaa4de538ab120ba21b3de1b5704551864226d2fae8f87937 -c /root/cess_client.yaml
-
-
-
-### (T)File delete
-
-* instruction：
-
-  ​		Delete file meta information.
-
-* usage:
-
+  ```shell
   ​		cessctl file delete <fileid>
-
-  ​		fileid：file unique id
-
+  ```
+  
 * example：
 
-  ​		cessctl file delete 1506154108548026368 -c /root/cess_client.yaml
+  [root@iZbp18tsw8ozfwv5y1z6avZ admin]# cessctl file delete 1517061233797238784
+  
+  2022/04/21 17:02:57 Connecting to ws://
+  
+  [OK]Delete fileid:1517061233797238784 success!
+
+
