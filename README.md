@@ -105,10 +105,13 @@ Please edit the configuration of the above file, press the ESC key on the keyboa
 
 ## **Global command**
 
+```shell
 -h,--help：Get the specific operation method of the command line
+```
 
+```shell
 -c,--config：Absolute path, the address of the configuration file
-
+```
 
 
 ## **Command group**
@@ -140,9 +143,9 @@ Please edit the configuration of the above file, press the ESC key on the keyboa
   
 * example：
 
-  
+  ```shell
   cessctl trade obtain 0x2ed4a2c67291bf3eaa4de538ab120ba21b3de1b5704551864226d2fae8f87937 
-
+  ```
 
 
 
@@ -164,8 +167,9 @@ Please edit the configuration of the above file, press the ESC key on the keyboa
       
 * example：
 
-  [root@iZbp18tsw8ozfwv5y1z6avZ ~]# cessctl find price
-  
+  ```shell
+  # cessctl find price
+  ```
   
 
   2022/04/25 14:06:23 Connecting to ws://
@@ -189,12 +193,13 @@ Please edit the configuration of the above file, press the ESC key on the keyboa
   
 * example：
 
+  ```shell
   cessctl trade exp 1 20
   
   2022/04/21 16:05:14 Connecting to ws://
   
   [Success]Buy space on chain success!
-
+  ```
 
   Tips: 
   
@@ -217,7 +222,8 @@ Please edit the configuration of the above file, press the ESC key on the keyboa
 
 * example：
   
-  [root@iZbp18tsw8ozfwv5y1z6avZ admin]# cessctl find space
+  ```shell
+  # cessctl find space
   
   
   2022/04/21 16:09:55 Connecting to ws://
@@ -229,7 +235,7 @@ Please edit the configuration of the above file, press the ESC key on the keyboa
   UsedSpace:24582(KB)
   
   RemainingSpace:3121146(KB)
-  
+  ```
 
 
 
@@ -248,7 +254,8 @@ Please edit the configuration of the above file, press the ESC key on the keyboa
   
 * example：
 
-  [root@iZbp18tsw8ozfwv5y1z6avZ admin]# cessctl file upload /root/test.txt 3 1234567887654321
+  ```shell
+  # cessctl file upload /root/test.txt 3 1234567887654321
   
   [Warming] Do you want to upload your file without private key (it's means your file status is public)?
   
@@ -260,9 +267,8 @@ Please edit the configuration of the above file, press the ESC key on the keyboa
   
   [██████████████████████████████████████████████████]100%         1/1
   
-  [Success]:upload file:/root/test.txt successful![root@iZbp18tsw8ozfwv5y1z6avZ admin]#
-
-
+  [Success]:upload file:/root/test.txt successful!#
+  ```
 
 ### (E)Download the specific file
 
@@ -278,14 +284,15 @@ Please edit the configuration of the above file, press the ESC key on the keyboa
   
 * example：
 
-  [root@iZbp18tsw8ozfwv5y1z6avZ admin]# cessctl file download 1517061233797238784
+  ```shell
+  # cessctl file download 1517061233797238784
   
   2022/04/21 16:58:39 Connecting to ws://
   
   [██████████████████████████████████████████████████]100%         1/1
   
   [OK]:File 'test.txt' has been downloaded to the directory :/root/installpath/test.txt
-
+  ```
 
 
 ### (F)Delete the specific file
@@ -302,10 +309,11 @@ Please edit the configuration of the above file, press the ESC key on the keyboa
   
 * example：
 
-  [root@iZbp18tsw8ozfwv5y1z6avZ admin]# cessctl file delete 1517061233797238784
+  ```shell
+  # cessctl file delete 1517061233797238784
   
   2022/04/21 17:02:57 Connecting to ws://
   
   [OK]Delete fileid:1517061233797238784 success!
-
+  ```
 
