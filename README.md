@@ -135,7 +135,7 @@ Please edit the configuration of the above file, press the ESC key on the keyboa
 * usage：
 
   ```shell
-  ​		cessctl trade obtain <public key>
+  cessctl trade obtain <public key>
   ```
   
 * example：
@@ -159,7 +159,7 @@ Please edit the configuration of the above file, press the ESC key on the keyboa
 
 
   ```shell
-  ​		cessctl find price
+  cessctl find price
   ```
       
 * example：
@@ -184,7 +184,7 @@ Please edit the configuration of the above file, press the ESC key on the keyboa
 * usage：
 
   ```shell
-  ​		cessctl trade exp <quantity><duration>
+  cessctl trade exp <quantity><duration>
   ```
   
 * example：
@@ -212,7 +212,7 @@ Please edit the configuration of the above file, press the ESC key on the keyboa
 * usage：
 
   ```shell
-  ​		cessctl find space
+  cessctl find space
   ```
 
 * example：
@@ -243,7 +243,7 @@ Please edit the configuration of the above file, press the ESC key on the keyboa
 * usage：
 
   ```shell
-  ​		cessctl upload file <filepath><backups><private key>
+  cessctl upload file <filepath><backups><private key>
   ```
   
 * example：
@@ -273,7 +273,7 @@ Please edit the configuration of the above file, press the ESC key on the keyboa
 * usage：
 
   ```shell
-  ​		cessctl file download <fileid>
+  cessctl file download <fileid>
   ```
   
 * example：
@@ -297,7 +297,7 @@ Please edit the configuration of the above file, press the ESC key on the keyboa
 * usage：
 
   ```shell
-  ​		cessctl file delete <fileid>
+  cessctl file delete <fileid>
   ```
   
 * example：
