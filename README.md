@@ -141,6 +141,7 @@ Please edit the configuration of the above file, press the ESC key on the keyboa
   
 * example：
 
+  
   cessctl trade obtain 0x2ed4a2c67291bf3eaa4de538ab120ba21b3de1b5704551864226d2fae8f87937 
 
 
@@ -217,10 +218,10 @@ Please edit the configuration of the above file, press the ESC key on the keyboa
 
 * example：
   
-[root@iZbp18tsw8ozfwv5y1z6avZ admin]# cessctl find space
+  [root@iZbp18tsw8ozfwv5y1z6avZ admin]# cessctl find space
   
   
-2022/04/21 16:09:55 Connecting to ws://
+  2022/04/21 16:09:55 Connecting to ws://
 
   ——You Purchased Space——
   
@@ -234,7 +235,7 @@ Please edit the configuration of the above file, press the ESC key on the keyboa
 
 
 
-### (D)Upload files
+### (D)Upload the specific files
 
 * instruction：
 
@@ -264,7 +265,7 @@ Please edit the configuration of the above file, press the ESC key on the keyboa
 
 
 
-### (E)Download file
+### (E)Download the specific file
 
 * instruction：
 
@@ -278,17 +279,17 @@ Please edit the configuration of the above file, press the ESC key on the keyboa
   
 * example：
 
-    [root@iZbp18tsw8ozfwv5y1z6avZ admin]# cessctl file download 1517061233797238784
+  [root@iZbp18tsw8ozfwv5y1z6avZ admin]# cessctl file download 1517061233797238784
   
-    2022/04/21 16:58:39 Connecting to ws://
+  2022/04/21 16:58:39 Connecting to ws://
   
-    [██████████████████████████████████████████████████]100%         1/1
+  [██████████████████████████████████████████████████]100%         1/1
   
-    [OK]:File 'test.txt' has been downloaded to the directory :/root/installpath/test.txt
+  [OK]:File 'test.txt' has been downloaded to the directory :/root/installpath/test.txt
 
 
 
-### (F)Delete file
+### (F)Delete the specific file
 
 * instruction：
 
