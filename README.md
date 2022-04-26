@@ -101,7 +101,6 @@ Please edit the configuration of the above file, press the ESC key on the keyboa
 
 **Hardware requirement:**
 * :one: Memory 8GB and above
-* :two: internet
 
 
 ## **Global command**
