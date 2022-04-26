@@ -1,6 +1,14 @@
 # **CESS-Portal**
 
-cess-portal is the client of the cess project. By using some simple commands of cess-portal, you can easily realize a series of operations such as purchasing space, querying space, uploading/downloading files, and querying file information on the Linux system.
+CESS-Portal is the storage client of the CESS project. By using some simple commands of CESS-Portal, you can easily realize a series of operations such as purchasing space, querying space, uploading/downloading files, and querying file information on the Linux system.
+
+CESS-Portal characteristics of operation function is shown below:
+
+- Supports enterprise-level commercial storage service
+- Efficient data retrieval and return ability
+- low data redundancy during storage
+- provides space storage service
+- high data security
 
 # **Build Code**
 
@@ -42,6 +50,22 @@ vim install-cessctl.sh
 
 Let me introduce the content of the configuration file of the one-click installation script.
 
+
+## **Configuration file**
+
+boardPath：Absolute path, the data kanban location of the result output; if not defined, output to: /etc/cess.d file.
+
+cessRpcAddr：Chain interaction address, the address that interacts with the chain.
+
+faucetAddress：Faucet address, the address to get coins from the faucet.
+
+idAccountPhraseOrSeed：Account private key, which is used as the user's mnemonic when signing transactions.
+
+accountPublicKey：The publicKey of public key conversion, used to query data on the chain, and the conversion address: https://polkadot.subscan.io/tools/ss58_transform.
+
+walletAddress：The wallet public key address, the owner id of the file when uploading the file metadata.
+
+
 ```shell
 ##The log file of the client's operation output, your operation results will be recorded in the output.log file under this file
 boardPath='/root'
@@ -71,163 +95,38 @@ Please edit the configuration of the above file, press the ESC key on the keyboa
 
 ## Prerequisites
 
+**Software requirement:**
 * :one: Centos
 * :two: Go 1.17 and above
 
-## **Command group**
-
-| command group name | subcommand name | features                                                     |
-| ------------------ | --------------- | ------------------------------------------------------------ |
-| find               | price           | Query the current storage price per MB                       |
-| find               | space           | Query currently used space, purchased space, remaining space |
-| find               | file            | Query file or file list                                      |
-| file               | upload          | upload files                                                 |
-| file               | download        | download file                                                |
-| trade              | exp             | buy storage                                                  |
-| trade              | obtain          | Get coins from the faucet                                    |
-| file               | delete          | delete file                                                  |
-
+**Hardware requirement:**
+* :one: Memory 8GB and above
 
 
 ## **Global command**
 
 -h,--help：Get the specific operation method of the command line
 
--c,--config：Absolute path, the address of the configuration file; used when not defined:/etc/cess.d/cess_client.yaml
+-c,--config：Absolute path, the address of the configuration file
 
 
 
-## **Configuration file**
+## **Command group**
 
-boardPath：Absolute path, the data kanban location of the result output; if not defined, output to: /etc/cess.d file.
+| command group name | subcommand name | features                                                     |
+| ------------------ | --------------- | ------------------------------------------------------------ |
+| find               | price           | Query the current storage price per MB                       |
+| find               | space           | Query real-time storage space information                    |
+| find               | file            | Query the uploaded files information                         |
+| file               | upload          | Upload the specific files                                    |
+| file               | download        | Download the specific file                                   |
+| trade              | exp             | Buy CESS storage space                                       |
+| trade              | obtain          | Top up tokens from the faucet                                |
+| file               | delete          | Delete the specifc file                                      |
 
-cessRpcAddr：Chain interaction address, the address that interacts with the chain.
 
-faucetAddress：Faucet address, the address to get coins from the faucet.
 
-idAccountPhraseOrSeed：Account private key, which is used as the user's mnemonic when signing transactions.
-
-accountPublicKey：The publicKey of public key conversion, used to query data on the chain, and the conversion address: https://polkadot.subscan.io/tools/ss58_transform.
-
-walletAddress：The wallet public key address, the owner id of the file when uploading the file metadata.
-
-
-
-## **Operate example**
-
-### (A)Query storage unit price
-
-* instruction：
-
-  ​		Chain query and displays the current lease storage space Price (Unit: Cess / MB)
-
-* usage：
-
-  ​		cessctl find price
-
-* example：
-
-  ​		cessctl find price -c /root/cess_client.yaml
-
-
-
-### (B)Check remaining space
-
-* instruction：
-
-  ​		Chain query current account purchased storage space usage (used and remaining)
-
-* usage：
-
-  ​		cessctl find space
-
-* example：
-
-  ​		cessctl find space -c /root/cess_client.yaml
-
-
-
-### (C)Query file information
-
-* instruction：
-
-  ​		Chain query all file information that has been uploaded by the current account (sorting, keyword retrieval...)
-
-* usage：
-
-  ​		cessctl find file <fileid>
-
-  ​		If fileid is vaild, output all file list information
-
-* example：
-
-  ​		Query single file information:cessctl find file 1483720947931287552 -c /root/cess_client.yaml
-
-  ​		Query file list information:cessctl find file -c /root/cess_client.yaml
-
-
-
-### (D)Upload files
-
-* instruction：
-
-  ​		Send local source files to scheduling nodes
-
-* usage：
-
-  ​		cessctl upload file <filepath> <downloadfee>
-
-  ​		filepath：The absolute path of the file, not a folder
-
-  ​		downloadfee：The cost of downloading the file, in cess
-
-* example：
-
-  ​		cessctl upload file /root/cess_client.yaml 10 -c /root/cess_client.yaml
-
-
-
-### (E)Download file
-
-* instruction：
-
-  ​		Download file based on fileid
-
-* usage：
-
-  ​		cessctl download <fileid>
-
-  ​		fileid：The unique id of the file
-
-* example：
-
-  ​		cessctl download file 1483720947931287552 -c /root/cess_client.yaml
-
-
-
-### (F)Buy space
-
-* instruction：
-
-  ​		Send on-chain transactions, buy space
-
-* usage：
-
-  ​		download exp <spacequantity> <expected price>
-
-  ​		spacequantity：The number of expansion capacity, unit: 1/512MB
-
-  ​		expected price：The maximum acceptable price for buying space, in cess; if it is empty, all prices are accepted
-
-* example：
-
-  ​		expected price 20cess：download exp 1 20 -c /root/cess_client.yaml
-
-  ​		All price accepted：download exp 1 -c /root/cess_client.yaml
-
-
-
-### (Y)Tap to get tokens
+## Top up tokens from the faucet
 
 * instruction：
 
@@ -235,28 +134,178 @@ walletAddress：The wallet public key address, the owner id of the file when upl
 
 * usage：
 
-  ​		cessctl obtain <address>
-
-  ​		address：publickey of the account
-
+  ```shell
+  ​		cessctl trade obtain <public key>
+  ```
+  
 * example：
 
-  ​		cessctl obtain 0x2ed4a2c67291bf3eaa4de538ab120ba21b3de1b5704551864226d2fae8f87937 -c /root/cess_client.yaml
+  
+  cessctl trade obtain 0x2ed4a2c67291bf3eaa4de538ab120ba21b3de1b5704551864226d2fae8f87937 
 
 
 
-### (T)File delete
+
+
+## **Operate example on Linux**
+
+### (A)Query the current storage price per MB
 
 * instruction：
 
-  ​		Delete file meta information.
+  ​		Query the current storage price per MB(Unit: TCESS / MB)
 
-* usage:
+* usage：
 
-  ​		cessctl file delete <fileid>
 
-  ​		fileid：file unique id
-
+  ```shell
+  ​		cessctl find price
+  ```
+      
 * example：
 
-  ​		cessctl file delete 1506154108548026368 -c /root/cess_client.yaml
+  [root@iZbp18tsw8ozfwv5y1z6avZ ~]# cessctl find price
+  
+  
+
+  2022/04/25 14:06:23 Connecting to ws://
+
+
+  [Success]The current storage price is:8.342023 per (MB)
+
+
+
+### (B)Buy CESS storage space 
+
+* instruction：
+
+  ​		buy the storage space
+  
+* usage：
+
+  ```shell
+  ​		cessctl trade exp <quantity><duration>
+  ```
+  
+* example：
+
+  cessctl trade exp 1 20
+  
+  2022/04/21 16:05:14 Connecting to ws://
+  
+  [Success]Buy space on chain success!
+
+
+  Tips: 
+  
+  [quantity] - The amount of space you want to buy, the unit is GB   
+  [duration] - The Time of storage space you want to use, the unit is month
+
+
+
+### (C)Query real-time storage space information 
+
+* instruction：
+
+  ​		Query storage space information include storage space, purchased storage space, and remaining storage space
+
+* usage：
+
+  ```shell
+  ​		cessctl find space
+  ```
+
+* example：
+  
+  [root@iZbp18tsw8ozfwv5y1z6avZ admin]# cessctl find space
+  
+  
+  2022/04/21 16:09:55 Connecting to ws://
+
+  ——You Purchased Space——
+  
+  PurchasedSpace:3145728(KB)
+  
+  UsedSpace:24582(KB)
+  
+  RemainingSpace:3121146(KB)
+  
+
+
+
+
+### (D)Upload the specific files
+
+* instruction：
+
+  ​		Send local source files to scheduling nodes
+
+* usage：
+
+  ```shell
+  ​		cessctl upload file <filepath><backups><private key>
+  ```
+  
+* example：
+
+  [root@iZbp18tsw8ozfwv5y1z6avZ admin]# cessctl file upload /root/test.txt 3 1234567887654321
+  
+  [Warming] Do you want to upload your file without private key (it's means your file status is public)?
+  
+  You can type the 'private key' or enter with nothing to jump it:
+  
+  2022/04/21 16:42:38 Connecting to ws://
+
+  File meta info upload:success! ,fileid is:1517061233797238784
+  
+  [██████████████████████████████████████████████████]100%         1/1
+  
+  [Success]:upload file:/root/test.txt successful![root@iZbp18tsw8ozfwv5y1z6avZ admin]#
+
+
+
+### (E)Download the specific file
+
+* instruction：
+
+  ​		Download specific file based on fileid
+
+* usage：
+
+  ```shell
+  ​		cessctl file download <fileid>
+  ```
+  
+* example：
+
+  [root@iZbp18tsw8ozfwv5y1z6avZ admin]# cessctl file download 1517061233797238784
+  
+  2022/04/21 16:58:39 Connecting to ws://
+  
+  [██████████████████████████████████████████████████]100%         1/1
+  
+  [OK]:File 'test.txt' has been downloaded to the directory :/root/installpath/test.txt
+
+
+
+### (F)Delete the specific file
+
+* instruction：
+
+  ​		Delete the specific file meta information
+
+* usage：
+
+  ```shell
+  ​		cessctl file delete <fileid>
+  ```
+  
+* example：
+
+  [root@iZbp18tsw8ozfwv5y1z6avZ admin]# cessctl file delete 1517061233797238784
+  
+  2022/04/21 17:02:57 Connecting to ws://
+  
+  [OK]Delete fileid:1517061233797238784 success!
+
+
