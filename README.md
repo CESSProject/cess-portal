@@ -125,7 +125,7 @@ Please edit the configuration of the above file, press the ESC key on the keyboa
 | file               | download        | Download the specific file                                   |
 | trade              | exp             | Buy CESS storage space                                       |
 | trade              | obtain          | Top up tokens from the faucet                                |
-| file               | delete          | Delete the specifc file                                      |
+| file               | delete          | Delete the specific file                                      |
 
 
 
