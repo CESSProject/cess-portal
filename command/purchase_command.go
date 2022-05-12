@@ -11,31 +11,31 @@ import (
 	"strings"
 )
 
-func NewTradeCommand() *cobra.Command {
+func NewPurchaseCommand() *cobra.Command {
 	tc := &cobra.Command{
 		Use:   "trade <subcommand>",
-		Short: "Trade related commands",
+		Short: "Purchase commands use for implement all of related transaction function",
 	}
 
-	tc.AddCommand(NewTradeBuySpaceCommand())
-	tc.AddCommand(NewTradeObtainCommand())
+	tc.AddCommand(NewPurchaseBuySpaceCommand())
+	tc.AddCommand(NewPurchaseObtainCommand())
 
 	return tc
 }
 
-func NewTradeBuySpaceCommand() *cobra.Command {
+func NewPurchaseBuySpaceCommand() *cobra.Command {
 	tbs := &cobra.Command{
-		Use:   "exp <spacequantity>  <expected price>",
-		Short: "exp refers to make your space bigger,unit:[1/512G].",
+		Use:   "storage <spacequantity>  <expected price>",
+		Short: "Buy CESS storage space",
 		Long:  `<spacequantity> buy space(not nullable); <expected price> set the expected price(integer) for the purchase(nullable) if null accept the storage unit price at the current moment.`,
 
-		Run: TradeBuySpaceCommandFunc,
+		Run: PurchaseBuySpaceCommandFunc,
 	}
 
 	return tbs
 }
 
-func TradeBuySpaceCommandFunc(cmd *cobra.Command, args []string) {
+func PurchaseBuySpaceCommandFunc(cmd *cobra.Command, args []string) {
 	InitComponents(cmd)
 	var expected = 0
 	var quantity = 0
@@ -65,19 +65,19 @@ func TradeBuySpaceCommandFunc(cmd *cobra.Command, args []string) {
 	client.Expansion(quantity, duration, expected)
 }
 
-func NewTradeObtainCommand() *cobra.Command {
+func NewPurchaseObtainCommand() *cobra.Command {
 	tbs := &cobra.Command{
-		Use:   "obtain <address>",
-		Short: "obtain refers to the trade with cess chian",
+		Use:   "free <address>",
+		Short: "Top up free TCESS from the faucet",
 		Long:  `Obtain command get a certain amount of tokens through the faucet service.`,
 
-		Run: TradeObtainCommandFunc,
+		Run: PurchaseObtainCommandFunc,
 	}
 
 	return tbs
 }
 
-func TradeObtainCommandFunc(cmd *cobra.Command, args []string) {
+func PurchaseObtainCommandFunc(cmd *cobra.Command, args []string) {
 	InitComponents(cmd)
 	if len(args) == 0 {
 		fmt.Printf("[Error]Please fill in the account public key! Usage: cessctl trade obtain <public key>")

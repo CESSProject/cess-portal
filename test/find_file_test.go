@@ -15,6 +15,6 @@ func TestFindFile(t *testing.T) {
 	//param
 	fileid := ""
 
-	err := client.FindFile(fileid)
+	err := client.QueryFile(fileid)
 	t.Fatal(err)
 }

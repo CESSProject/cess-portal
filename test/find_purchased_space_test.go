@@ -12,6 +12,6 @@ func TestFindPurchasedSpace(t *testing.T) {
 	conf.ClientConf.ChainData.AccountPublicKey = ""
 	conf.ClientConf.BoardInfo.BoardPath = ""
 
-	err := client.FindPurchasedSpace()
+	err := client.QueryPurchasedSpace()
 	t.Fatal(err)
 }

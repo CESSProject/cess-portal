@@ -12,6 +12,6 @@ func TestFindPrice(t *testing.T) {
 	conf.ClientConf.ChainData.AccountPublicKey = ""
 	conf.ClientConf.BoardInfo.BoardPath = ""
 
-	err := client.FindPrice()
+	err := client.QueryPrice()
 	t.Fatal(err)
 }

@@ -9,9 +9,9 @@ import (
 )
 
 /*
-FindPurchasedSpace means to query the space that the current user has purchased and the space that has been used
+QueryPurchasedSpace means to query the space that the current user has purchased and the space that has been used
 */
-func FindPurchasedSpace() error {
+func QueryPurchasedSpace() error {
 	chain.Chain_Init()
 
 	var ci chain.CessInfo
@@ -30,9 +30,9 @@ func FindPurchasedSpace() error {
 }
 
 /*
-FindPrice means to get real-time price of storage space
+QueryPrice means to get real-time price of storage space
 */
-func FindPrice() error {
+func QueryPrice() error {
 	chain.Chain_Init()
 
 	var ci chain.CessInfo
@@ -71,16 +71,16 @@ func FindPrice() error {
 
 	result := (1024 / float64((ava - purc))) * 1000
 
-	fmt.Printf("[Success]The current storage price is:%f per (MB)\n", result)
-	logger.OutPutLogger.Sugar().Infof("[Success]The current storage price is:%f per (MB)\n", result)
+	fmt.Printf("[Success]The current storage price is:%f per (G)\n", result*1024)
+	logger.OutPutLogger.Sugar().Infof("[Success]The current storage price is:%f per (G)\n", result*1024)
 	return nil
 }
 
 /*
-FindFile means to query the files uploaded by the current user
+QueryFile means to query the files uploaded by the current user
 fileid:fileid of the file to look for
 */
-func FindFile(fileid string) error {
+func QueryFile(fileid string) error {
 	chain.Chain_Init()
 
 	var ci chain.CessInfo

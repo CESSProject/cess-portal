@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/centrifuge/go-substrate-rpc-client/v4/types"
 	"github.com/pkg/errors"
+	"strconv"
 )
 
 //UserHoldSpaceDetails means to get specific information about user space
@@ -43,10 +44,13 @@ func (ci *CessInfo) UserHoldSpaceDetails() (UserHoldSpaceDetails, error) {
 }
 
 func (userinfo UserHoldSpaceDetails) String() string {
+	PurchasedSpace, _ := strconv.Atoi(userinfo.PurchasedSpace.String())
+	UsedSpace, _ := strconv.Atoi(userinfo.UsedSpace.String())
+	RemainingSpace, _ := strconv.Atoi(userinfo.RemainingSpace.String())
 	ret := "———————————————————You Purchased Space———————————————————\n"
-	ret += "                   PurchasedSpace:" + userinfo.PurchasedSpace.String() + "(KB)\n"
-	ret += "                   UsedSpace:" + userinfo.UsedSpace.String() + "(KB)\n"
-	ret += "                   RemainingSpace:" + userinfo.RemainingSpace.String() + "(KB)\n"
+	ret += "                   PurchasedSpace:" + strconv.Itoa(PurchasedSpace/1024) + "(MB)\n"
+	ret += "                   UsedSpace:" + strconv.Itoa(UsedSpace/1024) + "(MB)\n"
+	ret += "                   RemainingSpace:" + strconv.Itoa(RemainingSpace/1024) + "(MB)\n"
 	ret += "—————————————————————————————————————————————————————————"
 	return ret
 }

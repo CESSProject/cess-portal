@@ -29,6 +29,9 @@ backups:Number of backups of files that need to be uploaded
 PrivateKey:Encrypted password for uploaded files
 */
 func FileUpload(path, backups, PrivateKey string) error {
+	if len(PrivateKey) != 16 && len(PrivateKey) != 24 && len(PrivateKey) != 32 {
+		return errors.New("[Error]The privatekey must be 16,24,32 bits long")
+	}
 	chain.Chain_Init()
 	file, err := os.Stat(path)
 	if err != nil {
@@ -416,6 +419,9 @@ func FileDownload(fileid string) error {
 		if len(filePWD) == 0 {
 			return nil
 		}
+		if len(filePWD) != 16 && len(filePWD) != 24 && len(filePWD) != 32 {
+			return errors.New("[Error]The privatekey must be 16,24,32 bits long")
+		}
 		encodefile, err := ioutil.ReadFile(filepath.Join(conf.ClientConf.PathInfo.InstallPath, string(fileinfo.File_Name[:])))
 		if err != nil {
 			fmt.Printf("%s[Error]:Decode file:%s fail%s error:%s\n", tools.Red, filepath.Join(conf.ClientConf.PathInfo.InstallPath, string(fileinfo.File_Name[:])), tools.Reset, err)
@@ -474,6 +480,9 @@ func FileDecode(path string) error {
 	fmt.Println("Please enter the file's password:")
 	fmt.Print(">")
 	psw, _ := gopass.GetPasswdMasked()
+	if len(psw) != 16 && len(psw) != 24 && len(psw) != 32 {
+		return errors.New("[Error]The password must be 16,24,32 bits long")
+	}
 	encodefile, err := ioutil.ReadFile(path)
 	if err != nil {
 		fmt.Printf("%s[Error]Failed to read file, please check file integrity%s\n", tools.Red, tools.Reset)
