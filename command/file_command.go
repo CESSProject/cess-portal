@@ -19,7 +19,7 @@ func NewFileCommand() *cobra.Command {
 	fc.AddCommand(NewFileUploadCommand())
 	fc.AddCommand(NewFileDownloadCommand())
 	fc.AddCommand(NewFileDeleteCommand())
-	fc.AddCommand(NewFileDecodeCommand())
+	fc.AddCommand(NewFileDecryptCommand())
 
 	return fc
 }
@@ -28,7 +28,7 @@ func NewFileUploadCommand() *cobra.Command {
 	cc := &cobra.Command{
 		Use:   "upload <filepath> <backups> <private key>",
 		Short: "Upload the any specific file you want",
-		Long:  `Upload command send local source files to scheduling nodes.`,
+		Long:  `Upload command mean send the local source files to CESS nework scheduling nodes; <private key>you can input any 16 numbers to be your private key, then others people unable to decode your file data. if you choose private key is nil, then system is default you file become public file.`,
 
 		Run: FileUploadCommandFunc,
 	}
@@ -54,7 +54,7 @@ func NewFileDownloadCommand() *cobra.Command {
 	cc := &cobra.Command{
 		Use:   "download <fileid>",
 		Short: "Download the any specific file you want",
-		Long:  `Download command download file based on fileId.`,
+		Long:  `Download command mean download file from the CESS networks based on fileId.`,
 
 		Run: FileDownloadCommandFunc,
 	}
@@ -76,7 +76,7 @@ func NewFileDeleteCommand() *cobra.Command {
 	cc := &cobra.Command{
 		Use:   "delete <fileid>",
 		Short: "Delete the any specific file you want",
-		Long:  `Deleting a file means removing the file from CESS,But there may be a delay.`,
+		Long:  `Delete command means removing the file from CESS networks`,
 
 		Run: FileDeleteCommandFunc,
 	}
@@ -94,24 +94,24 @@ func FileDeleteCommandFunc(cmd *cobra.Command, args []string) {
 
 }
 
-func NewFileDecodeCommand() *cobra.Command {
+func NewFileDecryptCommand() *cobra.Command {
 	cc := &cobra.Command{
 		Use:   "decode <filepath>",
 		Short: "Decrypt the any specific file again when you failed file decrypt first chance",
 		Long:  `File decode means that if the file is not decrypted when you download it, it can be decode by this method.Please enter absolute path.`,
 
-		Run: FileDecodeCommandFunc,
+		Run: FileDecryptCommandFunc,
 	}
 
 	return cc
 }
 
-func FileDecodeCommandFunc(cmd *cobra.Command, args []string) {
+func FileDecryptCommandFunc(cmd *cobra.Command, args []string) {
 	InitComponents(cmd)
 
 	if len(args) == 0 {
 		fmt.Printf("Please enter the path of the file to be decoded'\n")
 		os.Exit(conf.Exit_CmdLineParaErr)
 	}
-	client.FileDecode(args[0])
+	client.FileDecrypt(args[0])
 }

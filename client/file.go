@@ -466,10 +466,10 @@ func FileDelete(fileid string) error {
 }
 
 /*
-FileDecode means that if the file is not decrypted when downloading the file, it can be decrypted by this method
+FileDecrypt means that if the file is not decrypted when downloading the file, it can be decrypted by this method
 When you download the file if it is not decode, you can decode it this way
 */
-func FileDecode(path string) error {
+func FileDecrypt(path string) error {
 	_, err := os.Stat(path)
 	if err != nil {
 		fmt.Printf("%s[Error]There is no such file, please confirm the correct location of the file, please enter the absolute path of the file%s\n", tools.Red, tools.Reset)

@@ -23,7 +23,7 @@ func NewQueryPriceCommand() *cobra.Command {
 	cc := &cobra.Command{
 		Use:   "price",
 		Short: "Query the current storage space price(TCESS/GB)",
-		Long:  `Price command chain to query and display the current storage space rental unit price (unit: MB).`,
+		Long:  `Price command use for query  and display the CESS network real-time storage space unit price (unit: TCESS/G).`,
 
 		Run: QueryPriceCommandFunc,
 	}
@@ -41,7 +41,7 @@ func NewQueryPurchasedSpaceCommand() *cobra.Command {
 	cc := &cobra.Command{
 		Use:   "space",
 		Short: "Query real-time storage space detailed information",
-		Long: `Space command chain query current account purchased storage space usage (used and remaining).
+		Long: `Space command use for query and display current account purchased storage space usage (used and remaining)..
 `,
 
 		Run: QueryPurchasedSpaceCommand,
@@ -60,7 +60,7 @@ func NewQueryFileCommand() *cobra.Command {
 	cc := &cobra.Command{
 		Use:   "file <fileId>",
 		Short: "Query the uploaded files information",
-		Long:  `File command chain query file information ,If <fileId> is null then show the file list`,
+		Long:  `File command use for query the CESS chain uploaded file information, if you choose do not input in the <fileid> then show the all uploaded file list information. `,
 
 		Run: QueryFileCommand,
 	}
