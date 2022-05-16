@@ -49,25 +49,18 @@ type FileInfo struct {
 	FileDupl    []FileDuplicateInfo `json:"file_dupl"`   //File backup information list
 }
 type FileDuplicateInfo struct {
-	DuplId    types.Bytes     `json:"dupl_id"`    //Backup id
-	RandKey   types.Bytes     `json:"rand_key"`   //Random key
-	SliceNum  types.U16       `json:"slice_num"`  //Number of slices
-	FileSlice []FileSliceInfo `json:"file_slice"` //Slice information list
+	MinerId   types.U64
+	BlockNum  types.U32
+	ScanSize  types.U32
+	Acc       types.AccountID
+	MinerIp   types.Bytes
+	DuplId    types.Bytes
+	RandKey   types.Bytes
+	BlockInfo []BlockInfo
 }
-
-type FileSliceInfo struct {
-	SliceId   types.Bytes   `json:"slice_id"`   //Slice id
-	SliceSize types.U32     `json:"slice_size"` //Slice size
-	SliceHash types.Bytes   `json:"slice_hash"` //Slice hash
-	FileShard FileShardInfo `json:"file_shard"` //Shard information
-}
-
-type FileShardInfo struct {
-	DataShardNum  types.U8      `json:"data_shard_num"`  //Number of data shard
-	RedunShardNum types.U8      `json:"redun_shard_num"` //Number of redundant shard
-	ShardHash     []types.Bytes `json:"shard_hash"`      //Shard hash list
-	ShardAddr     []types.Bytes `json:"shard_addr"`      //Store miner service addr list
-	Peerid        []types.U64   `json:"wallet_addr"`     //Store miner wallet addr list
+type BlockInfo struct {
+	BlockIndex types.U32
+	BlockSize  types.U32
 }
 
 type FileList struct {
