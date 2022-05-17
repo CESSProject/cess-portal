@@ -13,7 +13,7 @@ import (
 
 func NewPurchaseCommand() *cobra.Command {
 	tc := &cobra.Command{
-		Use:   "trade <subcommand>",
+		Use:   "purchase <subcommand>",
 		Short: "Purchase commands use for implement all of related transaction function",
 	}
 
@@ -42,23 +42,23 @@ func PurchaseBuySpaceCommandFunc(cmd *cobra.Command, args []string) {
 	var duration = 0
 	var err error
 	if len(args) < 2 {
-		fmt.Printf("[Error]Please fill in the amount of storage space you want to purchase! Usage: cessctl trade exp <quantity> <duration>\n")
-		logger.OutPutLogger.Sugar().Infof("[Error]Please fill in the amount of storage space you want to purchase! Usage: cessctl trade exp <spacequantity> <duration>\n")
+		fmt.Printf("[Error]Please fill in the amount of storage space you want to purchase! Usage: cessctl purchase storage <space quantity> <space duration>\n")
+		logger.OutPutLogger.Sugar().Infof("[Error]Please fill in the amount of storage space you want to purchase! Usage: cessctl purchase storage <space quantity> <space duration>\n")
 		os.Exit(conf.Exit_CmdLineParaErr)
 	}
 	if len(args) > 2 {
 		expected, err = strconv.Atoi(args[2])
 		if err != nil || expected < 0 {
-			fmt.Printf("[Error]Please enter the correct number (integer) in <expected price>\n")
-			logger.OutPutLogger.Sugar().Infof("[Error]Please enter the correct number (integer) in <expected price>\n")
+			fmt.Printf("[Error]Please enter the correct number (integer) in <expected price> <space duration>\n")
+			logger.OutPutLogger.Sugar().Infof("[Error]Please enter the correct number (integer) in <expected price> or <space duration>\n")
 			os.Exit(conf.Exit_CmdLineParaErr)
 		}
 	}
 	quantity, err1 := strconv.Atoi(args[0])
 	duration, err2 := strconv.Atoi(args[1])
 	if err1 != nil || err2 != nil || quantity < 0 {
-		fmt.Printf("[Error]Please enter the correct number (integer) in <spacequantity>\n")
-		logger.OutPutLogger.Sugar().Infof("[Error]Please enter the correct number (integer) in <spacequantity>\n")
+		fmt.Printf("[Error]Please enter the correct number (integer) in <space quantity> or \n")
+		logger.OutPutLogger.Sugar().Infof("[Error]Please enter the correct number (integer) in <space quantity>\n")
 		os.Exit(conf.Exit_CmdLineParaErr)
 	}
 

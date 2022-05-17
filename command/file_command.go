@@ -65,7 +65,7 @@ func NewFileDownloadCommand() *cobra.Command {
 func FileDownloadCommandFunc(cmd *cobra.Command, args []string) {
 	InitComponents(cmd)
 	if len(args) == 0 {
-		fmt.Printf("Please enter the fileid of the downloaded file 'download <fileid>'\n")
+		fmt.Printf("Please enter the fileid of the download file 'file download <fileid>'\n")
 		os.Exit(conf.Exit_CmdLineParaErr)
 	}
 
@@ -87,7 +87,7 @@ func NewFileDeleteCommand() *cobra.Command {
 func FileDeleteCommandFunc(cmd *cobra.Command, args []string) {
 	InitComponents(cmd)
 	if len(args) == 0 {
-		fmt.Printf("Please enter the fileid of the deleted file'delete <fileid>'\n")
+		fmt.Printf("Please enter the fileid of the delete file'file delete <fileid>'\n")
 		os.Exit(conf.Exit_CmdLineParaErr)
 	}
 	client.FileDelete(args[0])
