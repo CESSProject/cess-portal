@@ -26,9 +26,9 @@ func NewFileCommand() *cobra.Command {
 
 func NewFileUploadCommand() *cobra.Command {
 	cc := &cobra.Command{
-		Use:   "upload <filepath> <backups> <private key>",
+		Use:   "upload <file path> <backups>",
 		Short: "Upload the any specific file you want",
-		Long:  `Upload command mean send the local source files to CESS nework scheduling nodes; <private key>you can input any 16 numbers to be your private key, then others people unable to decode your file data. if you choose private key is nil, then system is default you file become public file.`,
+		Long:  `Upload command mean send the local source files to CESS nework scheduling nodes;You can input any 16/24/32 length numbers to be your private key, then others people unable to decode your file data. if you choose private key is nil, then system is default you file become public file.`,
 
 		Run: FileUploadCommandFunc,
 	}
@@ -39,7 +39,7 @@ func NewFileUploadCommand() *cobra.Command {
 func FileUploadCommandFunc(cmd *cobra.Command, args []string) {
 	InitComponents(cmd)
 	if len(args) < 2 {
-		fmt.Printf("Please enter correct parameters 'upload <filepath> <backups> <private key>'\n")
+		fmt.Printf("Please enter correct parameters 'upload <filepath> <backups>'\n")
 		os.Exit(conf.Exit_CmdLineParaErr)
 	}
 
@@ -52,7 +52,7 @@ func FileUploadCommandFunc(cmd *cobra.Command, args []string) {
 
 func NewFileDownloadCommand() *cobra.Command {
 	cc := &cobra.Command{
-		Use:   "download <fileid>",
+		Use:   "download <file id>",
 		Short: "Download the any specific file you want",
 		Long:  `Download command mean download file from the CESS networks based on fileId.`,
 
@@ -74,7 +74,7 @@ func FileDownloadCommandFunc(cmd *cobra.Command, args []string) {
 
 func NewFileDeleteCommand() *cobra.Command {
 	cc := &cobra.Command{
-		Use:   "delete <fileid>",
+		Use:   "delete <file id>",
 		Short: "Delete the any specific file you want",
 		Long:  `Delete command means removing the file from CESS networks`,
 
@@ -96,7 +96,7 @@ func FileDeleteCommandFunc(cmd *cobra.Command, args []string) {
 
 func NewFileDecryptCommand() *cobra.Command {
 	cc := &cobra.Command{
-		Use:   "decode <filepath>",
+		Use:   "decode <file path>",
 		Short: "Decrypt the any specific file again when you failed file decrypt first chance",
 		Long:  `File decode means that if the file is not decrypted when you download it, it can be decode by this method.Please enter absolute path.`,
 

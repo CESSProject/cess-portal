@@ -15,9 +15,9 @@ idAccountPhraseOrSeed=''
 accountPublicKey=''
 ##Wallet public key
 walletAddress=''
-##The storage location of the file encryption password entered when uploading the file，using an absolute address
+##The storage location of the file encryption password entered when uploading the file,using an absolute address
 keyPath=''
-##The path to download the file，using an absolute address
+##The path to download the file,using an absolute address
 installPath=''
 
 

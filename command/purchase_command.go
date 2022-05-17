@@ -25,9 +25,9 @@ func NewPurchaseCommand() *cobra.Command {
 
 func NewPurchaseBuySpaceCommand() *cobra.Command {
 	tbs := &cobra.Command{
-		Use:   "storage <spacequantity>  <expected price>",
+		Use:   "storage <space quantity> <space duration> <expected price>",
 		Short: "Buy CESS storage space",
-		Long:  `<spacequantity> storage space quantity you want to buy，unit(TCESS/GB); <space duration> storage space you want to rental, unit(TCESS/Month); <expected price> set the expected price(integer),unit(TCESS/GB) for the purchase, if input null mean accept the CESS real-time storage unit price.`,
+		Long:  `<space quantity> storage space quantity you want to buy,unit:GB; <space duration> storage space you want to rental, unit:Month; <expected price> set the expected price(integer),unit(TCESS/GB) for the purchase, if input null mean accept the CESS real-time storage unit price.`,
 
 		Run: PurchaseBuySpaceCommandFunc,
 	}

@@ -58,9 +58,9 @@ func QueryPurchasedSpaceCommand(cmd *cobra.Command, args []string) {
 
 func NewQueryFileCommand() *cobra.Command {
 	cc := &cobra.Command{
-		Use:   "file <fileId>",
+		Use:   "file <file id>",
 		Short: "Query the uploaded files information",
-		Long:  `File command use for query the CESS chain uploaded file information, if you choose do not input in the <fileid> then show the all uploaded file list information. `,
+		Long:  `File command use for query the CESS chain uploaded file information, if you choose do not input in the <file id> then show the all uploaded file list information. `,
 
 		Run: QueryFileCommand,
 	}

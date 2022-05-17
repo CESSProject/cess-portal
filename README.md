@@ -15,7 +15,7 @@ First you need to download the cess-portal project from GitHub
 ```shell
 git clone https://github.com/CESSProject/cess-portal.git
 ```
-Then run the build.sh(On Linux) or build.bat(On Windows) script file in the ‘install_ctl‘ folder，You can compile this project on any system，Before downloading, please install golang on the system and the version must be over 1.17.
+Then run the build.sh(On Linux) or build.bat(On Windows) script file in the ‘install_ctl‘ folder,You can compile this project on any system,Before downloading, please install golang on the system and the version must be over 1.17.
 
 ```shell
 ##Compile with script
@@ -78,38 +78,39 @@ Please edit the configuration of the above file, press the ESC key on the keyboa
 
 | command group name | subcommand name | features                                                     |
 | ------------------ | --------------- | ------------------------------------------------------------ |
-| find               | price           | Query the current storage price per MB                       |
-| find               | space           | Query currently used space, purchased space, remaining space |
-| find               | file            | Query file or file list                                      |
+| query              | price           | Query the current storage price per MB                       |
+| query              | space           | Query currently used space, purchased space, remaining space |
+| query              | file            | Query file or file list                                      |
 | file               | upload          | upload files                                                 |
 | file               | download        | download file                                                |
-| trade              | exp             | buy storage                                                  |
-| trade              | obtain          | Get coins from the faucet                                    |
 | file               | delete          | delete file                                                  |
+| file               | decrypt         | decrypt encrypted files                                      |
+| purchase           | exp             | buy storage                                                  |
+| purchase           | storage         | Get coins from the faucet                                    |
 
 
 
 ## **Global command**
 
--h,--help：Get the specific operation method of the command line
+-h,--help:Get the specific operation method of the command line
 
--c,--config：Absolute path, the address of the configuration file; used when not defined:/etc/cess.d/cess_client.yaml
+-c,--config:Absolute path, the address of the configuration file; used when not defined:/etc/cess.d/cess_client.yaml
 
 
 
 ## **Configuration file**
 
-boardPath：Absolute path, the data kanban location of the result output; if not defined, output to: /etc/cess.d file.
+boardPath:Absolute path, the data kanban location of the result output; if not defined, output to: /etc/cess.d file.
 
-cessRpcAddr：Chain interaction address, the address that interacts with the chain.
+cessRpcAddr:Chain interaction address, the address that interacts with the chain.
 
-faucetAddress：Faucet address, the address to get coins from the faucet.
+faucetAddress:Faucet address, the address to get coins from the faucet.
 
-idAccountPhraseOrSeed：Account private key, which is used as the user's mnemonic when signing transactions.
+idAccountPhraseOrSeed:Account private key, which is used as the user's mnemonic when signing transactions.
 
-accountPublicKey：The publicKey of public key conversion, used to query data on the chain, and the conversion address: https://polkadot.subscan.io/tools/ss58_transform.
+accountPublicKey:The publicKey of public key conversion, used to query data on the chain, and the conversion address: https://polkadot.subscan.io/tools/ss58_transform.
 
-walletAddress：The wallet public key address, the owner id of the file when uploading the file metadata.
+walletAddress:The wallet public key address, the owner id of the file when uploading the file metadata.
 
 
 
@@ -117,146 +118,164 @@ walletAddress：The wallet public key address, the owner id of the file when upl
 
 ### (A)Query storage unit price
 
-* instruction：
+* instruction:
 
   ​		Chain query and displays the current lease storage space Price (Unit: Cess / MB)
 
-* usage：
+* usage:
 
-  ​		cessctl find price
+  ​		cessctl query price
 
-* example：
+* example:
 
-  ​		cessctl find price -c /root/cess_client.yaml
+  ​		cessctl query price -c /root/cess_client.yaml
 
 
 
 ### (B)Check remaining space
 
-* instruction：
+* instruction:
 
   ​		Chain query current account purchased storage space usage (used and remaining)
 
-* usage：
+* usage:
 
-  ​		cessctl find space
+  ​		cessctl query space
 
-* example：
+* example:
 
-  ​		cessctl find space -c /root/cess_client.yaml
+  ​		cessctl query space -c /root/cess_client.yaml
 
 
 
 ### (C)Query file information
 
-* instruction：
+* instruction:
 
   ​		Chain query all file information that has been uploaded by the current account (sorting, keyword retrieval...)
 
-* usage：
+* usage:
 
-  ​		cessctl find file <fileid>
+  ​		cessctl query file <file id>
 
-  ​		If fileid is vaild, output all file list information
+  ​		If fileid is vaild, output all uploaded file information of the user in the configuration file
 
-* example：
+* example:
 
-  ​		Query single file information:cessctl find file 1483720947931287552 -c /root/cess_client.yaml
+  ​		Query single file information:cessctl query file 1483720947931287552 -c /root/cess_client.yaml
 
-  ​		Query file list information:cessctl find file -c /root/cess_client.yaml
+  ​		Query file list information:cessctl query file -c /root/cess_client.yaml
 
 
 
 ### (D)Upload files
 
-* instruction：
+* instruction:
 
   ​		Send local source files to scheduling nodes
 
-* usage：
+* usage:
 
-  ​		cessctl upload file <filepath> <downloadfee>
+  ​		cessctl file upload <file path> <backups>
 
-  ​		filepath：The absolute path of the file, not a folder
+  ​		file path:The absolute path of the file, not a folder
 
-  ​		downloadfee：The cost of downloading the file, in cess
+  ​		backups:The number of backups of uploaded files in the CESS system. The more the number of backups, the more secure it is and the more space it consumes
 
-* example：
+* example:
 
-  ​		cessctl upload file /root/cess_client.yaml 10 -c /root/cess_client.yaml
+  ​		cessctl file upload /root/cess_client.yaml 3 -c /root/cess_client.yaml
 
 
 
 ### (E)Download file
 
-* instruction：
+* instruction:
 
-  ​		Download file based on fileid
+  ​		Download file based on fileid,Download to the installPath path in the configuration file
 
-* usage：
+* usage:
 
-  ​		cessctl download <fileid>
+  ​		cessctl file download <file id>
 
-  ​		fileid：The unique id of the file
+  ​		fileid:The unique id of the file
 
-* example：
+* example:
 
-  ​		cessctl download file 1483720947931287552 -c /root/cess_client.yaml
+  ​		cessctl file download 1483720947931287552 -c /root/cess_client.yaml
 
 
 
 ### (F)Buy space
 
-* instruction：
+* instruction:
 
   ​		Send on-chain transactions, buy space
 
-* usage：
+* usage:
 
-  ​		download exp <spacequantity> <expected price>
+  ​		cessctl purchase exp <space quantity> <space duration> <expected price>
 
-  ​		spacequantity：The number of expansion capacity, unit: 1/512MB
+  ​		space quantity:The number of expansion capacity, unit: 1/1GB
 
-  ​		expected price：The maximum acceptable price for buying space, in cess; if it is empty, all prices are accepted
+  ​		space duration:You want to buy space for several time units, unit: 1/1month
 
-* example：
+  ​		expected price:The maximum acceptable price for buying space, in cess; if it is empty, all prices are accepted
 
-  ​		expected price 20cess：download exp 1 20 -c /root/cess_client.yaml
+* example:
 
-  ​		All price accepted：download exp 1 -c /root/cess_client.yaml
+  ​		expected price 20cess:cessctl purchase exp 1 1 20 -c /root/cess_client.yaml
+
+  ​		All price accepted:cessctl purchase exp 1 1 -c /root/cess_client.yaml
 
 
 
 ### (Y)Tap to get tokens
 
-* instruction：
+* instruction:
 
   ​		Get a certain amount of tokens through the faucet service
 
-* usage：
+* usage:
 
-  ​		cessctl obtain <address>
+  ​		cessctl purchase free <address>
 
-  ​		address：publickey of the account
+  ​		address:publickey of the account
 
-* example：
+* example:
 
-  ​		cessctl obtain 0x2ed4a2c67291bf3eaa4de538ab120ba21b3de1b5704551864226d2fae8f87937 -c /root/cess_client.yaml
+  ​		cessctl purchase free 0x2ed4a2c67291bf3eaa4de538ab120ba21b3de1b5704551864226d2fae8f87937 -c /root/cess_client.yaml
 
 
 
 ### (T)File delete
 
-* instruction：
+* instruction:
 
   ​		Delete file meta information.
 
 * usage:
 
-  ​		cessctl file delete <fileid>
+  ​		cessctl file delete <file id>
 
-  ​		fileid：file unique id
+  ​		fileid:file unique id
 
-* example：
+* example:
 
   ​		cessctl file delete 1506154108548026368 -c /root/cess_client.yaml
+
+###  (L)File decrypt
+
+* instruction:
+
+  ​		Decrypt the files that have not been decrypted, and the decrypted files will be stored in the 'installPath' path of the configuration file.
+
+* usage:
+
+  ​		cessctl file decrypt  <file path>
+
+  ​		filepath:path to the file that needs to be decrypted
+
+* example:
+
+  ​		cessctl file decrypt /root/test.txt -c /root/cess_client.yaml
