@@ -91,20 +91,20 @@ func FileUpload(path, backups, PrivateKey string) error {
 		fmt.Println("[Error]Get scheduler randomly error! ", err)
 		return err
 	}
-	var filesize uint64
+	//var filesize uint64
 	fee := new(big.Int)
 
 	ci.IdentifyAccountPhrase = conf.ClientConf.ChainData.IdAccountPhraseOrSeed
 	ci.TransactionName = chain.UploadFileTransactionName
 
-	if file.Size()/1024 == 0 {
-		filesize = 1
-	} else {
-		filesize = uint64(file.Size() / 1024)
-	}
+	//if file.Size()/1024 == 0 {
+	//	filesize = 1
+	//} else {
+	//	filesize = uint64(file.Size() / 1024)
+	//}
 	fee.SetInt64(int64(0))
 
-	AsInBlock, err := ci.UploadFileMetaInformation(fileid, file.Name(), filehash, PrivateKey == "", uint8(spares), filesize, fee)
+	AsInBlock, err := ci.UploadFileMetaInformation(fileid, file.Name(), filehash, PrivateKey == "", uint8(spares), uint64(file.Size()), fee)
 	if err != nil {
 		fmt.Printf("\n[Error]Upload file meta information error:%s\n", err)
 		return err
@@ -165,7 +165,7 @@ func FileUpload(path, backups, PrivateKey string) error {
 			logger.OutPutLogger.Sugar().Infof("[Error]Error getting reply from schedule, transfer failed! ", err)
 			return err
 		}
-		if res.Code != 0 {
+		if res.Code != 200 {
 			fmt.Printf("\n[Error]Upload file fail!scheduler problem:%s\n", res.Msg)
 			logger.OutPutLogger.Sugar().Infof("\n[Error]Upload file fail!scheduler problem:%s\n", res.Msg)
 			os.Exit(conf.Exit_SystemErr)
@@ -377,7 +377,7 @@ func FileDownload(fileid string) error {
 
 		var respbody rpc.RespBody
 		err = proto.Unmarshal(resp.Body, &respbody)
-		if err != nil || respbody.Code != 0 {
+		if err != nil || respbody.Code != 200 {
 			fmt.Printf("[Error]Download file from CESS error:%s. reply message:%s\n", err, respbody.Msg)
 			logger.OutPutLogger.Sugar().Infof("[Error]Download file from CESS error:%s. reply message:%s\n", err, respbody.Msg)
 			return err

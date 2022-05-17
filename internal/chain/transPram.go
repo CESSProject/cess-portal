@@ -12,8 +12,8 @@ var (
 	PurchasedSpaceChainModule  = "FileBank"
 	PurchasedSpaceModuleMethod = "UserHoldSpaceDetails"
 
-	FindPriceChainModule  = "Sminer"
-	FindPriceModuleMethod = []string{"PurchasedSpace", "AvailableSpace"}
+	FindPriceChainModule  = "FileBank"
+	FindPriceModuleMethod = "UnitPrice"
 
 	FindFileChainModule  = "FileBank"
 	FindFileModuleMethod = []string{"File", "UserHoldFileList"}
@@ -70,96 +70,4 @@ type SchedulerInfo struct {
 	Ip             types.Bytes     `json:"ip"`
 	Owner          types.AccountID `json:"stash_user"`
 	ControllerUser types.AccountID `json:"controller_user"`
-}
-
-//On-chain event analysis param
-type Event_UnsignedPhaseStarted struct {
-	Phase  types.Phase
-	Round  types.U32
-	Topics []types.Hash
-}
-type Event_SolutionStored struct {
-	Phase            types.Phase
-	Election_compute types.ElectionCompute
-	Prev_ejected     types.Bool
-	Topics           []types.Hash
-}
-
-type Event_SegmentBook_ParamSet struct {
-	Phase     types.Phase
-	PeerId    types.U64
-	SegmentId types.U64
-	Random    types.U32
-	Topics    []types.Hash
-}
-
-type Event_VPABCD_Submit_Verify struct {
-	Phase     types.Phase
-	PeerId    types.U64
-	SegmentId types.U64
-	Topics    []types.Hash
-}
-
-type Event_Sminer_TimedTask struct {
-	Phase  types.Phase
-	Topics []types.Hash
-}
-
-type Event_Sminer_Registered struct {
-	Phase   types.Phase
-	PeerAcc types.AccountID
-	Staking types.U128
-	Topics  []types.Hash
-}
-
-type Event_FileMap_RegistrationScheduler struct {
-	Phase  types.Phase
-	Acc    types.AccountID
-	Ip     types.Bytes
-	Topics []types.Hash
-}
-
-type Event_DeleteFile struct {
-	Phase  types.Phase
-	Acc    types.AccountID
-	Fileid types.Bytes
-	Topics []types.Hash
-}
-
-type Event_BuySpace struct {
-	Phase  types.Phase
-	Acc    types.AccountID
-	Size   types.U128
-	Fee    types.U128
-	Topics []types.Hash
-}
-
-type Event_FileUpload struct {
-	Phase  types.Phase
-	Acc    types.AccountID
-	Topics []types.Hash
-}
-
-type MyEventRecords struct {
-	types.EventRecords
-
-	SegmentBook_ParamSet          []Event_SegmentBook_ParamSet
-	SegmentBook_VPASubmitted      []Event_VPABCD_Submit_Verify
-	SegmentBook_VPBSubmitted      []Event_VPABCD_Submit_Verify
-	SegmentBook_VPCSubmitted      []Event_VPABCD_Submit_Verify
-	SegmentBook_VPDSubmitted      []Event_VPABCD_Submit_Verify
-	SegmentBook_VPAVerified       []Event_VPABCD_Submit_Verify
-	SegmentBook_VPBVerified       []Event_VPABCD_Submit_Verify
-	SegmentBook_VPCVerified       []Event_VPABCD_Submit_Verify
-	SegmentBook_VPDVerified       []Event_VPABCD_Submit_Verify
-	Sminer_TimedTask              []Event_Sminer_TimedTask
-	Sminer_Registered             []Event_Sminer_Registered
-	FileMap_RegistrationScheduler []Event_FileMap_RegistrationScheduler
-
-	FileBank_DeleteFile []Event_DeleteFile
-	FileBank_BuySpace   []Event_BuySpace
-	FileBank_FileUpload []Event_FileUpload
-
-	ElectionProviderMultiPhase_UnsignedPhaseStarted []Event_UnsignedPhaseStarted
-	ElectionProviderMultiPhase_SolutionStored       []Event_SolutionStored
 }
