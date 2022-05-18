@@ -47,7 +47,7 @@ func (userinfo UserHoldSpaceDetails) String() string {
 	PurchasedSpace, _ := strconv.Atoi(userinfo.PurchasedSpace.String())
 	UsedSpace, _ := strconv.Atoi(userinfo.UsedSpace.String())
 	RemainingSpace, _ := strconv.Atoi(userinfo.RemainingSpace.String())
-	if UsedSpace/1024/1024 == 0 {
+	if UsedSpace/1024/1024 == 0 && UsedSpace != 0 {
 		UsedSpace = 1
 	}
 	ret := "———————————————————You Purchased Space———————————————————\n"
