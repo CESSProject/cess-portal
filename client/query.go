@@ -47,7 +47,7 @@ func QueryPrice() error {
 		logger.OutPutLogger.Sugar().Infof("%s[Error]%sGet price fail::%s\n", tools.Red, tools.Reset, err)
 		return err
 	}
-	PerGB, _ := strconv.ParseFloat(fmt.Sprintf("%.12f", float64(Price.Int64())/float64(1000000000000)), 64)
+	PerGB, _ := strconv.ParseFloat(fmt.Sprintf("%.12f", float64(Price.Int64()*int64(1024))/float64(1000000000000)), 64)
 	fmt.Printf("[Success]The current storage price is:%.12f TCESS per (G)\n", PerGB)
 	logger.OutPutLogger.Sugar().Infof("[Success]The current storage price is:%.12f TCESS per (G)\n", PerGB)
 	return nil
