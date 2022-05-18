@@ -30,6 +30,7 @@ PrivateKey:Encrypted password for uploaded files
 */
 func FileUpload(path, backups, PrivateKey string) error {
 	if len(PrivateKey) != 16 && len(PrivateKey) != 24 && len(PrivateKey) != 32 && len(PrivateKey) != 0 {
+		fmt.Printf("[Error]The privatekey must be 16,24,32 bits long\n")
 		return errors.New("[Error]The privatekey must be 16,24,32 bits long")
 	}
 	chain.Chain_Init()
