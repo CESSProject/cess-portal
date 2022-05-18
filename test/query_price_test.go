@@ -9,7 +9,6 @@ import (
 func TestFindPrice(t *testing.T) {
 	//config file
 	conf.ClientConf.ChainData.CessRpcAddr = ""
-	conf.ClientConf.ChainData.AccountPublicKey = ""
 	conf.ClientConf.BoardInfo.BoardPath = ""
 
 	err := client.QueryPrice()

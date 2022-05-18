@@ -256,6 +256,10 @@ func DecodeToPub(address string, prefix []byte) ([]byte, error) {
 	return data[len(prefix) : len(data)-2], nil
 }
 
+func PubBytesTo0XString(pub []byte) string {
+	return fmt.Sprintf("%#x", pub)
+}
+
 func PubBytesToString(b []byte) string {
 	s := ""
 	for i := 0; i < len(b); i++ {

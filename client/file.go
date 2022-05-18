@@ -33,6 +33,10 @@ func FileUpload(path, backups, PrivateKey string) error {
 		fmt.Printf("[Error]The privatekey must be 16,24,32 bits long\n")
 		return errors.New("[Error]The privatekey must be 16,24,32 bits long")
 	}
+	if backups == "0" {
+		fmt.Printf("[Error]The number of backups must be bigger than 1\n")
+		return errors.New("The number of backups must be bigger than 1")
+	}
 	chain.Chain_Init()
 	file, err := os.Stat(path)
 	if err != nil {

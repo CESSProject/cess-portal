@@ -7,6 +7,7 @@ import (
 	"cess-portal/tools"
 	"encoding/json"
 	"fmt"
+	"github.com/pkg/errors"
 )
 
 type faucet struct {
@@ -70,7 +71,10 @@ expected:The expected number of prices when buying is required to prevent price 
 */
 func Expansion(quantity, duration, expected int) error {
 	chain.Chain_Init()
-
+	if quantity == 0 && duration == 0 {
+		fmt.Printf("[Error] Please enter the correct purchase number\n")
+		return errors.New("Please enter the correct purchase number")
+	}
 	var ci chain.CessInfo
 	ci.RpcAddr = conf.ClientConf.ChainData.CessRpcAddr
 	ci.IdentifyAccountPhrase = conf.ClientConf.ChainData.IdAccountPhraseOrSeed

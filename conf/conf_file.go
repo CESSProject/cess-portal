@@ -1,6 +1,7 @@
 package conf
 
 import (
+	"cess-portal/tools"
 	"fmt"
 	"gopkg.in/yaml.v3"
 	"io/ioutil"
@@ -50,4 +51,10 @@ func InitConf() {
 		fmt.Printf("\x1b[%dm[err]\x1b[0m The '%v' file format error\n", 41, ConfFilePath)
 		os.Exit(Exit_ConfErr)
 	}
+	pubkey, err := tools.DecodeToPub(ClientConf.ChainData.WalletAddress, tools.ChainCessTestPrefix)
+	if err != nil {
+		fmt.Printf("[Error]The wallet address you entered is incorrect, please re-enter\n")
+		os.Exit(Exit_ConfErr)
+	}
+	ClientConf.ChainData.AccountPublicKey = tools.PubBytesTo0XString(pubkey)
 }
