@@ -23,6 +23,12 @@ ObtainFromFaucet means to obtain tCESS for transaction spending through the fauc
 pbk:wallet's public key
 */
 func ObtainFromFaucet(pbk string) error {
+	pubkey, err := tools.DecodeToPub(pbk, tools.ChainCessTestPrefix)
+	if err != nil {
+		fmt.Printf("[Error]The wallet address you entered is incorrect, please re-enter\n")
+		return err
+	}
+	pbk = fmt.Sprintf("%#x", pubkey)
 	var ob = struct {
 		Address string `json:"Address"`
 	}{
