@@ -6,13 +6,16 @@ import (
 	"testing"
 )
 
-func TestObtainFromFaucet(t *testing.T) {
+func TestExpansion(t *testing.T) {
 	//config file
+	conf.ClientConf.ChainData.CessRpcAddr = ""
+	conf.ClientConf.ChainData.IdAccountPhraseOrSeed = ""
 	conf.ClientConf.BoardInfo.BoardPath = ""
-	conf.ClientConf.ChainData.FaucetAddress = ""
 
 	//param
-	pkg := ""
-	err := client.ObtainFromFaucet(pkg)
+	quantity := 1
+	duration := 1
+	expected := 0
+	err := client.Expansion(quantity, duration, expected)
 	t.Fatal(err)
 }
