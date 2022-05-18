@@ -11,73 +11,73 @@ import (
 	"strings"
 )
 
-func NewTradeCommand() *cobra.Command {
+func NewPurchaseCommand() *cobra.Command {
 	tc := &cobra.Command{
-		Use:   "trade <subcommand>",
-		Short: "Trade related commands",
+		Use:   "purchase <subcommand>",
+		Short: "Purchase commands use for implement all of related transaction function",
 	}
 
-	tc.AddCommand(NewTradeBuySpaceCommand())
-	tc.AddCommand(NewTradeObtainCommand())
+	tc.AddCommand(NewPurchaseBuySpaceCommand())
+	tc.AddCommand(NewPurchaseObtainCommand())
 
 	return tc
 }
 
-func NewTradeBuySpaceCommand() *cobra.Command {
+func NewPurchaseBuySpaceCommand() *cobra.Command {
 	tbs := &cobra.Command{
-		Use:   "exp <spacequantity>  <expected price>",
-		Short: "exp refers to make your space bigger,unit:[1/512G].",
-		Long:  `<spacequantity> buy space(not nullable); <expected price> set the expected price(integer) for the purchase(nullable) if null accept the storage unit price at the current moment.`,
+		Use:   "storage <space quantity> <space duration> <expected price>",
+		Short: "Buy CESS storage space",
+		Long:  `<space quantity> storage space quantity you want to buy,unit:GB; <space duration> storage space you want to rental, unit:Month; <expected price> set the expected price(integer),unit(TCESS/GB) for the purchase, if input null mean accept the CESS real-time storage unit price.`,
 
-		Run: TradeBuySpaceCommandFunc,
+		Run: PurchaseBuySpaceCommandFunc,
 	}
 
 	return tbs
 }
 
-func TradeBuySpaceCommandFunc(cmd *cobra.Command, args []string) {
+func PurchaseBuySpaceCommandFunc(cmd *cobra.Command, args []string) {
 	InitComponents(cmd)
 	var expected = 0
 	var quantity = 0
 	var duration = 0
 	var err error
 	if len(args) < 2 {
-		fmt.Printf("[Error]Please fill in the amount of storage space you want to purchase! Usage: cessctl trade exp <quantity> <duration>\n")
-		logger.OutPutLogger.Sugar().Infof("[Error]Please fill in the amount of storage space you want to purchase! Usage: cessctl trade exp <spacequantity> <duration>\n")
+		fmt.Printf("[Error]Please fill in the amount of storage space you want to purchase! Usage: cessctl purchase storage <space quantity> <space duration>\n")
+		logger.OutPutLogger.Sugar().Infof("[Error]Please fill in the amount of storage space you want to purchase! Usage: cessctl purchase storage <space quantity> <space duration>\n")
 		os.Exit(conf.Exit_CmdLineParaErr)
 	}
 	if len(args) > 2 {
 		expected, err = strconv.Atoi(args[2])
 		if err != nil || expected < 0 {
-			fmt.Printf("[Error]Please enter the correct number (integer) in <expected price>\n")
-			logger.OutPutLogger.Sugar().Infof("[Error]Please enter the correct number (integer) in <expected price>\n")
+			fmt.Printf("[Error]Please enter the correct number (integer) in <expected price> <space duration>\n")
+			logger.OutPutLogger.Sugar().Infof("[Error]Please enter the correct number (integer) in <expected price> or <space duration>\n")
 			os.Exit(conf.Exit_CmdLineParaErr)
 		}
 	}
 	quantity, err1 := strconv.Atoi(args[0])
 	duration, err2 := strconv.Atoi(args[1])
 	if err1 != nil || err2 != nil || quantity < 0 {
-		fmt.Printf("[Error]Please enter the correct number (integer) in <spacequantity>\n")
-		logger.OutPutLogger.Sugar().Infof("[Error]Please enter the correct number (integer) in <spacequantity>\n")
+		fmt.Printf("[Error]Please enter the correct number (integer) in <space quantity> or \n")
+		logger.OutPutLogger.Sugar().Infof("[Error]Please enter the correct number (integer) in <space quantity>\n")
 		os.Exit(conf.Exit_CmdLineParaErr)
 	}
 
 	client.Expansion(quantity, duration, expected)
 }
 
-func NewTradeObtainCommand() *cobra.Command {
+func NewPurchaseObtainCommand() *cobra.Command {
 	tbs := &cobra.Command{
-		Use:   "obtain <address>",
-		Short: "obtain refers to the trade with cess chian",
-		Long:  `Obtain command get a certain amount of tokens through the faucet service.`,
+		Use:   "free <address>",
+		Short: "Top up free TCESS from the faucet",
+		Long:  `Free command use for obtain the TCESS tokens from the CESS faucet service, the amount of each top up is 10000 TCESS`,
 
-		Run: TradeObtainCommandFunc,
+		Run: PurchaseObtainCommandFunc,
 	}
 
 	return tbs
 }
 
-func TradeObtainCommandFunc(cmd *cobra.Command, args []string) {
+func PurchaseObtainCommandFunc(cmd *cobra.Command, args []string) {
 	InitComponents(cmd)
 	if len(args) == 0 {
 		fmt.Printf("[Error]Please fill in the account public key! Usage: cessctl trade obtain <public key>")

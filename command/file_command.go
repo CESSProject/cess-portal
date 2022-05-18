@@ -13,22 +13,22 @@ import (
 func NewFileCommand() *cobra.Command {
 	fc := &cobra.Command{
 		Use:   "file <subcommand>",
-		Short: "File related commands",
+		Short: "File commands use for implement related file function operate",
 	}
 
 	fc.AddCommand(NewFileUploadCommand())
 	fc.AddCommand(NewFileDownloadCommand())
 	fc.AddCommand(NewFileDeleteCommand())
-	fc.AddCommand(NewFileDecodeCommand())
+	fc.AddCommand(NewFileDecryptCommand())
 
 	return fc
 }
 
 func NewFileUploadCommand() *cobra.Command {
 	cc := &cobra.Command{
-		Use:   "upload <filepath> <backups> <private key>",
-		Short: "upload refers to the upload file",
-		Long:  `Upload command send local source files to scheduling nodes.`,
+		Use:   "upload <file path> <backups>",
+		Short: "Upload the any specific file you want",
+		Long:  `Upload command mean send the local source files to CESS nework scheduling nodes;You can input any 16/24/32 length numbers to be your private key, then others people unable to decode your file data. if you choose private key is nil, then system is default you file become public file.`,
 
 		Run: FileUploadCommandFunc,
 	}
@@ -39,12 +39,12 @@ func NewFileUploadCommand() *cobra.Command {
 func FileUploadCommandFunc(cmd *cobra.Command, args []string) {
 	InitComponents(cmd)
 	if len(args) < 2 {
-		fmt.Printf("Please enter correct parameters 'upload <filepath> <backups> <private key>'\n")
+		fmt.Printf("Please enter correct parameters 'upload <filepath> <backups>'\n")
 		os.Exit(conf.Exit_CmdLineParaErr)
 	}
 
 	fmt.Printf("%s[Warming] Do you want to upload your file without private key (it's means your file status is public)?%s\n", tools.Red, tools.Reset)
-	fmt.Printf("%sYou can type the 'private key' or enter with nothing to jump it:%s", tools.Red, tools.Reset)
+	fmt.Printf("%sYou can type the 'private key' or enter with nothing to skip it:%s", tools.Red, tools.Reset)
 	psw, _ := gopass.GetPasswdMasked()
 
 	client.FileUpload(args[0], args[1], string(psw))
@@ -52,9 +52,9 @@ func FileUploadCommandFunc(cmd *cobra.Command, args []string) {
 
 func NewFileDownloadCommand() *cobra.Command {
 	cc := &cobra.Command{
-		Use:   "download <fileid>",
-		Short: "download refers to the download file",
-		Long:  `Download command download file based on fileId.`,
+		Use:   "download <file id>",
+		Short: "Download the any specific file you want",
+		Long:  `Download command mean download file from the CESS networks based on fileId.`,
 
 		Run: FileDownloadCommandFunc,
 	}
@@ -65,7 +65,7 @@ func NewFileDownloadCommand() *cobra.Command {
 func FileDownloadCommandFunc(cmd *cobra.Command, args []string) {
 	InitComponents(cmd)
 	if len(args) == 0 {
-		fmt.Printf("Please enter the fileid of the downloaded file 'download <fileid>'\n")
+		fmt.Printf("Please enter the fileid of the download file 'file download <fileid>'\n")
 		os.Exit(conf.Exit_CmdLineParaErr)
 	}
 
@@ -74,9 +74,9 @@ func FileDownloadCommandFunc(cmd *cobra.Command, args []string) {
 
 func NewFileDeleteCommand() *cobra.Command {
 	cc := &cobra.Command{
-		Use:   "delete <fileid>",
-		Short: "delete refers to the delete the file",
-		Long:  `Deleting a file means removing the file from CESS,But there may be a delay.`,
+		Use:   "delete <file id>",
+		Short: "Delete the any specific file you want",
+		Long:  `Delete command means removing the file from CESS networks`,
 
 		Run: FileDeleteCommandFunc,
 	}
@@ -87,31 +87,31 @@ func NewFileDeleteCommand() *cobra.Command {
 func FileDeleteCommandFunc(cmd *cobra.Command, args []string) {
 	InitComponents(cmd)
 	if len(args) == 0 {
-		fmt.Printf("Please enter the fileid of the deleted file'delete <fileid>'\n")
+		fmt.Printf("Please enter the fileid of the delete file'file delete <fileid>'\n")
 		os.Exit(conf.Exit_CmdLineParaErr)
 	}
 	client.FileDelete(args[0])
 
 }
 
-func NewFileDecodeCommand() *cobra.Command {
+func NewFileDecryptCommand() *cobra.Command {
 	cc := &cobra.Command{
-		Use:   "decode <filepath>",
-		Short: "decode refers to the decode the file",
+		Use:   "decode <file path>",
+		Short: "Decrypt the any specific file again when you failed file decrypt first chance",
 		Long:  `File decode means that if the file is not decrypted when you download it, it can be decode by this method.Please enter absolute path.`,
 
-		Run: FileDecodeCommandFunc,
+		Run: FileDecryptCommandFunc,
 	}
 
 	return cc
 }
 
-func FileDecodeCommandFunc(cmd *cobra.Command, args []string) {
+func FileDecryptCommandFunc(cmd *cobra.Command, args []string) {
 	InitComponents(cmd)
 
 	if len(args) == 0 {
 		fmt.Printf("Please enter the path of the file to be decoded'\n")
 		os.Exit(conf.Exit_CmdLineParaErr)
 	}
-	client.FileDecode(args[0])
+	client.FileDecrypt(args[0])
 }

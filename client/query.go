@@ -6,12 +6,13 @@ import (
 	"cess-portal/internal/logger"
 	"cess-portal/tools"
 	"fmt"
+	"strconv"
 )
 
 /*
-FindPurchasedSpace means to query the space that the current user has purchased and the space that has been used
+QueryPurchasedSpace means to query the space that the current user has purchased and the space that has been used
 */
-func FindPurchasedSpace() error {
+func QueryPurchasedSpace() error {
 	chain.Chain_Init()
 
 	var ci chain.CessInfo
@@ -30,57 +31,33 @@ func FindPurchasedSpace() error {
 }
 
 /*
-FindPrice means to get real-time price of storage space
+QueryPrice means to get real-time price of storage space
 */
-func FindPrice() error {
+func QueryPrice() error {
 	chain.Chain_Init()
 
 	var ci chain.CessInfo
 	ci.RpcAddr = conf.ClientConf.ChainData.CessRpcAddr
 	ci.ChainModule = chain.FindPriceChainModule
 
-	ci.ChainModuleMethod = chain.FindPriceModuleMethod[0]
-	AllPurchased, err := ci.GetPurchasedSpace()
+	ci.ChainModuleMethod = chain.FindPriceModuleMethod
+	Price, err := ci.GetPrice()
 	if err != nil {
-		fmt.Printf("%s[Error]%sGet all purchased fail:%s\n", tools.Red, tools.Reset, err)
-		logger.OutPutLogger.Sugar().Infof("%s[Error]%sGet all purchased fail::%s\n", tools.Red, tools.Reset, err)
+		fmt.Printf("%s[Error]%sGet price fail:%s\n", tools.Red, tools.Reset, err)
+		logger.OutPutLogger.Sugar().Infof("%s[Error]%sGet price fail::%s\n", tools.Red, tools.Reset, err)
 		return err
 	}
-
-	ci.ChainModuleMethod = chain.FindPriceModuleMethod[1]
-	AllAvailable, err := ci.GetAvailableSpace()
-	if err != nil {
-		fmt.Printf("[Error]Get all available fail:%s\n", err)
-		logger.OutPutLogger.Sugar().Infof("[Error]Get all available fail:%s\n", err)
-		return err
-	}
-
-	var purc int64
-	var ava int64
-	if AllPurchased.Int != nil {
-		purc = AllPurchased.Int64()
-	}
-	if AllAvailable.Int != nil {
-		ava = AllAvailable.Int64()
-	}
-	if purc == ava {
-		fmt.Printf("[Success]All space has been bought,The current storage price is:+∞ per (MB)\n")
-		logger.OutPutLogger.Sugar().Infof("[Success]All space has been bought,The current storage price is:+∞ per (MB)\n")
-		return err
-	}
-
-	result := (1024 / float64((ava - purc))) * 1000
-
-	fmt.Printf("[Success]The current storage price is:%f per (MB)\n", result)
-	logger.OutPutLogger.Sugar().Infof("[Success]The current storage price is:%f per (MB)\n", result)
+	PerMB, err := strconv.ParseFloat(strconv.FormatInt(Price.Int64()*1024, 10), 64)
+	fmt.Printf("[Success]The current storage price is:%f TCESS per (G)\n", PerMB)
+	logger.OutPutLogger.Sugar().Infof("[Success]The current storage price is:%f TCESS per (G)\n", PerMB)
 	return nil
 }
 
 /*
-FindFile means to query the files uploaded by the current user
+QueryFile means to query the files uploaded by the current user
 fileid:fileid of the file to look for
 */
-func FindFile(fileid string) error {
+func QueryFile(fileid string) error {
 	chain.Chain_Init()
 
 	var ci chain.CessInfo

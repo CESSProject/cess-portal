@@ -29,6 +29,9 @@ backups:Number of backups of files that need to be uploaded
 PrivateKey:Encrypted password for uploaded files
 */
 func FileUpload(path, backups, PrivateKey string) error {
+	if len(PrivateKey) != 16 && len(PrivateKey) != 24 && len(PrivateKey) != 32 {
+		return errors.New("[Error]The privatekey must be 16,24,32 bits long")
+	}
 	chain.Chain_Init()
 	file, err := os.Stat(path)
 	if err != nil {
@@ -88,20 +91,20 @@ func FileUpload(path, backups, PrivateKey string) error {
 		fmt.Println("[Error]Get scheduler randomly error! ", err)
 		return err
 	}
-	filesize := new(big.Int)
+	//var filesize uint64
 	fee := new(big.Int)
 
 	ci.IdentifyAccountPhrase = conf.ClientConf.ChainData.IdAccountPhraseOrSeed
 	ci.TransactionName = chain.UploadFileTransactionName
 
-	if file.Size()/1024 == 0 {
-		filesize.SetInt64(1)
-	} else {
-		filesize.SetInt64(file.Size() / 1024)
-	}
+	//if file.Size()/1024 == 0 {
+	//	filesize = 1
+	//} else {
+	//	filesize = uint64(file.Size() / 1024)
+	//}
 	fee.SetInt64(int64(0))
 
-	AsInBlock, err := ci.UploadFileMetaInformation(fileid, file.Name(), filehash, PrivateKey == "", uint8(spares), filesize, fee)
+	AsInBlock, err := ci.UploadFileMetaInformation(fileid, file.Name(), filehash, PrivateKey == "", uint8(spares), uint64(file.Size()), fee)
 	if err != nil {
 		fmt.Printf("\n[Error]Upload file meta information error:%s\n", err)
 		return err
@@ -162,7 +165,7 @@ func FileUpload(path, backups, PrivateKey string) error {
 			logger.OutPutLogger.Sugar().Infof("[Error]Error getting reply from schedule, transfer failed! ", err)
 			return err
 		}
-		if res.Code != 0 {
+		if res.Code != 200 {
 			fmt.Printf("\n[Error]Upload file fail!scheduler problem:%s\n", res.Msg)
 			logger.OutPutLogger.Sugar().Infof("\n[Error]Upload file fail!scheduler problem:%s\n", res.Msg)
 			os.Exit(conf.Exit_SystemErr)
@@ -374,7 +377,7 @@ func FileDownload(fileid string) error {
 
 		var respbody rpc.RespBody
 		err = proto.Unmarshal(resp.Body, &respbody)
-		if err != nil || respbody.Code != 0 {
+		if err != nil || respbody.Code != 200 {
 			fmt.Printf("[Error]Download file from CESS error:%s. reply message:%s\n", err, respbody.Msg)
 			logger.OutPutLogger.Sugar().Infof("[Error]Download file from CESS error:%s. reply message:%s\n", err, respbody.Msg)
 			return err
@@ -415,6 +418,9 @@ func FileDownload(fileid string) error {
 		filePWD, _ := gopass.GetPasswdMasked()
 		if len(filePWD) == 0 {
 			return nil
+		}
+		if len(filePWD) != 16 && len(filePWD) != 24 && len(filePWD) != 32 {
+			return errors.New("[Error]The privatekey must be 16,24,32 bits long")
 		}
 		encodefile, err := ioutil.ReadFile(filepath.Join(conf.ClientConf.PathInfo.InstallPath, string(fileinfo.File_Name[:])))
 		if err != nil {
@@ -460,9 +466,10 @@ func FileDelete(fileid string) error {
 }
 
 /*
+FileDecrypt means that if the file is not decrypted when downloading the file, it can be decrypted by this method
 When you download the file if it is not decode, you can decode it this way
 */
-func FileDecode(path string) error {
+func FileDecrypt(path string) error {
 	_, err := os.Stat(path)
 	if err != nil {
 		fmt.Printf("%s[Error]There is no such file, please confirm the correct location of the file, please enter the absolute path of the file%s\n", tools.Red, tools.Reset)
@@ -473,6 +480,9 @@ func FileDecode(path string) error {
 	fmt.Println("Please enter the file's password:")
 	fmt.Print(">")
 	psw, _ := gopass.GetPasswdMasked()
+	if len(psw) != 16 && len(psw) != 24 && len(psw) != 32 {
+		return errors.New("[Error]The password must be 16,24,32 bits long")
+	}
 	encodefile, err := ioutil.ReadFile(path)
 	if err != nil {
 		fmt.Printf("%s[Error]Failed to read file, please check file integrity%s\n", tools.Red, tools.Reset)

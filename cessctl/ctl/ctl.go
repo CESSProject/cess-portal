@@ -24,9 +24,9 @@ func init() {
 	rootCmd.PersistentFlags().StringVarP(&globalFlag.ConfFilePath, "config", "c", "", "Custom configuration file path, requires absolute path")
 
 	rootCmd.AddCommand(
-		command.NewFindCommand(),
+		command.NewQueryCommand(),
 		command.NewFileCommand(),
-		command.NewTradeCommand(),
+		command.NewPurchaseCommand(),
 	)
 }
 func Start() error {
