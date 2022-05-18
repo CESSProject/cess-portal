@@ -356,7 +356,7 @@ func FileDownload(fileid string) error {
 		},
 	}
 	wantfile.FileId = fileid
-	wantfile.WalletAddress = conf.ClientConf.ChainData.AccountPublicKey
+	wantfile.WalletAddress = conf.ClientConf.ChainData.WalletAddress
 	wantfile.Blocks = 1
 
 	for {
@@ -383,8 +383,8 @@ func FileDownload(fileid string) error {
 		var respbody rpc.RespBody
 		err = proto.Unmarshal(resp.Body, &respbody)
 		if err != nil || respbody.Code != 200 {
-			fmt.Printf("[Error]Download file from CESS error:%s. reply message:%s\n", err, respbody.Msg)
-			logger.OutPutLogger.Sugar().Infof("[Error]Download file from CESS error:%s. reply message:%s\n", err, respbody.Msg)
+			fmt.Printf("[Error]Download file from CESS. reply message:%s\n", err, respbody.Msg)
+			logger.OutPutLogger.Sugar().Infof("[Error]Download file from CESS error:%v. reply message:%s\n", err, respbody.Msg)
 			return err
 		}
 		var blockData module.FileDownloadInfo
