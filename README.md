@@ -52,8 +52,6 @@ cessRpcAddr='ws://xxx.xx.xx.xxx:9949/'
 faucetAddress='http://xx.xxx.xx.xx:9708/transfer'
 ##Memo Seed for Wallet
 idAccountPhraseOrSeed='lazy funny invest opinion jaguar romance anger return glare flat lift clap'
-##The public key address of the wallet, which is generated from the wallet address, and the generated address: https://polkadot.subscan.io/tools/ss58_transform
-accountPublicKey='0x1c298066dcd205a267df5b29a2ec7104b03b27e009dd3166f7318194eb9ee77a'
 ##wallet address
 walletAddress='5AhdZVDwjFXpvbsTjHaXv2jqNos49zFFnb5K4A1hnzVSo1iR'
 ##If the file upload is encrypted, the password memo of the file will be saved here, and it can be created to the next directory of the existing folder.
@@ -108,8 +106,6 @@ cessRpcAddr:Chain interaction address, the address that interacts with the chain
 faucetAddress:Faucet address, the address to get coins from the faucet.
 
 idAccountPhraseOrSeed:Account private key, which is used as the user's mnemonic when signing transactions.
-
-accountPublicKey:The publicKey of public key conversion, used to query data on the chain, and the conversion address: https://polkadot.subscan.io/tools/ss58_transform.
 
 walletAddress:The wallet public key address, the owner id of the file when uploading the file metadata.
 
