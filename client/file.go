@@ -77,13 +77,13 @@ func FileUpload(path, backups, PrivateKey string) error {
 
 	f, err := os.Open(path)
 	if err != nil {
-		fmt.Println("[Error]This file was broken! ", err)
+		fmt.Println("[Error]This file was broken!\n ", err)
 		return err
 	}
 	defer f.Close()
 	filebyte, err := ioutil.ReadAll(f)
 	if err != nil {
-		fmt.Println("[Error]analyze this file error! ", err)
+		fmt.Println("[Error]analyze this file error!\n ", err)
 		return err
 	}
 
@@ -93,7 +93,7 @@ func FileUpload(path, backups, PrivateKey string) error {
 	ci.ChainModuleMethod = chain.FindSchedulerInfoMethod
 	schds, err := ci.GetSchedulerInfo()
 	if err != nil {
-		fmt.Println("[Error]Get scheduler randomly error! ", err)
+		fmt.Println("[Error]Get scheduler randomly error!\n ", err)
 		return err
 	}
 	//var filesize uint64
@@ -145,7 +145,7 @@ func FileUpload(path, backups, PrivateKey string) error {
 		blockinfo.Data = data
 		info, err := proto.Marshal(&blockinfo)
 		if err != nil {
-			fmt.Println("[Error]Serialization error, please upload again! ", err)
+			fmt.Println("[Error]Serialization error, please upload again!\n ", err)
 			logger.OutPutLogger.Sugar().Infof("[Error]Serialization error, please upload again! ", err)
 			return err
 		}
@@ -166,7 +166,7 @@ func FileUpload(path, backups, PrivateKey string) error {
 		var res rpc.RespBody
 		err = proto.Unmarshal(resp.Body, &res)
 		if err != nil {
-			fmt.Printf("\n[Error]Error getting reply from schedule, transfer failed! ", err)
+			fmt.Printf("\n[Error]Error getting reply from schedule, transfer failed!\n ", err)
 			logger.OutPutLogger.Sugar().Infof("[Error]Error getting reply from schedule, transfer failed! ", err)
 			return err
 		}
@@ -199,14 +199,14 @@ func FileUpload(path, backups, PrivateKey string) error {
 		}
 		_, err = keyfile.WriteString(PrivateKey)
 		if err != nil {
-			fmt.Printf("%s[Error]:Failed to write key to file:%s%s error:%s", tools.Red, filepath.Join(conf.ClientConf.PathInfo.KeyPath, (file.Name()+".pem")), tools.Reset, err)
+			fmt.Printf("%s[Error]:Failed to write key to file:%s%s error:%s\n", tools.Red, filepath.Join(conf.ClientConf.PathInfo.KeyPath, (file.Name()+".pem")), tools.Reset, err)
 			logger.OutPutLogger.Sugar().Infof("%s[Error]:Failed to write key to file:%s%s error:%s", tools.Red, filepath.Join(conf.ClientConf.PathInfo.KeyPath, (file.Name()+".pem")), tools.Reset, err)
 			return err
 		}
 
 		encodefile, err := tools.AesEncrypt(filebyte, []byte(PrivateKey))
 		if err != nil {
-			fmt.Println("[Error]Encode the file fail ,error! ", err)
+			fmt.Println("[Error]Encode the file fail ,error!\n ", err)
 			return err
 		}
 		blocks := len(encodefile) / blocksize
@@ -236,7 +236,7 @@ func FileUpload(path, backups, PrivateKey string) error {
 		}
 		bar.Finish()
 	} else {
-		fmt.Printf("%s[Tips]%s:upload file:%s without private key", tools.Yellow, tools.Reset, path)
+		fmt.Printf("%s[Tips]%s:upload file:%s without private key\n", tools.Yellow, tools.Reset, path)
 		blocks := len(filebyte) / blocksize
 		if len(filebyte)%blocksize == 0 {
 			blocktotal = blocks
@@ -264,7 +264,7 @@ func FileUpload(path, backups, PrivateKey string) error {
 		}
 		bar.Finish()
 	}
-	fmt.Printf("%s[Success]%s:upload file:%s successful!", tools.Green, tools.Reset, path)
+	fmt.Printf("%s[Success]%s:upload file:%s successful!\n", tools.Green, tools.Reset, path)
 	return nil
 }
 
@@ -312,7 +312,7 @@ func FileDownload(fileid string) error {
 	}
 	installfile, err := os.OpenFile(filepath.Join(conf.ClientConf.PathInfo.InstallPath, string(fileinfo.File_Name[:])), os.O_WRONLY|os.O_APPEND, 0666)
 	if err != nil {
-		fmt.Printf("%s[Error]:Failed to save key error:%s%s", tools.Red, err, tools.Reset)
+		fmt.Printf("%s[Error]:Failed to save key error:%s%s\n", tools.Red, err, tools.Reset)
 		logger.OutPutLogger.Sugar().Infof("%s[Error]:Failed to save key error:%s%s", tools.Red, err, tools.Reset)
 		return err
 	}
@@ -435,7 +435,7 @@ func FileDownload(fileid string) error {
 		}
 		decodefile, err := tools.AesDecrypt(encodefile, filePWD)
 		if err != nil {
-			fmt.Println("[Error]Dncode the file fail ,error! ", err)
+			fmt.Println("[Error]Dncode the file fail ,error!\n ", err)
 			return err
 		}
 		err = installfile.Truncate(0)
@@ -511,17 +511,17 @@ func FileDecrypt(path string) error {
 	}
 	fileinfo, err := os.Create(filepath.Join(conf.ClientConf.PathInfo.InstallPath, filename))
 	if err != nil {
-		fmt.Printf("%s[Error]An error occurred while saving the decoded file! error:%s%s ", tools.Red, err, tools.Reset)
+		fmt.Printf("%s[Error]An error occurred while saving the decoded file! error:%s%s\n ", tools.Red, err, tools.Reset)
 		return err
 	}
 	defer fileinfo.Close()
 	_, err = fileinfo.Write(decodefile)
 	if err != nil {
-		fmt.Printf("%s[Error]Failed to save decrypted content to file! error:%s%s ", tools.Red, err, tools.Reset)
+		fmt.Printf("%s[Error]Failed to save decrypted content to file! error:%s%s\n ", tools.Red, err, tools.Reset)
 		return err
 	}
 
-	fmt.Printf("%s[Success]The file was decrypted successfully and the file has been saved to:%s%s ", tools.Green, filepath.Join(conf.ClientConf.PathInfo.InstallPath, filename), tools.Reset)
+	fmt.Printf("%s[Success]The file was decrypted successfully and the file has been saved to:%s%s\n ", tools.Green, filepath.Join(conf.ClientConf.PathInfo.InstallPath, filename), tools.Reset)
 
 	return nil
 }
