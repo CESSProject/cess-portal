@@ -15,6 +15,7 @@ First you need to download the cess-portal project from GitHub
 ```shell
 git clone https://github.com/CESSProject/cess-portal.git
 ```
+
 Then run the build.sh(On Linux) or build.bat(On Windows) script file in the ‘install_ctl‘ folder,You can compile this project on any system,Before downloading, please install golang on the system and the version must be over 1.17.
 
 ```shell
