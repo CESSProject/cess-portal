@@ -54,6 +54,9 @@ func FileUpload(path, backups, PrivateKey string) error {
 		fmt.Printf("[Error]Please enter a correct integer!\n")
 		return err
 	}
+	if spares > conf.MaxBackups {
+		fmt.Printf("[warm]The maximum number of backups is %v, it has been set to %v backups for you.\n", conf.MaxBackups, conf.MaxBackups)
+	}
 
 	filehash, err := tools.CalcFileHash(path)
 	if err != nil {
@@ -141,7 +144,7 @@ func FileUpload(path, backups, PrivateKey string) error {
 		},
 	}
 	commit := func(num int, data []byte) error {
-		blockinfo.BlockNum = int32(num) + 1
+		blockinfo.BlockIndex = int32(num) + 1
 		blockinfo.Data = data
 		info, err := proto.Marshal(&blockinfo)
 		if err != nil {
@@ -215,7 +218,7 @@ func FileUpload(path, backups, PrivateKey string) error {
 		} else {
 			blocktotal = blocks + 1
 		}
-		blockinfo.Blocks = int32(blocktotal)
+		blockinfo.BlockTotal = int32(blocktotal)
 		var bar tools.Bar
 		bar.NewOption(0, int64(blocktotal))
 		for i := 0; i < blocktotal; i++ {
@@ -243,7 +246,7 @@ func FileUpload(path, backups, PrivateKey string) error {
 		} else {
 			blocktotal = blocks + 1
 		}
-		blockinfo.Blocks = int32(blocktotal)
+		blockinfo.BlockTotal = int32(blocktotal)
 		var bar tools.Bar
 		bar.NewOption(0, int64(blocktotal))
 		for i := 0; i < blocktotal; i++ {
@@ -357,7 +360,7 @@ func FileDownload(fileid string) error {
 	}
 	wantfile.FileId = fileid
 	wantfile.WalletAddress = conf.ClientConf.ChainData.WalletAddress
-	wantfile.Blocks = 1
+	wantfile.BlockIndex = 1
 
 	for {
 		data, err := proto.Marshal(&wantfile)
@@ -403,12 +406,12 @@ func FileDownload(fileid string) error {
 		}
 
 		getAllBar.Do(func() {
-			bar.NewOption(0, int64(blockData.BlockNum))
+			bar.NewOption(0, int64(blockData.BlockTotal))
 		})
-		bar.Play(int64(blockData.Blocks))
-		wantfile.Blocks++
+		bar.Play(int64(blockData.BlockIndex))
+		wantfile.BlockIndex++
 		sp.Put(req)
-		if blockData.Blocks == blockData.BlockNum {
+		if blockData.BlockIndex == blockData.BlockTotal {
 			break
 		}
 	}

@@ -16,3 +16,5 @@ const (
 	Exit_ChainErr       = -3
 	Exit_SystemErr      = -4
 )
+
+const MaxBackups = 6
