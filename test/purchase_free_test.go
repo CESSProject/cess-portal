@@ -9,10 +9,10 @@ import (
 func TestObtainFromFaucet(t *testing.T) {
 	//config file
 	conf.ClientConf.BoardInfo.BoardPath = ""
-	conf.ClientConf.ChainData.FaucetAddress = "http://139.224.19.104:9708/transfer"
+	conf.ClientConf.ChainData.FaucetAddress = ""
 
 	//param
-	pkg := "cXhqoREguFc6SteocXoiyhjoeJXzF4yng71wd2fZn2jVrzxSy"
+	pkg := ""
 	err := client.ObtainFromFaucet(pkg)
 	t.Fatal(err)
 }

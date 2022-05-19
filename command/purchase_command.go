@@ -80,18 +80,15 @@ func NewPurchaseObtainCommand() *cobra.Command {
 func PurchaseObtainCommandFunc(cmd *cobra.Command, args []string) {
 	InitComponents(cmd)
 	if len(args) == 0 {
-		fmt.Printf("[Error]Please fill in the account public key! Usage: cessctl trade obtain <public key>")
-		logger.OutPutLogger.Sugar().Infof("Please fill in the account public key! Usage: cessctl trade obtain <public key>\n")
+		fmt.Printf("[Error]Please fill in the account public key! Usage: cessctl trade obtain <wallet address>")
 		os.Exit(conf.Exit_CmdLineParaErr)
 	}
 	if len(args[0]) != 49 {
 		fmt.Printf("[Error]Please enter the correct number of digits for the wallet address!\n")
-		logger.OutPutLogger.Sugar().Infof("[Error]Please enter the correct number of digits for the wallet address!\n")
 		os.Exit(conf.Exit_CmdLineParaErr)
 	}
 	if !strings.HasPrefix(args[0], "c") {
 		fmt.Println("[Error]The wallet address you entered is not in the correct format!\n")
-		logger.OutPutLogger.Sugar().Infof("[Error]The wallet address you entered is not in the correct format!\n")
 		os.Exit(conf.Exit_CmdLineParaErr)
 	}
 

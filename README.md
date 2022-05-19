@@ -117,7 +117,7 @@ walletAddress:The wallet public key address, the owner id of the file when uploa
 
 * instruction:
 
-  ​		Chain query and displays the current lease storage space Price (Unit: Cess / MB)
+  ​		Chain query and displays the current lease storage space Price (Unit: TCess / MB)
 
 * usage:
 
@@ -211,7 +211,7 @@ walletAddress:The wallet public key address, the owner id of the file when uploa
 
 * usage:
 
-  ​		cessctl purchase exp <space quantity> <space duration> <expected price>
+  ​		cessctl purchase storage <space quantity> <space duration> <expected price>
 
   ​		space quantity:The number of expansion capacity, unit: 1/1GB
 
@@ -221,9 +221,9 @@ walletAddress:The wallet public key address, the owner id of the file when uploa
 
 * example:
 
-  ​		expected price 20cess:cessctl purchase exp 1 1 20 -c /root/cess_client.yaml
+  ​		expected price 20cess:cessctl purchase storage 1 1 20 -c /root/cess_client.yaml
 
-  ​		All price accepted:cessctl purchase exp 1 1 -c /root/cess_client.yaml
+  ​		All price accepted:cessctl purchase storage 1 1 -c /root/cess_client.yaml
 
 
 
@@ -235,13 +235,13 @@ walletAddress:The wallet public key address, the owner id of the file when uploa
 
 * usage:
 
-  ​		cessctl purchase free <address>
+  ​		cessctl purchase free <wallet address>
 
   ​		address:publickey of the account
 
 * example:
 
-  ​		cessctl purchase free 0x2ed4a2c67291bf3eaa4de538ab120ba21b3de1b5704551864226d2fae8f87937 -c /root/cess_client.yaml
+  ​		cessctl purchase free cXjsAyird2dizRjmHML9Eqxp1MGodGdEUHv8rjr7z56Dv5A7C-c /root/cess_client.yaml
 
 
 
