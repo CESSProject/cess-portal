@@ -21,7 +21,7 @@ type answer struct {
 
 /*
 ObtainFromFaucet means to obtain tCESS for transaction spending through the faucet
-pbk:wallet address
+walletaddress:wallet address
 */
 func ObtainFromFaucet(walletaddress string) error {
 	pubkey, err := tools.DecodeToPub(walletaddress, tools.ChainCessTestPrefix)
@@ -32,7 +32,7 @@ func ObtainFromFaucet(walletaddress string) error {
 	var ob = struct {
 		Address string `json:"Address"`
 	}{
-		fmt.Sprintf("%#x", pubkey),
+		tools.PubBytesTo0XString(pubkey),
 	}
 	var res faucet
 	resp, err := tools.Post(conf.ClientConf.ChainData.FaucetAddress, ob)

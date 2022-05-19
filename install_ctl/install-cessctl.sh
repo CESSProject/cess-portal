@@ -18,20 +18,22 @@ keyPath=''
 ##The path to download the file,using an absolute address
 installPath=''
 
-
-
-sudo sed -i "s|boardPath : \"\"|boardPath : \"${boardPath}\"|g" ./cess_client.yaml
-sudo sed -i "s|cessRpcAddr : \"\"|cessRpcAddr : \"${cessRpcAddr}\"|g" ./cess_client.yaml
-sudo sed -i "s|faucetAddress : \"\"|faucetAddress : \"${faucetAddress}\"|g" ./cess_client.yaml
-sudo sed -i "s|idAccountPhraseOrSeed : \"\"|idAccountPhraseOrSeed : \"${idAccountPhraseOrSeed}\"|g" ./cess_client.yaml
-sudo sed -i "s|walletAddress : \"\"|walletAddress : \"${walletAddress}\"|g" ./cess_client.yaml
-sudo sed -i "s|keyPath : \"\"|keyPath : \"${keyPath}\"|g" ./cess_client.yaml
-sudo sed -i "s|installPath : \"\"|installPath : \"${installPath}\"|g" ./cess_client.yaml
-
-rm -rf /usr/bin/cessctl
-rm -rf /etc/cess.d/
+if [ -f "/usr/bin/cessctl" ]; then
+  rm -rf /usr/bin/cessctl
+fi
+if [ -f "/etc/cess.d/" ]; then
+  rm -rf /etc/cess.d/
+fi
 mkdir /etc/cess.d/
 cp ./cess_client.yaml /etc/cess.d/
 chmod 777 ./cessctl
 mv ./cessctl /usr/bin/
 cessctl -h
+
+sudo sed -i "s|boardPath : \"\"|boardPath : \"${boardPath}\"|g" /etc/cess.d/cess_client.yaml
+sudo sed -i "s|cessRpcAddr : \"\"|cessRpcAddr : \"${cessRpcAddr}\"|g" /etc/cess.d/cess_client.yaml
+sudo sed -i "s|faucetAddress : \"\"|faucetAddress : \"${faucetAddress}\"|g" /etc/cess.d/cess_client.yaml
+sudo sed -i "s|idAccountPhraseOrSeed : \"\"|idAccountPhraseOrSeed : \"${idAccountPhraseOrSeed}\"|g" /etc/cess.d/cess_client.yaml
+sudo sed -i "s|walletAddress : \"\"|walletAddress : \"${walletAddress}\"|g" /etc/cess.d/cess_client.yaml
+sudo sed -i "s|keyPath : \"\"|keyPath : \"${keyPath}\"|g" /etc/cess.d/cess_client.yaml
+sudo sed -i "s|installPath : \"\"|installPath : \"${installPath}\"|g" /etc/cess.d/cess_client.yaml
