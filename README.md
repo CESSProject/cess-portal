@@ -125,7 +125,7 @@ walletAddress:The wallet public key address, the owner id of the file when uploa
 
 * example:
 
-  ​		cessctl query price -c /root/cess_client.yaml
+  ​		cessctl query price -c /etc/cess.d/cess_client.yaml
 
 
 
