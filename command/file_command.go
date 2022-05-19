@@ -96,7 +96,7 @@ func FileDeleteCommandFunc(cmd *cobra.Command, args []string) {
 
 func NewFileDecryptCommand() *cobra.Command {
 	cc := &cobra.Command{
-		Use:   "decode <file path>",
+		Use:   "decrypt <file path>",
 		Short: "Decrypt the any specific file again when you failed file decrypt first chance",
 		Long:  `File decode means that if the file is not decrypted when you download it, it can be decode by this method.Please enter absolute path.`,
 
