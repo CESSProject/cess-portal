@@ -70,7 +70,7 @@ expected:The expected number of prices when buying is required to prevent price 
 */
 func Expansion(quantity, duration, expected int) error {
 	chain.Chain_Init()
-	if quantity == 0 && duration == 0 {
+	if quantity == 0 || duration == 0 {
 		fmt.Printf("[Error] Please enter the correct purchase number\n")
 		return errors.New("Please enter the correct purchase number")
 	}
