@@ -21,7 +21,7 @@ installPath=''
 if [ -f "/usr/bin/cessctl" ]; then
   rm -rf /usr/bin/cessctl
 fi
-if [ -f "/etc/cess.d/" ]; then
+if [ -e "/etc/cess.d/" ]; then
   rm -rf /etc/cess.d/
 fi
 mkdir /etc/cess.d/
