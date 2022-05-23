@@ -43,7 +43,7 @@ func QueryPrice() error {
 	ci.ChainModuleMethod = chain.FindPriceModuleMethod
 	Price, err := ci.GetPrice()
 	if err != nil {
-		fmt.Printf("%s[Error]%sGet price fail:%s\n", tools.Red, tools.Reset, err)
+		fmt.Printf("%s[Error]%sGet price fail\n", tools.Red, tools.Reset)
 		logger.OutPutLogger.Sugar().Infof("%s[Error]%sGet price fail::%s\n", tools.Red, tools.Reset, err)
 		return err
 	}
@@ -68,7 +68,7 @@ func QueryFile(fileid string) error {
 		ci.ChainModuleMethod = chain.FindFileModuleMethod[0]
 		data, err := ci.GetFileInfo(fileid)
 		if err != nil {
-			fmt.Printf("[Error]Get file:%s info fail:%s\n", fileid, err)
+			fmt.Printf("[Error]Get file:%s info fail\n", fileid)
 			logger.OutPutLogger.Sugar().Infof("[Error]Get file:%s info fail:%s\n", fileid, err)
 			return err
 		}
@@ -80,7 +80,7 @@ func QueryFile(fileid string) error {
 		ci.ChainModuleMethod = chain.FindFileModuleMethod[1]
 		data, err := ci.GetFileList()
 		if err != nil {
-			fmt.Printf("[Error]Get file list fail:%s\n", err)
+			fmt.Printf("[Error]Get file list fail\n")
 			logger.OutPutLogger.Sugar().Infof("[Error]Get file list fail:%s\n", err)
 			return err
 		}

@@ -37,18 +37,19 @@ func ObtainFromFaucet(walletaddress string) error {
 	var res faucet
 	resp, err := tools.Post(conf.ClientConf.ChainData.FaucetAddress, ob)
 	if err != nil {
-		fmt.Printf("[Error]System error:%s\n", err)
-		logger.OutPutLogger.Sugar().Infof("[Error]System error:%s\n", err)
+		fmt.Printf("[Error]Network problem, please check your network connection\n")
+		logger.OutPutLogger.Sugar().Infof("[Error]Network problem, please check your network connection, error:%s\n", err)
 		return err
 	}
 	err = json.Unmarshal(resp, &res)
 	if err != nil {
-		fmt.Println("unmarshal error:", err)
+		fmt.Printf("Incorrect response from faucet\n")
+		logger.OutPutLogger.Sugar().Infof("Incorrect response from faucet,error:%s", err)
 		return err
 	}
 	if res.Ans.Err != "" {
-		fmt.Printf("[Error]Obtain from faucet fail:%s\n", res.Ans.Err)
-		logger.OutPutLogger.Sugar().Infof("[Error]Obtain from faucet fail:%s\n", res.Ans.Err)
+		fmt.Printf("[Error]get free token from faucet fail\n")
+		logger.OutPutLogger.Sugar().Infof("[Error]get free token from faucet fail:%s\n", res.Ans.Err)
 		return err
 	}
 

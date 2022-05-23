@@ -105,19 +105,15 @@ func FileUpload(path, backups, PrivateKey string) error {
 	ci.IdentifyAccountPhrase = conf.ClientConf.ChainData.IdAccountPhraseOrSeed
 	ci.TransactionName = chain.UploadFileTransactionName
 
-	//if file.Size()/1024 == 0 {
-	//	filesize = 1
-	//} else {
-	//	filesize = uint64(file.Size() / 1024)
-	//}
 	fee.SetInt64(int64(0))
 
-	AsInBlock, err := ci.UploadFileMetaInformation(fileid, file.Name(), filehash, PrivateKey == "", uint8(spares), uint64(file.Size()), fee)
+	FileUploadStatus, err := ci.UploadFileMetaInformation(fileid, file.Name(), filehash, PrivateKey == "", uint8(spares), uint64(file.Size()), fee)
 	if err != nil {
-		fmt.Printf("\n[Error]Upload file meta information error:%s\n", err)
+		fmt.Printf("[Error]Upload file meta information fail\n")
+		logger.OutPutLogger.Sugar().Infof("[Error]Upload file meta information error:%s\n", err)
 		return err
 	}
-	fmt.Printf("\nFile meta info upload:%s ,fileid is:%s\n", AsInBlock, fileid)
+	fmt.Printf("File meta info upload:%s ,fileid is:%s\n", FileUploadStatus, fileid)
 
 	var client *rpc.Client
 	for i, schd := range schds {
@@ -148,8 +144,8 @@ func FileUpload(path, backups, PrivateKey string) error {
 		blockinfo.Data = data
 		info, err := proto.Marshal(&blockinfo)
 		if err != nil {
-			fmt.Println("[Error]Serialization error, please upload again!\n ", err)
-			logger.OutPutLogger.Sugar().Infof("[Error]Serialization error, please upload again! ", err)
+			fmt.Println("[Error]There was a problem with the network during upload, please upload again!\n")
+			logger.OutPutLogger.Sugar().Infof("[Error]There was a problem with the network during upload, please upload again!error:%s", err)
 			return err
 		}
 		reqmsg := sp.Get().(*rpc.ReqMsg)
@@ -161,7 +157,7 @@ func FileUpload(path, backups, PrivateKey string) error {
 		resp, err := client.Call(ctx, reqmsg)
 		defer cancel()
 		if err != nil {
-			fmt.Printf("\n%s[Error]Failed to transfer file to scheduler,error:%s%s\n", tools.Red, err, tools.Reset)
+			fmt.Printf("%s[Error]Failed to transfer file to scheduler%s\n", tools.Red, tools.Reset)
 			logger.OutPutLogger.Sugar().Infof("%s[Error]Failed to transfer file to scheduler,error:%s%s\n", tools.Red, err, tools.Reset)
 			return err
 		}
@@ -169,13 +165,13 @@ func FileUpload(path, backups, PrivateKey string) error {
 		var res rpc.RespBody
 		err = proto.Unmarshal(resp.Body, &res)
 		if err != nil {
-			fmt.Printf("\n[Error]Error getting reply from schedule, transfer failed!\n ", err)
-			logger.OutPutLogger.Sugar().Infof("[Error]Error getting reply from schedule, transfer failed! ", err)
+			fmt.Printf("[Error]response error from scheduler,upload failed\n")
+			logger.OutPutLogger.Sugar().Infof("[Error]response error from scheduler,upload failed!error:%s ", err)
 			return err
 		}
 		if res.Code != 200 {
-			fmt.Printf("\n[Error]Upload file fail!scheduler problem:%s\n", res.Msg)
-			logger.OutPutLogger.Sugar().Infof("\n[Error]Upload file fail!scheduler problem:%s\n", res.Msg)
+			fmt.Printf("[Error]Upload file fail!scheduler problem:%s\n", res.Msg)
+			logger.OutPutLogger.Sugar().Infof("[Error]Upload file fail!scheduler problem:%s\n", res.Msg)
 			os.Exit(conf.Exit_SystemErr)
 		}
 		sp.Put(reqmsg)
@@ -187,7 +183,7 @@ func FileUpload(path, backups, PrivateKey string) error {
 		if err != nil {
 			err = os.Mkdir(conf.ClientConf.PathInfo.KeyPath, os.ModePerm)
 			if err != nil {
-				fmt.Printf("%s[Error]Create key path error :%s%s\n", tools.Red, err, tools.Reset)
+				fmt.Printf("%s[Error]Create key path %s\n", tools.Red, tools.Reset)
 				logger.OutPutLogger.Sugar().Infof("%s[Error]Create key path error :%s%s\n", tools.Red, err, tools.Reset)
 				os.Exit(conf.Exit_SystemErr)
 			}
@@ -196,20 +192,21 @@ func FileUpload(path, backups, PrivateKey string) error {
 		os.Create(filepath.Join(conf.ClientConf.PathInfo.KeyPath, file.Name()) + ".pem")
 		keyfile, err := os.OpenFile(filepath.Join(conf.ClientConf.PathInfo.KeyPath, file.Name())+".pem", os.O_WRONLY|os.O_APPEND, 0666)
 		if err != nil {
-			fmt.Printf("%s[Error]:Failed to save key%s error:%s\n", tools.Red, tools.Reset, err)
+			fmt.Printf("%s[Error]:Failed to save key%s\n", tools.Red, tools.Reset)
 			logger.OutPutLogger.Sugar().Infof("%s[Error]:Failed to save key%s error:%s\n", tools.Red, tools.Reset, err)
 			return err
 		}
 		_, err = keyfile.WriteString(PrivateKey)
 		if err != nil {
-			fmt.Printf("%s[Error]:Failed to write key to file:%s%s error:%s\n", tools.Red, filepath.Join(conf.ClientConf.PathInfo.KeyPath, (file.Name()+".pem")), tools.Reset, err)
+			fmt.Printf("%s[Error]:Failed to write key to file:%s%s\n", tools.Red, filepath.Join(conf.ClientConf.PathInfo.KeyPath, (file.Name()+".pem")), tools.Reset)
 			logger.OutPutLogger.Sugar().Infof("%s[Error]:Failed to write key to file:%s%s error:%s", tools.Red, filepath.Join(conf.ClientConf.PathInfo.KeyPath, (file.Name()+".pem")), tools.Reset, err)
 			return err
 		}
 
 		encodefile, err := tools.AesEncrypt(filebyte, []byte(PrivateKey))
 		if err != nil {
-			fmt.Println("[Error]Encode the file fail ,error!\n ", err)
+			fmt.Println("[Error]Encode the file fail ,error!\n ")
+			logger.OutPutLogger.Sugar().Infof("[Error]Encode the file fail ,error:%s\n ", err)
 			return err
 		}
 		blocks := len(encodefile) / blocksize
@@ -233,7 +230,8 @@ func FileUpload(path, backups, PrivateKey string) error {
 			err = commit(i, block)
 			if err != nil {
 				bar.Finish()
-				fmt.Printf("%s[Error]:Failed to upload the file%s error:%s\n", tools.Red, tools.Reset, err)
+				fmt.Printf("%s[Error]File upload failed, network error%s\n", tools.Red, tools.Reset)
+				logger.OutPutLogger.Sugar().Infof("%s[Error]File upload failed, network error:%s%s\n", tools.Red, err, tools.Reset)
 				return err
 			}
 		}
@@ -261,7 +259,8 @@ func FileUpload(path, backups, PrivateKey string) error {
 			err = commit(i, block)
 			if err != nil {
 				bar.Finish()
-				fmt.Printf("%s[Error]:Failed to upload the file%s error:%s\n", tools.Red, tools.Reset, err)
+				fmt.Printf("%s[Error]File upload failed, network error%s\n", tools.Red, tools.Reset)
+				logger.OutPutLogger.Sugar().Infof("%s[Error]File upload failed, network error:%s%s\n", tools.Red, err, tools.Reset)
 				return err
 			}
 		}
@@ -288,8 +287,8 @@ func FileDownload(fileid string) error {
 		return err
 	}
 	if fileinfo.File_Name == nil {
-		fmt.Printf("%s[Error]The fileid:%s used to find the file is incorrect, please try again%s\n", tools.Red, fileid, err, tools.Reset)
-		logger.OutPutLogger.Sugar().Infof("%s[Error]The fileid:%s used to find the file is incorrect, please try again%s\n", tools.Red, fileid, err, tools.Reset)
+		fmt.Printf("%s[Error]The fileid:%s used to find the file is incorrect, please try again%s\n", tools.Red, fileid, tools.Reset)
+		logger.OutPutLogger.Sugar().Infof("%s[Error]The fileid:%s used to find the file is incorrect, please try again%s\n", tools.Red, fileid, tools.Reset)
 		return err
 	}
 	if string(fileinfo.FileState) != "active" {
@@ -302,20 +301,20 @@ func FileDownload(fileid string) error {
 	if err != nil {
 		err = os.Mkdir(conf.ClientConf.PathInfo.InstallPath, os.ModePerm)
 		if err != nil {
-			fmt.Printf("%s[Error]Create install path error :%s%s\n", tools.Red, err, tools.Reset)
+			fmt.Printf("%s[Error]Create install path error %s\n", tools.Red, tools.Reset)
 			logger.OutPutLogger.Sugar().Infof("%s[Error]Create install path error :%s%s\n", tools.Red, err, tools.Reset)
 			os.Exit(conf.Exit_SystemErr)
 		}
 	}
 	_, err = os.Create(filepath.Join(conf.ClientConf.PathInfo.InstallPath, string(fileinfo.File_Name[:])))
 	if err != nil {
-		fmt.Printf("%s[Error]Create installed file error :%s%s\n", tools.Red, err, tools.Reset)
+		fmt.Printf("%s[Error]Create installed file error %s\n", tools.Red, tools.Reset)
 		logger.OutPutLogger.Sugar().Infof("%s[Error]Create installed file error :%s%s\n", tools.Red, err, tools.Reset)
 		os.Exit(conf.Exit_SystemErr)
 	}
 	installfile, err := os.OpenFile(filepath.Join(conf.ClientConf.PathInfo.InstallPath, string(fileinfo.File_Name[:])), os.O_WRONLY|os.O_APPEND, 0666)
 	if err != nil {
-		fmt.Printf("%s[Error]:Failed to save key error:%s%s\n", tools.Red, err, tools.Reset)
+		fmt.Printf("%s[Error]:Failed to save key error%s\n", tools.Red, tools.Reset)
 		logger.OutPutLogger.Sugar().Infof("%s[Error]:Failed to save key error:%s%s", tools.Red, err, tools.Reset)
 		return err
 	}
@@ -326,7 +325,8 @@ func FileDownload(fileid string) error {
 	ci.ChainModuleMethod = chain.FindSchedulerInfoMethod
 	schds, err := ci.GetSchedulerInfo()
 	if err != nil {
-		fmt.Printf("%s[Error]Get scheduler list error:%s%s\n ", tools.Red, err, tools.Reset)
+		fmt.Printf("%s[Error]Get scheduler list error%s\n ", tools.Red, tools.Reset)
+		logger.OutPutLogger.Sugar().Infof("%s[Error]Get scheduler list error:%s%s\n ", tools.Red, err, tools.Reset)
 		return err
 	}
 
@@ -338,10 +338,9 @@ func FileDownload(fileid string) error {
 		defer cancel()
 		if err != nil {
 			err = errors.New("Connect with scheduler timeout")
-			fmt.Printf("%s[Tips]%sdialog with scheduler:%s fail! reason:%s\n", tools.Yellow, tools.Reset, string(base58.Decode(string(schd.Ip))), err)
+			//fmt.Printf("%s[Tips]%sdialog with scheduler:%s fail! reason:%s\n", tools.Yellow, tools.Reset, string(base58.Decode(string(schd.Ip))), err)
 			if i == len(schds)-1 {
 				fmt.Printf("%s[Error]All scheduler is offline!!!%s\n", tools.Red, tools.Reset)
-				//logger.OutPutLogger.Sugar().Infof("\n%s[Error]All scheduler is offlien!!!%s\n", tools.Red, tools.Reset)
 				return err
 			}
 			continue
@@ -365,7 +364,7 @@ func FileDownload(fileid string) error {
 	for {
 		data, err := proto.Marshal(&wantfile)
 		if err != nil {
-			fmt.Printf("[Error]Marshal req file error:%s\n", err)
+			fmt.Printf("[Error]Marshal req file error\n")
 			logger.OutPutLogger.Sugar().Infof("[Error]Marshal req file error:%s\n", err)
 			return err
 		}
@@ -378,7 +377,7 @@ func FileDownload(fileid string) error {
 		resp, err := client.Call(ctx, req)
 		cancel()
 		if err != nil {
-			fmt.Printf("[Error]Download file fail error:%s\n", err)
+			fmt.Printf("[Error]Download file fail error\n")
 			logger.OutPutLogger.Sugar().Infof("[Error]Download file fail error:%s\n", err)
 			return err
 		}
@@ -386,21 +385,21 @@ func FileDownload(fileid string) error {
 		var respbody rpc.RespBody
 		err = proto.Unmarshal(resp.Body, &respbody)
 		if err != nil || respbody.Code != 200 {
-			fmt.Printf("[Error]Download file from CESS. reply message:%s\n", err, respbody.Msg)
+			fmt.Printf("[Error]Download file from CESS fail\n")
 			logger.OutPutLogger.Sugar().Infof("[Error]Download file from CESS error:%v. reply message:%s\n", err, respbody.Msg)
 			return err
 		}
 		var blockData module.FileDownloadInfo
 		err = proto.Unmarshal(respbody.Data, &blockData)
 		if err != nil {
-			fmt.Printf("[Error]Download file from CESS error:%s\n", err)
+			fmt.Printf("[Error]Download file from CESS error\n")
 			logger.OutPutLogger.Sugar().Infof("[Error]Download file from CESS error:%s\n", err)
 			return err
 		}
 
 		_, err = installfile.Write(blockData.Data)
 		if err != nil {
-			fmt.Printf("%s[Error]:Failed to write file's block to file:%s%s error:%s\n", tools.Red, filepath.Join(conf.ClientConf.PathInfo.InstallPath, string(fileinfo.File_Name[:])), tools.Reset, err)
+			fmt.Printf("%s[Error]Failed to write file's block to file:%s%s error:%s\n", tools.Red, filepath.Join(conf.ClientConf.PathInfo.InstallPath, string(fileinfo.File_Name[:])), tools.Reset)
 			logger.OutPutLogger.Sugar().Infof("%s[Error]:Failed to write file's block to file:%s%s error:%s", tools.Red, filepath.Join(conf.ClientConf.PathInfo.InstallPath, string(fileinfo.File_Name[:])), tools.Reset, err)
 			return err
 		}
@@ -418,7 +417,7 @@ func FileDownload(fileid string) error {
 
 	bar.Finish()
 	fmt.Printf("%s[OK]:File '%s' has been downloaded to the directory :%s%s\n", tools.Green, string(fileinfo.File_Name), filepath.Join(conf.ClientConf.PathInfo.InstallPath, string(fileinfo.File_Name[:])), tools.Reset)
-	//logger.OutPutLogger.Sugar().Infof("%s[OK]:File '%s' has been downloaded to the directory :%s%s", tools.Green,string(fileinfo.Filename),filepath.Join(conf.ClientConf.PathInfo.InstallPath,string(fileinfo.Filename[:])), tools.Reset)
+	fmt.Printf("%s[OK]:File '%s' has been downloaded to the directory :%s%s\n", tools.Green, string(fileinfo.File_Name), filepath.Join(conf.ClientConf.PathInfo.InstallPath, string(fileinfo.File_Name[:])), tools.Reset)
 
 	if !fileinfo.Public {
 		fmt.Printf("%s[Warm]This is a private file, please enter the file password(If you don't want to decrypt, just press enter):%s\n", tools.Green, tools.Reset)
@@ -432,13 +431,14 @@ func FileDownload(fileid string) error {
 		}
 		encodefile, err := ioutil.ReadFile(filepath.Join(conf.ClientConf.PathInfo.InstallPath, string(fileinfo.File_Name[:])))
 		if err != nil {
-			fmt.Printf("%s[Error]:Decode file:%s fail%s error:%s\n", tools.Red, filepath.Join(conf.ClientConf.PathInfo.InstallPath, string(fileinfo.File_Name[:])), tools.Reset, err)
+			fmt.Printf("%s[Error]:Decode file:%s fail%s", tools.Red, filepath.Join(conf.ClientConf.PathInfo.InstallPath, string(fileinfo.File_Name[:])), tools.Reset)
 			logger.OutPutLogger.Sugar().Infof("%s[Error]:Decode file:%s fail%s error:%s\n", tools.Red, filepath.Join(conf.ClientConf.PathInfo.InstallPath, string(fileinfo.File_Name[:])), tools.Reset, err)
 			return err
 		}
 		decodefile, err := tools.AesDecrypt(encodefile, filePWD)
 		if err != nil {
-			fmt.Println("[Error]Dncode the file fail ,error!\n ", err)
+			fmt.Println("[Error]Dncode the file fail,Incorrect password\n ", err)
+			fmt.Println("[Error]Dncode the file fail ,error:%s\n ", err)
 			return err
 		}
 		err = installfile.Truncate(0)
@@ -462,8 +462,8 @@ func FileDelete(fileid string) error {
 
 	err := ci.DeleteFileOnChain(fileid)
 	if err != nil {
-		fmt.Printf("%s[Error]Delete file error:%s%s\n", tools.Red, tools.Reset, err)
-		logger.OutPutLogger.Sugar().Infof("%s[Error]Delete file error:%s%s\n", tools.Red, tools.Reset, err)
+		fmt.Printf("%s[Error]Delete file error%s\n", tools.Red, tools.Reset)
+		logger.OutPutLogger.Sugar().Infof("%s[Error]Delete file error:%s%s\n", tools.Red, err, tools.Reset)
 		return err
 	} else {
 		fmt.Printf("%s[OK]Delete fileid:%s success!%s\n", tools.Green, fileid, tools.Reset)
@@ -500,7 +500,8 @@ func FileDecrypt(path string) error {
 
 	decodefile, err := tools.AesDecrypt(encodefile, psw)
 	if err != nil {
-		fmt.Printf("%s[Error]File decode failed, please check your password! error:%s%s ", tools.Red, err, tools.Reset)
+		fmt.Printf("%s[Error]File decode failed, please check your password!%s ", tools.Red, tools.Reset)
+		logger.OutPutLogger.Sugar().Infof("%s[Error]File decode failed, please check your password! error:%s%s ", tools.Red, err, tools.Reset)
 		return err
 	}
 	filename := filepath.Base(path)
@@ -508,19 +509,22 @@ func FileDecrypt(path string) error {
 	if path == filepath.Join(conf.ClientConf.PathInfo.InstallPath, filename) {
 		err = os.Remove(path)
 		if err != nil {
-			fmt.Printf("%s[Error]An error occurred while saving the decoded file! error:%s%s ", tools.Red, err, tools.Reset)
+			fmt.Printf("%s[Error]An error occurred while saving the decoded file!%s ", tools.Red, tools.Reset)
+			logger.OutPutLogger.Sugar().Infof("%s[Error]An error occurred while saving the decoded file! error:%s%s ", tools.Red, err, tools.Reset)
 			return err
 		}
 	}
 	fileinfo, err := os.Create(filepath.Join(conf.ClientConf.PathInfo.InstallPath, filename))
 	if err != nil {
-		fmt.Printf("%s[Error]An error occurred while saving the decoded file! error:%s%s\n ", tools.Red, err, tools.Reset)
+		fmt.Printf("%s[Error]An error occurred while saving the decoded file!%s\n ", tools.Red, tools.Reset)
+		logger.OutPutLogger.Sugar().Infof("%s[Error]An error occurred while saving the decoded file! error:%s%s\n ", tools.Red, err, tools.Reset)
 		return err
 	}
 	defer fileinfo.Close()
 	_, err = fileinfo.Write(decodefile)
 	if err != nil {
-		fmt.Printf("%s[Error]Failed to save decrypted content to file! error:%s%s\n ", tools.Red, err, tools.Reset)
+		fmt.Printf("%s[Error]Failed to save decrypted content to file!%s\n ", tools.Red, tools.Reset)
+		logger.OutPutLogger.Sugar().Infof("%s[Error]Failed to save decrypted content to file! error:%s%s\n ", tools.Red, err, tools.Reset)
 		return err
 	}
 

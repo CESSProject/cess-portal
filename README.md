@@ -84,8 +84,8 @@ Please edit the configuration of the above file, press the ESC key on the keyboa
 | file               | download        | download file                                                |
 | file               | delete          | delete file                                                  |
 | file               | decrypt         | decrypt encrypted files                                      |
-| purchase           | exp             | buy storage                                                  |
-| purchase           | storage         | Get coins from the faucet                                    |
+| purchase           | storage         | buy storage                                                  |
+| purchase           | free            | Get coins from the faucet                                    |
 
 
 
@@ -117,7 +117,7 @@ walletAddress:The wallet public key address, the owner id of the file when uploa
 
 * instruction:
 
-  ​		Chain query and displays the current lease storage space Price (Unit: TCess / MB)
+  ​		Chain query and displays the current lease storage space Price (Unit: TCess / GB)
 
 * usage:
 
@@ -125,7 +125,7 @@ walletAddress:The wallet public key address, the owner id of the file when uploa
 
 * example:
 
-  ​		cessctl query price -c /etc/cess.d/cess_client.yaml
+  ​		cessctl query price
 
 
 
@@ -141,7 +141,7 @@ walletAddress:The wallet public key address, the owner id of the file when uploa
 
 * example:
 
-  ​		cessctl query space -c /root/cess_client.yaml
+  ​		cessctl query space
 
 
 
@@ -159,9 +159,9 @@ walletAddress:The wallet public key address, the owner id of the file when uploa
 
 * example:
 
-  ​		Query single file information:cessctl query file 1483720947931287552 -c /root/cess_client.yaml
+  ​		Query single file information:cessctl query file 1483720947931287552
 
-  ​		Query file list information:cessctl query file -c /root/cess_client.yaml
+  ​		Query file list information:cessctl query file
 
 
 
@@ -181,7 +181,7 @@ walletAddress:The wallet public key address, the owner id of the file when uploa
 
 * example:
 
-  ​		cessctl file upload /root/cess_client.yaml 3 -c /root/cess_client.yaml
+  ​		cessctl file upload /root/test.txt 3
 
 
 
@@ -199,7 +199,7 @@ walletAddress:The wallet public key address, the owner id of the file when uploa
 
 * example:
 
-  ​		cessctl file download 1483720947931287552 -c /root/cess_client.yaml
+  ​		cessctl file download 1483720947931287552
 
 
 
@@ -221,9 +221,9 @@ walletAddress:The wallet public key address, the owner id of the file when uploa
 
 * example:
 
-  ​		expected price 20cess:cessctl purchase storage 1 1 20 -c /root/cess_client.yaml
+  ​		expected price 20cess:cessctl purchase storage 1 1 20
 
-  ​		All price accepted:cessctl purchase storage 1 1 -c /root/cess_client.yaml
+  ​		All price accepted:cessctl purchase storage 1 1
 
 
 
@@ -237,11 +237,11 @@ walletAddress:The wallet public key address, the owner id of the file when uploa
 
   ​		cessctl purchase free <wallet address>
 
-  ​		address:publickey of the account
+  ​		address:wallet address
 
 * example:
 
-  ​		cessctl purchase free cXjsAyird2dizRjmHML9Eqxp1MGodGdEUHv8rjr7z56Dv5A7C-c /root/cess_client.yaml
+  ​		cessctl purchase free cXjsAyird2dizRjmHML9Eqxp1MGodGdEUHv8rjr7z56Dv5A7C
 
 
 
@@ -259,7 +259,7 @@ walletAddress:The wallet public key address, the owner id of the file when uploa
 
 * example:
 
-  ​		cessctl file delete 1506154108548026368 -c /root/cess_client.yaml
+  ​		cessctl file delete 1506154108548026368
 
 ###  (L)File decrypt
 
@@ -275,4 +275,4 @@ walletAddress:The wallet public key address, the owner id of the file when uploa
 
 * example:
 
-  ​		cessctl file decrypt /root/test.txt -c /root/cess_client.yaml
+  ​		cessctl file decrypt /root/test.txt
