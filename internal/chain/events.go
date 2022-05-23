@@ -215,16 +215,23 @@ type Event_Balances_Withdraw struct {
 	Amount types.U128
 	Topics []types.Hash
 }
+type Event_OutstandingChallenges struct {
+	Phase  types.Phase
+	PeerId types.U64
+	Fileid types.Bytes
+	Topics []types.Hash
+}
 
 // All event types
 type MyEventRecords struct {
 	//system
 	types.EventRecords
 	//SegmentBook
-	SegmentBook_PPBNoOnTimeSubmit []Event_PPBNoOnTimeSubmit
-	SegmentBook_PPDNoOnTimeSubmit []Event_PPDNoOnTimeSubmit
-	SegmentBook_ChallengeProof    []Event_ChallengeProof
-	SegmentBook_VerifyProof       []Event_VerifyProof
+	SegmentBook_PPBNoOnTimeSubmit     []Event_PPBNoOnTimeSubmit
+	SegmentBook_PPDNoOnTimeSubmit     []Event_PPDNoOnTimeSubmit
+	SegmentBook_ChallengeProof        []Event_ChallengeProof
+	SegmentBook_VerifyProof           []Event_VerifyProof
+	SegmentBook_OutstandingChallenges []Event_OutstandingChallenges
 	//Sminer
 	Sminer_Registered         []Event_Registered
 	Sminer_TimedTask          []Event_TimedTask
