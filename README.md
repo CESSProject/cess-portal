@@ -22,8 +22,6 @@ Then run the build.sh(On Linux) or build.bat(On Windows) script file in the ‘i
 ##Compile with script
 cd /cess-portal/install_ctl
 
-##Run it on windows platform
-./build.bat
 ##Run it on linux platform
 sh build.sh
 ```

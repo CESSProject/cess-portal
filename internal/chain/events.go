@@ -221,6 +221,11 @@ type Event_OutstandingChallenges struct {
 	Fileid types.Bytes
 	Topics []types.Hash
 }
+type Event_ReceiveSpace struct {
+	Phase  types.Phase
+	Acc    types.AccountID
+	Topics []types.Hash
+}
 
 // All event types
 type MyEventRecords struct {
@@ -257,6 +262,7 @@ type MyEventRecords struct {
 	FileBank_FillerUpload         []Event_FillerUpload
 	FileBank_ClearInvalidFile     []Event_ClearInvalidFile
 	FileBank_RecoverFile          []Event_RecoverFile
+	FileBank_ReceiveSpace         []Event_ReceiveSpace
 	//FileMap
 	FileMap_RegistrationScheduler []Event_RegistrationScheduler
 	//other system
