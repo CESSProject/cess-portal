@@ -153,7 +153,7 @@ func FileUpload(path, backups, PrivateKey string) error {
 		reqmsg.Method = module.UploadService
 		reqmsg.Service = module.CtlServiceName
 
-		ctx, cancel := context.WithTimeout(context.Background(), 20*time.Second)
+		ctx, cancel := context.WithTimeout(context.Background(), 120*time.Second)
 		resp, err := client.Call(ctx, reqmsg)
 		defer cancel()
 		if err != nil {
@@ -373,7 +373,7 @@ func FileDownload(fileid string) error {
 		req.Service = module.CtlServiceName
 		req.Body = data
 
-		ctx, cancel := context.WithTimeout(context.Background(), 60*time.Second)
+		ctx, cancel := context.WithTimeout(context.Background(), 120*time.Second)
 		resp, err := client.Call(ctx, req)
 		cancel()
 		if err != nil {
