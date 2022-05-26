@@ -287,8 +287,8 @@ func FileDownload(fileid string) error {
 		return err
 	}
 	if fileinfo.File_Name == nil {
-		fmt.Printf("%s[Error]The fileid:%s used to find the file is incorrect, please try again%s\n", tools.Red, fileid, tools.Reset)
-		logger.OutPutLogger.Sugar().Infof("%s[Error]The fileid:%s used to find the file is incorrect, please try again%s\n", tools.Red, fileid, tools.Reset)
+		fmt.Printf("%s[Error]The fileid:%s has been deleted,the file does not exist%s\n", tools.Red, fileid, tools.Reset)
+		logger.OutPutLogger.Sugar().Infof("%s[Error]The fileid:%s has been deleted,the file does not exist%s\n", tools.Red, fileid, tools.Reset)
 		return err
 	}
 	if string(fileinfo.FileState) != "active" {
@@ -416,7 +416,6 @@ func FileDownload(fileid string) error {
 	}
 
 	bar.Finish()
-	fmt.Printf("%s[OK]:File '%s' has been downloaded to the directory :%s%s\n", tools.Green, string(fileinfo.File_Name), filepath.Join(conf.ClientConf.PathInfo.InstallPath, string(fileinfo.File_Name[:])), tools.Reset)
 	fmt.Printf("%s[OK]:File '%s' has been downloaded to the directory :%s%s\n", tools.Green, string(fileinfo.File_Name), filepath.Join(conf.ClientConf.PathInfo.InstallPath, string(fileinfo.File_Name[:])), tools.Reset)
 
 	if !fileinfo.Public {
