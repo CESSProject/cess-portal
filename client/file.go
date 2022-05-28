@@ -337,7 +337,7 @@ func FileDownload(fileid string) error {
 		client, err = rpc.DialWebsocket(ctx, wsURL, "")
 		defer cancel()
 		if err != nil {
-			err = errors.New("Connect with scheduler timeout")
+			err = errors.New("Connect with scheduler timeout\n")
 			//fmt.Printf("%s[Tips]%sdialog with scheduler:%s fail! reason:%s\n", tools.Yellow, tools.Reset, string(base58.Decode(string(schd.Ip))), err)
 			if i == len(schds)-1 {
 				fmt.Printf("%s[Error]All scheduler is offline!!!%s\n", tools.Red, tools.Reset)
@@ -426,11 +426,12 @@ func FileDownload(fileid string) error {
 			return nil
 		}
 		if len(filePWD) != 16 && len(filePWD) != 24 && len(filePWD) != 32 {
-			return errors.New("[Error]The privatekey must be 16,24,32 bits long")
+			fmt.Printf("%s[Error]The password must be 16,24,32 bits long,your password length is :%v%s\n", tools.Red, len(filePWD), tools.Reset)
+			return errors.New("[Error]The password must be 16,24,32 bits long")
 		}
 		encodefile, err := ioutil.ReadFile(filepath.Join(conf.ClientConf.PathInfo.InstallPath, string(fileinfo.File_Name[:])))
 		if err != nil {
-			fmt.Printf("%s[Error]:Decode file:%s fail%s", tools.Red, filepath.Join(conf.ClientConf.PathInfo.InstallPath, string(fileinfo.File_Name[:])), tools.Reset)
+			fmt.Printf("%s[Error]:Decode file:%s fail%s\n", tools.Red, filepath.Join(conf.ClientConf.PathInfo.InstallPath, string(fileinfo.File_Name[:])), tools.Reset)
 			logger.OutPutLogger.Sugar().Infof("%s[Error]:Decode file:%s fail%s error:%s\n", tools.Red, filepath.Join(conf.ClientConf.PathInfo.InstallPath, string(fileinfo.File_Name[:])), tools.Reset, err)
 			return err
 		}
@@ -500,7 +501,7 @@ func FileDecrypt(path string) error {
 
 	decodefile, err := tools.AesDecrypt(encodefile, psw)
 	if err != nil {
-		fmt.Printf("%s[Error]File decode failed, please check your password!%s ", tools.Red, tools.Reset)
+		fmt.Printf("%s[Error]File decode failed, please check your password!%s\n", tools.Red, tools.Reset)
 		logger.OutPutLogger.Sugar().Infof("%s[Error]File decode failed, please check your password! error:%s%s ", tools.Red, err, tools.Reset)
 		return err
 	}
@@ -509,7 +510,7 @@ func FileDecrypt(path string) error {
 	if path == filepath.Join(conf.ClientConf.PathInfo.InstallPath, filename) {
 		err = os.Remove(path)
 		if err != nil {
-			fmt.Printf("%s[Error]An error occurred while saving the decoded file!%s ", tools.Red, tools.Reset)
+			fmt.Printf("%s[Error]An error occurred while saving the decoded file!%s\n ", tools.Red, tools.Reset)
 			logger.OutPutLogger.Sugar().Infof("%s[Error]An error occurred while saving the decoded file! error:%s%s ", tools.Red, err, tools.Reset)
 			return err
 		}
