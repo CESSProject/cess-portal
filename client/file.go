@@ -488,6 +488,7 @@ func FileDecrypt(path string) error {
 	fmt.Print(">")
 	psw, _ := gopass.GetPasswdMasked()
 	if len(psw) != 16 && len(psw) != 24 && len(psw) != 32 {
+		fmt.Printf("%s[Error]The password must be 16,24,32 bits long,your password length is :%v%s\n", tools.Red, len(psw), tools.Reset)
 		return errors.New("[Error]The password must be 16,24,32 bits long")
 	}
 	encodefile, err := ioutil.ReadFile(path)
