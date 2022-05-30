@@ -10,6 +10,7 @@ func TestFindFile(t *testing.T) {
 	//config file
 	conf.ClientConf.ChainData.CessRpcAddr = ""
 	conf.ClientConf.BoardInfo.BoardPath = ""
+	conf.ClientConf.ChainData.AccountPublicKey = ""
 
 	//param
 	fileid := ""

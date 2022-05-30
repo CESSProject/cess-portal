@@ -435,7 +435,7 @@ func FileDownload(fileid string) error {
 			logger.OutPutLogger.Sugar().Infof("%s[Error]:Decode file:%s fail%s error:%s\n", tools.Red, filepath.Join(conf.ClientConf.PathInfo.InstallPath, string(fileinfo.File_Name[:])), tools.Reset, err)
 			return err
 		}
-		decodefile, err := tools.AesDecrypt(encodefile, filePWD)
+		decryptfile, err := tools.AesDecrypt(encodefile, filePWD)
 		if err != nil {
 			fmt.Println("[Error]Dncode the file fail,Incorrect password\n ", err)
 			fmt.Println("[Error]Dncode the file fail ,error:%s\n ", err)
@@ -443,7 +443,7 @@ func FileDownload(fileid string) error {
 		}
 		err = installfile.Truncate(0)
 		_, err = installfile.Seek(0, os.SEEK_SET)
-		_, err = installfile.Write(decodefile[:])
+		_, err = installfile.Write(decryptfile[:])
 	}
 
 	return nil
@@ -475,7 +475,7 @@ func FileDelete(fileid string) error {
 
 /*
 FileDecrypt means that if the file is not decrypted when downloading the file, it can be decrypted by this method
-When you download the file if it is not decode, you can decode it this way
+When you download the file if it is not decrypt, you can decrypt it this way
 */
 func FileDecrypt(path string) error {
 	_, err := os.Stat(path)
@@ -499,30 +499,30 @@ func FileDecrypt(path string) error {
 		return err
 	}
 
-	decodefile, err := tools.AesDecrypt(encodefile, psw)
+	decryptfile, err := tools.AesDecrypt(encodefile, psw)
 	if err != nil {
-		fmt.Printf("%s[Error]File decode failed, please check your password!%s\n", tools.Red, tools.Reset)
-		logger.OutPutLogger.Sugar().Infof("%s[Error]File decode failed, please check your password! error:%s%s ", tools.Red, err, tools.Reset)
+		fmt.Printf("%s[Error]File decrypt failed, please check your password!%s\n", tools.Red, tools.Reset)
+		logger.OutPutLogger.Sugar().Infof("%s[Error]File decrypt failed, please check your password! error:%s%s ", tools.Red, err, tools.Reset)
 		return err
 	}
 	filename := filepath.Base(path)
-	//The decoded file is saved to the download folder, if the name is the same, the original file will be deleted
+	//The decrypted file is saved to the download folder, if the name is the same, the original file will be deleted
 	if path == filepath.Join(conf.ClientConf.PathInfo.InstallPath, filename) {
 		err = os.Remove(path)
 		if err != nil {
-			fmt.Printf("%s[Error]An error occurred while saving the decoded file!%s\n ", tools.Red, tools.Reset)
-			logger.OutPutLogger.Sugar().Infof("%s[Error]An error occurred while saving the decoded file! error:%s%s ", tools.Red, err, tools.Reset)
+			fmt.Printf("%s[Error]An error occurred while saving the decrypted file!%s\n ", tools.Red, tools.Reset)
+			logger.OutPutLogger.Sugar().Infof("%s[Error]An error occurred while saving the decrypted file! error:%s%s ", tools.Red, err, tools.Reset)
 			return err
 		}
 	}
 	fileinfo, err := os.Create(filepath.Join(conf.ClientConf.PathInfo.InstallPath, filename))
 	if err != nil {
-		fmt.Printf("%s[Error]An error occurred while saving the decoded file!%s\n ", tools.Red, tools.Reset)
-		logger.OutPutLogger.Sugar().Infof("%s[Error]An error occurred while saving the decoded file! error:%s%s\n ", tools.Red, err, tools.Reset)
+		fmt.Printf("%s[Error]An error occurred while saving the decrypted file!%s\n ", tools.Red, tools.Reset)
+		logger.OutPutLogger.Sugar().Infof("%s[Error]An error occurred while saving the decrypted file! error:%s%s\n ", tools.Red, err, tools.Reset)
 		return err
 	}
 	defer fileinfo.Close()
-	_, err = fileinfo.Write(decodefile)
+	_, err = fileinfo.Write(decryptfile)
 	if err != nil {
 		fmt.Printf("%s[Error]Failed to save decrypted content to file!%s\n ", tools.Red, tools.Reset)
 		logger.OutPutLogger.Sugar().Infof("%s[Error]Failed to save decrypted content to file! error:%s%s\n ", tools.Red, err, tools.Reset)

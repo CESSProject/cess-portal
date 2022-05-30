@@ -28,7 +28,7 @@ func NewFileUploadCommand() *cobra.Command {
 	cc := &cobra.Command{
 		Use:   "upload <file path> <backups>",
 		Short: "Upload the any specific file you want",
-		Long:  `Upload command mean send the local source files to CESS nework scheduling nodes;You can input any 16/24/32 length numbers to be your private key, then others people unable to decode your file data. if you choose private key is nil, then system is default you file become public file.`,
+		Long:  `Upload command mean send the local source files to CESS nework scheduling nodes;You can input any 16/24/32 length numbers to be your private key, then others people unable to decrypt your file data. if you choose private key is nil, then system is default you file become public file.`,
 
 		Run: FileUploadCommandFunc,
 	}
@@ -98,7 +98,7 @@ func NewFileDecryptCommand() *cobra.Command {
 	cc := &cobra.Command{
 		Use:   "decrypt <file path>",
 		Short: "Decrypt the any specific file again when you failed file decrypt first chance",
-		Long:  `File decode means that if the file is not decrypted when you download it, it can be decode by this method.Please enter absolute path.`,
+		Long:  `File decode means that if the file is not decrypted when you download it, it can be decrypt by this method.Please enter absolute path.`,
 
 		Run: FileDecryptCommandFunc,
 	}
@@ -110,7 +110,7 @@ func FileDecryptCommandFunc(cmd *cobra.Command, args []string) {
 	InitComponents(cmd)
 
 	if len(args) == 0 {
-		fmt.Printf("Please enter the path of the file to be decoded'\n")
+		fmt.Printf("Please enter the path of the file to be decrypt'\n")
 		os.Exit(conf.Exit_CmdLineParaErr)
 	}
 	client.FileDecrypt(args[0])
