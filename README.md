@@ -2,6 +2,11 @@
 
 cess-portal is the client of the cess project. By using some simple commands of cess-portal, you can easily realize a series of operations such as purchasing space, querying space, uploading/downloading files, and querying file information on the Linux system.
 
+# Prerequisites
+
+* :one: Centos
+* :two: Go 1.17 and above
+
 # **Build Code**
 
 If you don't have git software on your machine, please install it first
@@ -65,11 +70,6 @@ Please edit the configuration of the above file, press the ESC key on the keyboa
 ```
 
 # **Getting Started**
-
-## Prerequisites
-
-* :one: Centos
-* :two: Go 1.17 and above
 
 ## **Command group**
 
