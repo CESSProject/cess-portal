@@ -48,7 +48,7 @@ func ObtainFromFaucet(walletaddress string) error {
 		return err
 	}
 	if res.Ans.Err != "" {
-		fmt.Printf("[Error]get free token from faucet fail\n")
+		fmt.Printf("[Error]get free token from faucet fail:%s\n", res.Ans.Err)
 		logger.OutPutLogger.Sugar().Infof("[Error]get free token from faucet fail:%s\n", res.Ans.Err)
 		return err
 	}

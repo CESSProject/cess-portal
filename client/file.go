@@ -123,7 +123,6 @@ func FileUpload(path, backups, PrivateKey string) error {
 		defer cancel()
 		if err != nil {
 			err = errors.New("Connect with scheduler timeout")
-			fmt.Printf("%s[Tips]%sdialog with scheduler:%s fail! reason:%s\n", tools.Yellow, tools.Reset, string(base58.Decode(string(schd.Ip))), err)
 			if i == len(schds)-1 {
 				fmt.Printf("%s[Error]All scheduler is offline!!!%s\n", tools.Red, tools.Reset)
 				logger.OutPutLogger.Sugar().Infof("\n%s[Error]All scheduler is offlien!!!%s\n", tools.Red, tools.Reset)
@@ -338,7 +337,6 @@ func FileDownload(fileid string) error {
 		defer cancel()
 		if err != nil {
 			err = errors.New("Connect with scheduler timeout\n")
-			//fmt.Printf("%s[Tips]%sdialog with scheduler:%s fail! reason:%s\n", tools.Yellow, tools.Reset, string(base58.Decode(string(schd.Ip))), err)
 			if i == len(schds)-1 {
 				fmt.Printf("%s[Error]All scheduler is offline!!!%s\n", tools.Red, tools.Reset)
 				return err
