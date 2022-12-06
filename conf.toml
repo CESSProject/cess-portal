@@ -1,0 +1,6 @@
+#The rpc address of the chain node
+RpcAddr           = "ws://192.168.14.211:9944/"
+#Phrase or seed for wallet account
+AccountSeed       = "father weird payment camp saddle assault dune knee network prize enemy liquid"
+#wallet account of cess 
+AccountId = "cXjTYBWUY68uGG2t3ShAhmLtNhz3WdBfXrYn4XaQYg5pKLZcF"

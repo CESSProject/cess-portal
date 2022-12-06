@@ -3,52 +3,69 @@ package logger
 import (
 	"cess-portal/conf"
 	"fmt"
+	"os"
+	"time"
+
 	"github.com/natefinch/lumberjack"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
-	"os"
-	"path/filepath"
-	"time"
 )
 
 var (
-	OutPutLogger *zap.Logger
+	Err  *zap.Logger
+	Out  *zap.Logger
+	Uld  *zap.Logger
+	path string
 )
 
-func InitLogger() {
-	if len(conf.ClientConf.BoardInfo.BoardPath) == 0 {
-		conf.ClientConf.BoardInfo.BoardPath = conf.Board_Path_D
-	}
-	_, err := os.Stat(conf.ClientConf.BoardInfo.BoardPath)
+func Log_Init() {
+	f, err := os.Stat(conf.LogfileDir)
 	if err != nil {
-		err = os.MkdirAll(conf.ClientConf.BoardInfo.BoardPath, os.ModePerm)
+		err = os.MkdirAll(conf.LogfileDir, os.ModeDir)
 		if err != nil {
-			fmt.Printf("\x1b[%dm[err]\x1b[0m Create '%v' file output.log error\n", 41, conf.ClientConf.BoardInfo.BoardPath)
-			os.Exit(conf.Exit_ConfErr)
+			path = "./log"
+		} else {
+			path = conf.LogfileDir
+		}
+	} else {
+		if f.IsDir() {
+			path = conf.LogfileDir
+		} else {
+			err = os.RemoveAll(conf.LogfileDir)
+			if err != nil {
+				fmt.Printf("\x1b[%dm[err]\x1b[0m %v\n", 41, err)
+				os.Exit(1)
+			}
+			err = os.MkdirAll(conf.LogfileDir, os.ModeDir)
+			if err != nil {
+				path = "./log"
+			} else {
+				path = conf.LogfileDir
+			}
 		}
 	}
-	initOutPutLogger()
+	initUldLogger()
 }
 
-// output log
-func initOutPutLogger() {
-	outputlogpath := filepath.Join(conf.ClientConf.BoardInfo.BoardPath, "output.log")
+// out log
+func initUldLogger() {
+	uldlogpath := path + "/uld.log"
 	hook := lumberjack.Logger{
-		Filename:   outputlogpath,
-		MaxSize:    10,
-		MaxAge:     360,
+		Filename:   uldlogpath,
+		MaxSize:    10,  //MB
+		MaxAge:     365, //Day
 		MaxBackups: 0,
 		LocalTime:  true,
 		Compress:   true,
 	}
 	encoderConfig := zapcore.EncoderConfig{
-		MessageKey: "msg",
-		TimeKey:    "time",
-		//CallerKey:    "file",
-		LineEnding:  zapcore.DefaultLineEnding,
-		EncodeLevel: zapcore.LowercaseLevelEncoder,
-		EncodeTime:  formatEncodeTime,
-		//EncodeCaller: zapcore.ShortCallerEncoder,
+		MessageKey:   "msg",
+		TimeKey:      "time",
+		CallerKey:    "file",
+		LineEnding:   zapcore.DefaultLineEnding,
+		EncodeLevel:  zapcore.LowercaseLevelEncoder,
+		EncodeTime:   formatEncodeTime,
+		EncodeCaller: zapcore.ShortCallerEncoder,
 	}
 	atomicLevel := zap.NewAtomicLevel()
 	atomicLevel.SetLevel(zap.InfoLevel)
@@ -60,7 +77,8 @@ func initOutPutLogger() {
 	)
 	caller := zap.AddCaller()
 	development := zap.Development()
-	OutPutLogger = zap.New(core, caller, development)
+	Uld = zap.New(core, caller, development)
+	Uld.Sugar().Errorf("The service has started and created a log file in the %v", uldlogpath)
 }
 
 func formatEncodeTime(t time.Time, enc zapcore.PrimitiveArrayEncoder) {

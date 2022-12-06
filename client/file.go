@@ -3,531 +3,390 @@ package client
 import (
 	"cess-portal/conf"
 	"cess-portal/internal/chain"
-	"cess-portal/internal/logger"
-	"cess-portal/internal/rpc"
-	"cess-portal/module"
+	"cess-portal/internal/erasure"
+	"cess-portal/internal/hashtree"
+	. "cess-portal/internal/logger"
+	"cess-portal/internal/tcp"
 	"cess-portal/tools"
-	"context"
+	"encoding/hex"
 	"errors"
 	"fmt"
-	"github.com/btcsuite/btcutil/base58"
-	"github.com/howeyc/gopass"
-	"google.golang.org/protobuf/proto"
-	"io/ioutil"
-	"math/big"
+	"io"
+	"log"
+	"net"
 	"os"
 	"path/filepath"
-	"strconv"
-	"sync"
 	"time"
+
+	cesskeyring "github.com/CESSProject/go-keyring"
+	"github.com/centrifuge/go-substrate-rpc-client/v4/types"
 )
 
-/*
-FileUpload means upload files to CESS system
-path:The absolute path of the file to be uploaded
-backups:Number of backups of files that need to be uploaded
-PrivateKey:Encrypted password for uploaded files
-*/
-func FileUpload(path, backups, PrivateKey string) error {
-	if len(PrivateKey) != 16 && len(PrivateKey) != 24 && len(PrivateKey) != 32 && len(PrivateKey) != 0 {
-		fmt.Printf("[Error]The privatekey must be 16,24,32 bits long\n")
-		return errors.New("[Error]The privatekey must be 16,24,32 bits long")
-	}
-	if backups == "0" {
-		fmt.Printf("[Error]The number of backups must be bigger than 1\n")
-		return errors.New("The number of backups must be bigger than 1")
-	}
-	chain.Chain_Init()
-	file, err := os.Stat(path)
+const LOG_TAG_FILEUPLOAD = "UploadFile"
+const LOG_TAG_FILEDELETE = "FileDelete"
+const LOG_TAG_FILEDOWNLOAD = "FileDownload"
+const ERR_404 = "Not found"
+
+//File Upload
+
+func FileUpload(fullpath, bucketName string) {
+	fpath, fname := filepath.Split(fullpath)
+	//set cache dir
+	conf.FileCacheDir = fpath
+	// Calc file state
+	fstat, err := os.Stat(filepath.Join(fpath, fname))
 	if err != nil {
-		fmt.Printf("[Error]Please enter the correct file path!\n")
-		return err
+		Uld.Sugar().Infof("[%v] %v", LOG_TAG_FILEUPLOAD, err)
 	}
-
-	if file.IsDir() {
-		fmt.Printf("[Error]Please do not upload the folder!\n")
-		return err
-	}
-
-	spares, err := strconv.Atoi(backups)
+	// Calc reedsolomon
+	chunkPath, datachunkLen, rduchunkLen, err := erasure.ReedSolomon(filepath.Join(fpath, fname), fstat.Size())
 	if err != nil {
-		fmt.Printf("[Error]Please enter a correct integer!\n")
-		return err
-	}
-	if spares > conf.MaxBackups {
-		fmt.Printf("[warm]The maximum number of backups is %v, it has been set to %v backups for you.\n", conf.MaxBackups, conf.MaxBackups)
+		Uld.Sugar().Infof("[%v] %v", LOG_TAG_FILEUPLOAD, err)
+		log.Println("Client internal error, please try again or check the problems reported in the log")
+		return
 	}
 
-	filehash, err := tools.CalcFileHash(path)
+	if len(chunkPath) != (datachunkLen + rduchunkLen) {
+		Uld.Sugar().Infof("[%v] %v", LOG_TAG_FILEUPLOAD, "ReedSolomon failed")
+		log.Println("Client internal error, please try again or check the problems reported in the log")
+		return
+	}
+	// Calc merkle hash tree
+	hTree, err := hashtree.NewHashTree(chunkPath)
 	if err != nil {
-		fmt.Printf("[Error]There is a problem with the file, please replace it!\n")
-		return err
+		Uld.Sugar().Infof("[%v] %v", LOG_TAG_FILEUPLOAD, err)
+		log.Println("Client internal error, please try again or check the problems reported in the log")
+		return
 	}
 
-	fileid, err := tools.GetGuid(1)
+	// Merkel root hash
+	fileid := hex.EncodeToString(hTree.MerkleRoot())
+	//save fileid
+	newpath := filepath.Join(fpath, fileid)
+	f, err := os.Create(newpath)
 	if err != nil {
-		fmt.Printf("[Error]Create snowflake fail! error:%s\n", err)
-		return err
+		Uld.Sugar().Infof("[%v] %v", LOG_TAG_FILEUPLOAD, err)
+		log.Println("Failed to save fileid, possibly due to insufficient permissions. you can check the log for details")
+		return
 	}
-	var blockinfo module.FileUploadInfo
-	blockinfo.Backups = backups
-	blockinfo.FileId = fileid
-	blockinfo.BlockSize = int32(file.Size())
-	blockinfo.FileHash = filehash
-
-	blocksize := 1024 * 1024
-	blocktotal := 0
-
-	f, err := os.Open(path)
-	if err != nil {
-		fmt.Println("[Error]This file was broken!\n ", err)
-		return err
-	}
-	defer f.Close()
-	filebyte, err := ioutil.ReadAll(f)
-	if err != nil {
-		fmt.Println("[Error]analyze this file error!\n ", err)
-		return err
-	}
-
-	var ci chain.CessInfo
-	ci.RpcAddr = conf.ClientConf.ChainData.CessRpcAddr
-	ci.ChainModule = chain.FindSchedulerInfoModule
-	ci.ChainModuleMethod = chain.FindSchedulerInfoMethod
-	schds, err := ci.GetSchedulerInfo()
-	if err != nil {
-		fmt.Println("[Error]Get scheduler randomly error!\n ", err)
-		return err
-	}
-	//var filesize uint64
-	fee := new(big.Int)
-
-	ci.IdentifyAccountPhrase = conf.ClientConf.ChainData.IdAccountPhraseOrSeed
-	ci.TransactionName = chain.UploadFileTransactionName
-
-	fee.SetInt64(int64(0))
-
-	FileUploadStatus, err := ci.UploadFileMetaInformation(fileid, file.Name(), filehash, PrivateKey == "", uint8(spares), uint64(file.Size()), fee)
-	if err != nil {
-		fmt.Printf("[Error]Upload file meta information fail\n")
-		logger.OutPutLogger.Sugar().Infof("[Error]Upload file meta information error:%s\n", err)
-		return err
-	}
-	fmt.Printf("File meta info upload:%s ,fileid is:%s\n", FileUploadStatus, fileid)
-
-	var client *rpc.Client
-	for i, schd := range schds {
-		wsURL := "ws://" + string(base58.Decode(string(schd.Ip)))
-		ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
-		client, err = rpc.DialWebsocket(ctx, wsURL, "")
-		defer cancel()
-		if err != nil {
-			err = errors.New("Connect with scheduler timeout")
-			if i == len(schds)-1 {
-				fmt.Printf("%s[Error]All scheduler is offline!!!%s\n", tools.Red, tools.Reset)
-				logger.OutPutLogger.Sugar().Infof("\n%s[Error]All scheduler is offlien!!!%s\n", tools.Red, tools.Reset)
-				return err
-			}
-			continue
-		} else {
-			break
-		}
-	}
-	sp := sync.Pool{
-		New: func() interface{} {
-			return &rpc.ReqMsg{}
-		},
-	}
-	commit := func(num int, data []byte) error {
-		blockinfo.BlockIndex = int32(num) + 1
-		blockinfo.Data = data
-		info, err := proto.Marshal(&blockinfo)
-		if err != nil {
-			fmt.Println("[Error]There was a problem with the network during upload, please upload again!\n")
-			logger.OutPutLogger.Sugar().Infof("[Error]There was a problem with the network during upload, please upload again!error:%s", err)
-			return err
-		}
-		reqmsg := sp.Get().(*rpc.ReqMsg)
-		reqmsg.Body = info
-		reqmsg.Method = module.UploadService
-		reqmsg.Service = module.CtlServiceName
-
-		ctx, cancel := context.WithTimeout(context.Background(), 120*time.Second)
-		resp, err := client.Call(ctx, reqmsg)
-		defer cancel()
-		if err != nil {
-			fmt.Printf("%s[Error]Failed to transfer file to scheduler%s\n", tools.Red, tools.Reset)
-			logger.OutPutLogger.Sugar().Infof("%s[Error]Failed to transfer file to scheduler,error:%s%s\n", tools.Red, err, tools.Reset)
-			return err
-		}
-
-		var res rpc.RespBody
-		err = proto.Unmarshal(resp.Body, &res)
-		if err != nil {
-			fmt.Printf("[Error]response error from scheduler,upload failed\n")
-			logger.OutPutLogger.Sugar().Infof("[Error]response error from scheduler,upload failed!error:%s ", err)
-			return err
-		}
-		if res.Code != 200 {
-			fmt.Printf("[Error]Upload file fail!scheduler problem:%s\n", res.Msg)
-			logger.OutPutLogger.Sugar().Infof("[Error]Upload file fail!scheduler problem:%s\n", res.Msg)
-			os.Exit(conf.Exit_SystemErr)
-		}
-		sp.Put(reqmsg)
-		return nil
-	}
-
-	if len(PrivateKey) != 0 {
-		_, err = os.Stat(conf.ClientConf.PathInfo.KeyPath)
-		if err != nil {
-			err = os.Mkdir(conf.ClientConf.PathInfo.KeyPath, os.ModePerm)
-			if err != nil {
-				fmt.Printf("%s[Error]Create key path %s\n", tools.Red, tools.Reset)
-				logger.OutPutLogger.Sugar().Infof("%s[Error]Create key path error :%s%s\n", tools.Red, err, tools.Reset)
-				os.Exit(conf.Exit_SystemErr)
-			}
-		}
-
-		os.Create(filepath.Join(conf.ClientConf.PathInfo.KeyPath, file.Name()) + ".pem")
-		keyfile, err := os.OpenFile(filepath.Join(conf.ClientConf.PathInfo.KeyPath, file.Name())+".pem", os.O_WRONLY|os.O_APPEND, 0666)
-		if err != nil {
-			fmt.Printf("%s[Error]:Failed to save key%s\n", tools.Red, tools.Reset)
-			logger.OutPutLogger.Sugar().Infof("%s[Error]:Failed to save key%s error:%s\n", tools.Red, tools.Reset, err)
-			return err
-		}
-		_, err = keyfile.WriteString(PrivateKey)
-		if err != nil {
-			fmt.Printf("%s[Error]:Failed to write key to file:%s%s\n", tools.Red, filepath.Join(conf.ClientConf.PathInfo.KeyPath, (file.Name()+".pem")), tools.Reset)
-			logger.OutPutLogger.Sugar().Infof("%s[Error]:Failed to write key to file:%s%s error:%s", tools.Red, filepath.Join(conf.ClientConf.PathInfo.KeyPath, (file.Name()+".pem")), tools.Reset, err)
-			return err
-		}
-
-		encodefile, err := tools.AesEncrypt(filebyte, []byte(PrivateKey))
-		if err != nil {
-			fmt.Println("[Error]Encode the file fail ,error!\n ")
-			logger.OutPutLogger.Sugar().Infof("[Error]Encode the file fail ,error:%s\n ", err)
-			return err
-		}
-		blocks := len(encodefile) / blocksize
-		if len(encodefile)%blocksize == 0 {
-			blocktotal = blocks
-		} else {
-			blocktotal = blocks + 1
-		}
-		blockinfo.BlockTotal = int32(blocktotal)
-		var bar tools.Bar
-		bar.NewOption(0, int64(blocktotal))
-		for i := 0; i < blocktotal; i++ {
-			block := make([]byte, 0)
-			if blocks != i {
-				block = encodefile[i*blocksize : (i+1)*blocksize]
-				bar.Play(int64(i + 1))
-			} else {
-				block = encodefile[i*blocksize:]
-				bar.Play(int64(i + 1))
-			}
-			err = commit(i, block)
-			if err != nil {
-				bar.Finish()
-				fmt.Printf("%s[Error]File upload failed, network error%s\n", tools.Red, tools.Reset)
-				logger.OutPutLogger.Sugar().Infof("%s[Error]File upload failed, network error:%s%s\n", tools.Red, err, tools.Reset)
-				return err
-			}
-		}
-		bar.Finish()
+	f.Close()
+	// Rename chunks with root hash
+	var newChunksPath = make([]string, 0)
+	if rduchunkLen == 0 {
+		newChunksPath = append(newChunksPath, fileid)
 	} else {
-		fmt.Printf("%s[Tips]%s:upload file:%s without private key\n", tools.Yellow, tools.Reset, path)
-		blocks := len(filebyte) / blocksize
-		if len(filebyte)%blocksize == 0 {
-			blocktotal = blocks
-		} else {
-			blocktotal = blocks + 1
+		for i := 0; i < len(chunkPath); i++ {
+			var ext = filepath.Ext(chunkPath[i])
+			var newchunkpath = filepath.Join(fpath, fileid+ext)
+			os.Rename(chunkPath[i], newchunkpath)
+			newChunksPath = append(newChunksPath, fileid+ext)
 		}
-		blockinfo.BlockTotal = int32(blocktotal)
-		var bar tools.Bar
-		bar.NewOption(0, int64(blocktotal))
-		for i := 0; i < blocktotal; i++ {
-			block := make([]byte, 0)
-			if blocks != i {
-				block = filebyte[i*blocksize : (i+1)*blocksize]
-				bar.Play(int64(i + 1))
-			} else {
-				block = filebyte[i*blocksize:]
-				bar.Play(int64(i + 1))
-			}
-			err = commit(i, block)
-			if err != nil {
-				bar.Finish()
-				fmt.Printf("%s[Error]File upload failed, network error%s\n", tools.Red, tools.Reset)
-				logger.OutPutLogger.Sugar().Infof("%s[Error]File upload failed, network error:%s%s\n", tools.Red, err, tools.Reset)
-				return err
-			}
-		}
-		bar.Finish()
 	}
-	fmt.Printf("%s[Success]%s:upload file:%s successful!\n", tools.Green, tools.Reset, path)
-	return nil
+	//build a user brief
+	pubkey, err := tools.DecodePublicKeyOfCessAccount(conf.C.AccountId)
+	if err != nil {
+		Uld.Sugar().Infof("[%v] %v", LOG_TAG_FILEUPLOAD, err)
+		log.Println("Failed to decode public key from cess account,please check your config setting")
+		return
+	}
+	userBrief := chain.UserBrief{
+		User:        types.NewAccountID(pubkey),
+		File_name:   types.Bytes(fname),
+		Bucket_name: types.Bytes(bucketName),
+	}
+	// Declaration file
+	txhash, err := chain.ChainClient.DeclarationFile(fileid, userBrief)
+	if err != nil || txhash == "" {
+		Uld.Sugar().Infof("[%v] %v", LOG_TAG_FILEUPLOAD, err)
+		log.Println("Failed to upload file declaration. you can check the log for details")
+		return
+	}
+	task_StoreFile(newChunksPath, LOG_TAG_FILEUPLOAD, fileid, fname, fstat.Size())
 }
 
-/*
-FileDownload means download file by file id
-fileid:fileid of the file to download
-*/
-func FileDownload(fileid string) error {
-	chain.Chain_Init()
-	var ci chain.CessInfo
-	ci.RpcAddr = conf.ClientConf.ChainData.CessRpcAddr
-	ci.ChainModule = chain.FindFileChainModule
-	ci.ChainModuleMethod = chain.FindFileModuleMethod[0]
-	fileinfo, err := ci.GetFileInfo(fileid)
-	if err != nil {
-		fmt.Printf("%s[Error]Get file:%s info fail:%s%s\n", tools.Red, fileid, err, tools.Reset)
-		logger.OutPutLogger.Sugar().Infof("%s[Error]Get file:%s info fail:%s%s\n", tools.Red, fileid, err, tools.Reset)
-		return err
-	}
-	if fileinfo.File_Name == nil {
-		fmt.Printf("%s[Error]The fileid:%s has been deleted,the file does not exist%s\n", tools.Red, fileid, tools.Reset)
-		logger.OutPutLogger.Sugar().Infof("%s[Error]The fileid:%s has been deleted,the file does not exist%s\n", tools.Red, fileid, tools.Reset)
-		return err
-	}
-	if string(fileinfo.FileState) != "active" {
-		fmt.Printf("%s[Tips]The file:%s has not been backed up, please try again later%s\n", tools.Yellow, fileid, tools.Reset)
-		logger.OutPutLogger.Sugar().Infof("%s[Tips]The file:%s has not been backed up, please try again later%s\n", tools.Yellow, fileid, tools.Reset)
-		return err
-	}
-
-	_, err = os.Stat(conf.ClientConf.PathInfo.InstallPath)
-	if err != nil {
-		err = os.Mkdir(conf.ClientConf.PathInfo.InstallPath, os.ModePerm)
-		if err != nil {
-			fmt.Printf("%s[Error]Create install path error %s\n", tools.Red, tools.Reset)
-			logger.OutPutLogger.Sugar().Infof("%s[Error]Create install path error :%s%s\n", tools.Red, err, tools.Reset)
-			os.Exit(conf.Exit_SystemErr)
+func task_StoreFile(fpath []string, logtag, fid, fname string, fsize int64) {
+	defer func() {
+		if err := recover(); err != nil {
+			Err.Sugar().Errorf("%v", err)
 		}
-	}
-	_, err = os.Create(filepath.Join(conf.ClientConf.PathInfo.InstallPath, string(fileinfo.File_Name[:])))
-	if err != nil {
-		fmt.Printf("%s[Error]Create installed file error %s\n", tools.Red, tools.Reset)
-		logger.OutPutLogger.Sugar().Infof("%s[Error]Create installed file error :%s%s\n", tools.Red, err, tools.Reset)
-		os.Exit(conf.Exit_SystemErr)
-	}
-	installfile, err := os.OpenFile(filepath.Join(conf.ClientConf.PathInfo.InstallPath, string(fileinfo.File_Name[:])), os.O_WRONLY|os.O_APPEND, 0666)
-	if err != nil {
-		fmt.Printf("%s[Error]:Failed to save key error%s\n", tools.Red, tools.Reset)
-		logger.OutPutLogger.Sugar().Infof("%s[Error]:Failed to save key error:%s%s", tools.Red, err, tools.Reset)
-		return err
-	}
-	defer installfile.Close()
-
-	ci.RpcAddr = conf.ClientConf.ChainData.CessRpcAddr
-	ci.ChainModule = chain.FindSchedulerInfoModule
-	ci.ChainModuleMethod = chain.FindSchedulerInfoMethod
-	schds, err := ci.GetSchedulerInfo()
-	if err != nil {
-		fmt.Printf("%s[Error]Get scheduler list error%s\n ", tools.Red, tools.Reset)
-		logger.OutPutLogger.Sugar().Infof("%s[Error]Get scheduler list error:%s%s\n ", tools.Red, err, tools.Reset)
-		return err
-	}
-
-	var client *rpc.Client
-	for i, schd := range schds {
-		wsURL := "ws://" + string(base58.Decode(string(schd.Ip)))
-		ctx, cancel := context.WithTimeout(context.Background(), 1*time.Second)
-		client, err = rpc.DialWebsocket(ctx, wsURL, "")
-		defer cancel()
-		if err != nil {
-			err = errors.New("Connect with scheduler timeout\n")
-			if i == len(schds)-1 {
-				fmt.Printf("%s[Error]All scheduler is offline!!!%s\n", tools.Red, tools.Reset)
-				return err
-			}
-			continue
-		} else {
-			break
-		}
-	}
-
-	var wantfile module.FileDownloadReq
-	var bar tools.Bar
-	var getAllBar sync.Once
-	sp := sync.Pool{
-		New: func() interface{} {
-			return &rpc.ReqMsg{}
-		},
-	}
-	wantfile.FileId = fileid
-	wantfile.WalletAddress = conf.ClientConf.ChainData.WalletAddress
-	wantfile.BlockIndex = 1
-
+	}()
+	var channel_1 = make(chan uint8, 1)
+	Uld.Sugar().Infof("[%v] Start the file backup management process", fid)
+	go uploadToStorage(channel_1, fpath, logtag, fid, fname, fsize)
 	for {
-		data, err := proto.Marshal(&wantfile)
-		if err != nil {
-			fmt.Printf("[Error]Marshal req file error\n")
-			logger.OutPutLogger.Sugar().Infof("[Error]Marshal req file error:%s\n", err)
-			return err
+		select {
+		case result := <-channel_1:
+			if result == 1 {
+				go uploadToStorage(channel_1, fpath, logtag, fid, fname, fsize)
+				time.Sleep(time.Second * 6)
+			}
+			if result == 2 {
+				Uld.Sugar().Infof("[%v] File save successfully", fid)
+				log.Println("Upload file success")
+				return
+			}
+			if result == 3 {
+				Uld.Sugar().Infof("[%v] File save failed", fid)
+				log.Println("Upload file failed, please try again.")
+				return
+			}
 		}
-		req := sp.Get().(*rpc.ReqMsg)
-		req.Method = module.DownloadService
-		req.Service = module.CtlServiceName
-		req.Body = data
+	}
+}
 
-		ctx, cancel := context.WithTimeout(context.Background(), 120*time.Second)
-		resp, err := client.Call(ctx, req)
-		cancel()
+// Upload files to cess storage system
+func uploadToStorage(ch chan uint8, fpath []string, logtag, fid, fname string, fsize int64) {
+	defer func() {
+		err := recover()
 		if err != nil {
-			fmt.Printf("[Error]Download file fail error\n")
-			logger.OutPutLogger.Sugar().Infof("[Error]Download file fail error:%s\n", err)
-			return err
+			ch <- 1
+			Uld.Sugar().Infof("[panic]: [%v] [%v] %v", logtag, fpath, err)
 		}
+	}()
 
-		var respbody rpc.RespBody
-		err = proto.Unmarshal(resp.Body, &respbody)
-		if err != nil || respbody.Code != 200 {
-			fmt.Printf("[Error]Download file from CESS fail\n")
-			logger.OutPutLogger.Sugar().Infof("[Error]Download file from CESS error:%v. reply message:%s\n", err, respbody.Msg)
-			return err
-		}
-		var blockData module.FileDownloadInfo
-		err = proto.Unmarshal(respbody.Data, &blockData)
+	var existFile = make([]string, 0)
+	for i := 0; i < len(fpath); i++ {
+		_, err := os.Stat(filepath.Join(conf.FileCacheDir, fpath[i]))
 		if err != nil {
-			fmt.Printf("[Error]Download file from CESS error\n")
-			logger.OutPutLogger.Sugar().Infof("[Error]Download file from CESS error:%s\n", err)
-			return err
+			continue
 		}
+		existFile = append(existFile, fpath[i])
+	}
+	msg := tools.GetRandomcode(16)
 
-		_, err = installfile.Write(blockData.Data)
+	kr, _ := cesskeyring.FromURI(conf.C.AccountSeed, cesskeyring.NetSubstrate{})
+	// sign message
+	sign, err := kr.Sign(kr.SigningContext([]byte(msg)))
+	if err != nil {
+		ch <- 1
+		Uld.Sugar().Infof("[%v] %v", logtag, err)
+		return
+	}
+
+	// Get all scheduler
+	schds, err := chain.ChainClient.GetSchedulerList()
+	if err != nil {
+		ch <- 1
+		Uld.Sugar().Infof("[%v] %v", logtag, err)
+		return
+	}
+
+	tools.RandSlice(schds)
+
+	for i := 0; i < len(schds); i++ {
+		wsURL := fmt.Sprintf("%d.%d.%d.%d:%d",
+			schds[i].Ip.Value[0],
+			schds[i].Ip.Value[1],
+			schds[i].Ip.Value[2],
+			schds[i].Ip.Value[3],
+			schds[i].Ip.Port,
+		)
+		log.Println("Will send to ", wsURL)
+		conTcp, err := dialTcpServer(wsURL)
 		if err != nil {
-			fmt.Printf("%s[Error]Failed to write file's block to file:%s%s error:%s\n", tools.Red, filepath.Join(conf.ClientConf.PathInfo.InstallPath, string(fileinfo.File_Name[:])), tools.Reset)
-			logger.OutPutLogger.Sugar().Infof("%s[Error]:Failed to write file's block to file:%s%s error:%s", tools.Red, filepath.Join(conf.ClientConf.PathInfo.InstallPath, string(fileinfo.File_Name[:])), tools.Reset, err)
-			return err
+			Uld.Sugar().Error(fmt.Errorf("dial %v err: %v", wsURL, err))
+			continue
 		}
+		srv := tcp.NewClient(tcp.NewTcp(conTcp), conf.FileCacheDir, existFile)
+		err = srv.SendFile(fid, fsize, conf.PublicKey, []byte(msg), sign[:])
+		if err != nil {
+			Uld.Sugar().Infof("[%v] %v", logtag, err)
+			continue
+		}
+		ch <- 2
+		return
+	}
+	ch <- 1
+}
 
-		getAllBar.Do(func() {
-			bar.NewOption(0, int64(blockData.BlockTotal))
-		})
-		bar.Play(int64(blockData.BlockIndex))
-		wantfile.BlockIndex++
-		sp.Put(req)
-		if blockData.BlockIndex == blockData.BlockTotal {
+// File Download
+
+func FileDownload(fid, cacheDir string) {
+	conf.FileCacheDir = cacheDir
+	_, err := os.Stat(conf.FileCacheDir)
+	if err != nil {
+		err = os.MkdirAll(conf.FileCacheDir, os.ModeDir)
+		if err != nil {
+			Uld.Sugar().Infof("[%v] %v", LOG_TAG_FILEDOWNLOAD, err)
+			return
+		}
+	}
+	// //clear cache
+	fpath := filepath.Join(conf.FileCacheDir, fid)
+	_, err = os.Stat(fpath)
+	if err == nil {
+		os.Remove(fpath)
+	}
+	// file meta info
+	fmeta, err := chain.ChainClient.GetFileMetaInfo(fid) //GetFileMetaInfoOnChain(fid)
+	if err != nil {
+		if err.Error() == chain.ERR_Empty {
+			Uld.Sugar().Errorf("[%v] Get file metadata err: %v", LOG_TAG_FILEDOWNLOAD, err)
+			log.Println("Get file metadata failed,please ensure that you have configured the correct account or passed in the fileid of.")
+			return
+		}
+		Uld.Sugar().Errorf("[%v] %v", LOG_TAG_FILEDOWNLOAD, err)
+		log.Println("Get file metadata failed.")
+		return
+	}
+	r := len(fmeta.BlockInfo) / 3
+	d := len(fmeta.BlockInfo) - r
+	down_count := 0
+	for i := 0; i < len(fmeta.BlockInfo); i++ {
+		// Download the file from the scheduler service
+		fname := filepath.Join(conf.FileCacheDir, string(fmeta.BlockInfo[i].BlockId[:]))
+		if len(fmeta.BlockInfo) == 1 {
+			fname = fname[:(len(fname) - 4)]
+		}
+		mip := fmt.Sprintf("%d.%d.%d.%d:%d",
+			fmeta.BlockInfo[i].MinerIp.Value[0],
+			fmeta.BlockInfo[i].MinerIp.Value[1],
+			fmeta.BlockInfo[i].MinerIp.Value[2],
+			fmeta.BlockInfo[i].MinerIp.Value[3],
+			fmeta.BlockInfo[i].MinerIp.Port,
+		)
+		err = downloadFromStorage(fname, int64(fmeta.BlockInfo[i].BlockSize), mip)
+		if err != nil {
+			Uld.Sugar().Errorf("[%v] Downloading %drd shard err: %v", LOG_TAG_FILEDOWNLOAD, i, err)
+			log.Printf("Download shard %d failed,please try again.\n", i)
+		} else {
+			down_count++
+		}
+		if down_count >= d {
 			break
 		}
 	}
+	log.Println("info", conf.FileCacheDir, fid, d, r)
+	err = erasure.ReedSolomon_Restore(conf.FileCacheDir, fid, d, r, uint64(fmeta.Size))
+	if err != nil {
+		Uld.Sugar().Errorf("[%v] ReedSolomon_Restore: %v", LOG_TAG_FILEDOWNLOAD, err)
+		log.Println("Restore reedSolomon failed,please try again.")
+		return
+	}
 
-	bar.Finish()
-	fmt.Printf("%s[OK]:File '%s' has been downloaded to the directory :%s%s\n", tools.Green, string(fileinfo.File_Name), filepath.Join(conf.ClientConf.PathInfo.InstallPath, string(fileinfo.File_Name[:])), tools.Reset)
+	if r > 0 {
+		fstat, err := os.Stat(fpath)
+		if err != nil {
+			Uld.Sugar().Errorf("[%v] %v", LOG_TAG_FILEDOWNLOAD, err)
+			log.Println("download file failed.")
+			return
+		}
+		if uint64(fstat.Size()) > uint64(fmeta.Size) {
+			tempfile := fpath + ".temp"
+			copyFile(fpath, tempfile, int64(fmeta.Size))
+			os.Remove(fpath)
+			os.Rename(tempfile, fpath)
+		}
+	}
+	//delete file slice and rename file
+	for i := 0; i < d; i++ {
+		os.Remove(fmt.Sprintf("%s.00%d", fpath, i))
+	}
+	newPath := filepath.Join(conf.FileCacheDir, string(fmeta.UserBriefs[0].File_name))
+	os.Rename(fpath, newPath)
+	log.Println("Download file success.")
+}
 
-	if !fileinfo.Public {
-		fmt.Printf("%s[Warm]This is a private file, please enter the file password(If you don't want to decrypt, just press enter):%s\n", tools.Green, tools.Reset)
-		fmt.Printf("Password:")
-		filePWD, _ := gopass.GetPasswdMasked()
-		if len(filePWD) == 0 {
+// Download files from cess storage service
+func downloadFromStorage(fpath string, fsize int64, mip string) error {
+	fsta, err := os.Stat(fpath)
+	if err == nil {
+		if fsta.Size() == fsize {
 			return nil
+		} else {
+			os.Remove(fpath)
 		}
-		if len(filePWD) != 16 && len(filePWD) != 24 && len(filePWD) != 32 {
-			fmt.Printf("%s[Error]The password must be 16,24,32 bits long,your password length is :%v%s\n", tools.Red, len(filePWD), tools.Reset)
-			return errors.New("[Error]The password must be 16,24,32 bits long")
-		}
-		encodefile, err := ioutil.ReadFile(filepath.Join(conf.ClientConf.PathInfo.InstallPath, string(fileinfo.File_Name[:])))
-		if err != nil {
-			fmt.Printf("%s[Error]:Decode file:%s fail%s\n", tools.Red, filepath.Join(conf.ClientConf.PathInfo.InstallPath, string(fileinfo.File_Name[:])), tools.Reset)
-			logger.OutPutLogger.Sugar().Infof("%s[Error]:Decode file:%s fail%s error:%s\n", tools.Red, filepath.Join(conf.ClientConf.PathInfo.InstallPath, string(fileinfo.File_Name[:])), tools.Reset, err)
+	}
+
+	msg := tools.GetRandomcode(16)
+
+	kr, _ := cesskeyring.FromURI(conf.C.AccountSeed, cesskeyring.NetSubstrate{})
+	// sign message
+	sign, err := kr.Sign(kr.SigningContext([]byte(msg)))
+	if err != nil {
+		return err
+	}
+
+	tcpAddr, err := net.ResolveTCPAddr("tcp", mip)
+	if err != nil {
+		return err
+	}
+
+	conTcp, err := net.DialTCP("tcp", nil, tcpAddr)
+	if err != nil {
+		return err
+	}
+	srv := tcp.NewClient(tcp.NewTcp(conTcp), conf.FileCacheDir, nil)
+	return srv.RecvFile(filepath.Base(fpath), fsize, conf.PublicKey, []byte(msg), sign[:])
+}
+
+func copyFile(src, dst string, length int64) error {
+	srcfile, err := os.OpenFile(src, os.O_RDONLY, os.ModePerm)
+	if err != nil {
+		return err
+	}
+	defer srcfile.Close()
+	dstfile, err := os.OpenFile(dst, os.O_CREATE|os.O_WRONLY|os.O_TRUNC, os.ModePerm)
+	if err != nil {
+		return err
+	}
+	defer dstfile.Close()
+
+	var buf = make([]byte, 64*1024)
+	var count int64
+	for {
+		n, err := srcfile.Read(buf)
+		if err != nil && err != io.EOF {
 			return err
 		}
-		decryptfile, err := tools.AesDecrypt(encodefile, filePWD)
-		if err != nil {
-			fmt.Println("[Error]Dncode the file fail,Incorrect password\n ", err)
-			fmt.Println("[Error]Dncode the file fail ,error:%s\n ", err)
-			return err
+		if n == 0 {
+			break
 		}
-		err = installfile.Truncate(0)
-		_, err = installfile.Seek(0, os.SEEK_SET)
-		_, err = installfile.Write(decryptfile[:])
+		count += int64(n)
+		if count < length {
+			dstfile.Write(buf[:n])
+		} else {
+			tail := count - length
+			if n >= int(tail) {
+				dstfile.Write(buf[:(n - int(tail))])
+			}
+		}
 	}
 
 	return nil
 }
 
-/*
-FileDelete means to delete the file from the CESS system by the file id
-fileid:fileid of the file that needs to be deleted
-*/
-func FileDelete(fileid string) error {
-	chain.Chain_Init()
-	var ci chain.CessInfo
-	ci.RpcAddr = conf.ClientConf.ChainData.CessRpcAddr
-	ci.IdentifyAccountPhrase = conf.ClientConf.ChainData.IdAccountPhraseOrSeed
-	ci.TransactionName = chain.DeleteFileTransactionName
+//File Delete
 
-	err := ci.DeleteFileOnChain(fileid)
-	if err != nil {
-		fmt.Printf("%s[Error]Delete file error%s\n", tools.Red, tools.Reset)
-		logger.OutPutLogger.Sugar().Infof("%s[Error]Delete file error:%s%s\n", tools.Red, err, tools.Reset)
-		return err
-	} else {
-		fmt.Printf("%s[OK]Delete fileid:%s success!%s\n", tools.Green, fileid, tools.Reset)
-		logger.OutPutLogger.Sugar().Infof("%s[OK]Delete fileid:%s success!%s\n", tools.Green, fileid, tools.Reset)
-		return nil
+func FileDelete(fid string) {
+	if fid == "" {
+		Uld.Sugar().Errorf("[%v] No fid", LOG_TAG_FILEDELETE)
+		log.Println("Please enter the correct fid")
+		return
 	}
-
+	//Delete files in cesss storage service
+	txhash, err := chain.ChainClient.DeleteFile(chain.ChainClient.GetPublicKey(), fid)
+	if txhash == "" {
+		Err.Sugar().Errorf("[%sv] %v", LOG_TAG_FILEDELETE, err)
+		log.Println("delete file in cess storage service failed.")
+		return
+	}
+	log.Println("Delete file success,the Tx hash is", txhash)
 }
 
-/*
-FileDecrypt means that if the file is not decrypted when downloading the file, it can be decrypted by this method
-When you download the file if it is not decrypt, you can decrypt it this way
-*/
-func FileDecrypt(path string) error {
-	_, err := os.Stat(path)
+func dialTcpServer(address string) (*net.TCPConn, error) {
+	tcpAddr, err := net.ResolveTCPAddr("tcp", address)
 	if err != nil {
-		fmt.Printf("%s[Error]There is no such file, please confirm the correct location of the file, please enter the absolute path of the file%s\n", tools.Red, tools.Reset)
-		logger.OutPutLogger.Sugar().Infof("%s[Error]There is no such file, please confirm the correct location of the file, please enter the absolute path of the file%s\n", tools.Red, tools.Reset)
-		return err
+		return nil, err
 	}
-
-	fmt.Println("Please enter the file's password:")
-	fmt.Print(">")
-	psw, _ := gopass.GetPasswdMasked()
-	if len(psw) != 16 && len(psw) != 24 && len(psw) != 32 {
-		fmt.Printf("%s[Error]The password must be 16,24,32 bits long,your password length is :%v%s\n", tools.Red, len(psw), tools.Reset)
-		return errors.New("[Error]The password must be 16,24,32 bits long")
-	}
-	encodefile, err := ioutil.ReadFile(path)
+	dialer := net.Dialer{Timeout: conf.Tcp_Dial_Timeout}
+	netCon, err := dialer.Dial("tcp", tcpAddr.String())
 	if err != nil {
-		fmt.Printf("%s[Error]Failed to read file, please check file integrity%s\n", tools.Red, tools.Reset)
-		logger.OutPutLogger.Sugar().Infof("%s[Error]Failed to read file, please check file integrity%s\n", tools.Red, tools.Reset)
-		return err
+		return nil, err
 	}
-
-	decryptfile, err := tools.AesDecrypt(encodefile, psw)
-	if err != nil {
-		fmt.Printf("%s[Error]File decrypt failed, please check your password!%s\n", tools.Red, tools.Reset)
-		logger.OutPutLogger.Sugar().Infof("%s[Error]File decrypt failed, please check your password! error:%s%s ", tools.Red, err, tools.Reset)
-		return err
+	conTcp, ok := netCon.(*net.TCPConn)
+	if !ok {
+		return nil, errors.New("network conversion failed")
 	}
-	filename := filepath.Base(path)
-	//The decrypted file is saved to the download folder, if the name is the same, the original file will be deleted
-	if path == filepath.Join(conf.ClientConf.PathInfo.InstallPath, filename) {
-		err = os.Remove(path)
-		if err != nil {
-			fmt.Printf("%s[Error]An error occurred while saving the decrypted file!%s\n ", tools.Red, tools.Reset)
-			logger.OutPutLogger.Sugar().Infof("%s[Error]An error occurred while saving the decrypted file! error:%s%s ", tools.Red, err, tools.Reset)
-			return err
-		}
-	}
-	fileinfo, err := os.Create(filepath.Join(conf.ClientConf.PathInfo.InstallPath, filename))
-	if err != nil {
-		fmt.Printf("%s[Error]An error occurred while saving the decrypted file!%s\n ", tools.Red, tools.Reset)
-		logger.OutPutLogger.Sugar().Infof("%s[Error]An error occurred while saving the decrypted file! error:%s%s\n ", tools.Red, err, tools.Reset)
-		return err
-	}
-	defer fileinfo.Close()
-	_, err = fileinfo.Write(decryptfile)
-	if err != nil {
-		fmt.Printf("%s[Error]Failed to save decrypted content to file!%s\n ", tools.Red, tools.Reset)
-		logger.OutPutLogger.Sugar().Infof("%s[Error]Failed to save decrypted content to file! error:%s%s\n ", tools.Red, err, tools.Reset)
-		return err
-	}
-
-	fmt.Printf("%s[Success]The file was decrypted successfully and the file has been saved to:%s%s\n ", tools.Green, filepath.Join(conf.ClientConf.PathInfo.InstallPath, filename), tools.Reset)
-
-	return nil
+	return conTcp, nil
 }

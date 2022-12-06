@@ -3,90 +3,134 @@ package client
 import (
 	"cess-portal/conf"
 	"cess-portal/internal/chain"
-	"cess-portal/internal/logger"
+	. "cess-portal/internal/logger"
 	"cess-portal/tools"
+	"encoding/json"
 	"fmt"
-	"strconv"
+	"log"
 )
 
-/*
-QueryPurchasedSpace means to query the space that the current user has purchased and the space that has been used
-*/
-func QueryPurchasedSpace() error {
-	chain.Chain_Init()
-
-	var ci chain.CessInfo
-	ci.RpcAddr = conf.ClientConf.ChainData.CessRpcAddr
-	ci.ChainModule = chain.PurchasedSpaceChainModule
-	ci.ChainModuleMethod = chain.PurchasedSpaceModuleMethod
-
-	userinfo, err := ci.UserHoldSpaceDetails()
-	if err != nil {
-		fmt.Printf("[Error]Get user data fail:%s\n", err)
-		logger.OutPutLogger.Sugar().Infof("[Error]Get user data fail:%s\n", err)
-		return err
-	}
-	fmt.Println(userinfo)
-	return nil
+type FileInfo struct {
+	State string   `json:"file_state"`
+	Size  uint64   `json:"file_size"`
+	Names []string `json:"file_names"`
 }
 
-/*
-QueryPrice means to get real-time price of storage space
-*/
-func QueryPrice() error {
-	chain.Chain_Init()
-
-	var ci chain.CessInfo
-	ci.RpcAddr = conf.ClientConf.ChainData.CessRpcAddr
-	ci.ChainModule = chain.FindPriceChainModule
-
-	ci.ChainModuleMethod = chain.FindPriceModuleMethod
-	Price, err := ci.GetPrice()
-	if err != nil {
-		fmt.Printf("%s[Error]%sGet price fail\n", tools.Red, tools.Reset)
-		logger.OutPutLogger.Sugar().Infof("%s[Error]%sGet price fail::%s\n", tools.Red, tools.Reset, err)
-		return err
-	}
-	PerGB, _ := strconv.ParseFloat(fmt.Sprintf("%.12f", float64(Price.Int64()*int64(1024))/float64(1000000000000)), 64)
-	fmt.Printf("[Success]The current storage price is:%.12f (TCESS/GB)\n", PerGB)
-	logger.OutPutLogger.Sugar().Infof("[Success]The current storage price is:%.12f (TCESS/GB)\n", PerGB)
-	return nil
+type SpacePackage struct {
+	chain.SpacePackage
+	State string `json:"state"`
 }
 
-/*
-QueryFile means to query the files uploaded by the current user
-fileid:fileid of the file to look for
-*/
-func QueryFile(fileid string) error {
-	chain.Chain_Init()
+const LOG_TAG_FILEQUERY = "FileQuery"
+const LOG_TAG_BUCKETQUERY = "BucketQuery"
 
-	var ci chain.CessInfo
-	ci.RpcAddr = conf.ClientConf.ChainData.CessRpcAddr
-	ci.ChainModule = chain.FindFileChainModule
-
-	if fileid != "" {
-		ci.ChainModuleMethod = chain.FindFileModuleMethod[0]
-		data, err := ci.GetFileInfo(fileid)
-		if err != nil {
-			fmt.Printf("[Error]Get file:%s info fail\n", fileid)
-			logger.OutPutLogger.Sugar().Infof("[Error]Get file:%s info fail:%s\n", fileid, err)
-			return err
+func UserSpaceQuery() {
+	spaceInfo, err := chain.ChainClient.GetUserSpaceMetadata(conf.PublicKey)
+	if err != nil {
+		if err.Error() == chain.ERR_Empty {
+			Uld.Sugar().Errorf("[%v] No space info", LOG_TAG_FILEQUERY)
+			log.Println("Please configure  the correct account seed")
+			return
 		}
-		fmt.Println(data)
-		if len(data.File_Name) == 0 {
-			fmt.Printf("%s[Tips]This file:%s may have been deleted by someone%s\n", tools.Yellow, fileid, tools.Reset)
-		}
-	} else {
-		ci.ChainModuleMethod = chain.FindFileModuleMethod[1]
-		data, err := ci.GetFileList()
-		if err != nil {
-			fmt.Printf("[Error]Get file list fail\n")
-			logger.OutPutLogger.Sugar().Infof("[Error]Get file list fail:%s\n", err)
-			return err
-		}
-		for _, fileinfo := range data {
-			fmt.Printf("%s\n", string(fileinfo))
-		}
+		Uld.Sugar().Errorf("[%v] Get space info error:%v", LOG_TAG_FILEQUERY, err)
+		log.Println("user space info query failed.")
+		return
 	}
-	return nil
+	wrap := SpacePackage{spaceInfo, string(spaceInfo.State)}
+	jbytes, err := json.Marshal(wrap)
+	if err != nil {
+		Uld.Sugar().Errorf("[%v] Marshal space info error:%v", LOG_TAG_FILEQUERY, err)
+		log.Println("user space info query failed.")
+		return
+	}
+	fmt.Println("space info of your account is as follow:")
+	tools.ShowJsonData(jbytes, "  ")
+	fmt.Printf("\nNote: the unit of space capacity is (B),the space validity period is calculated according to the block height.\n")
+}
+
+func FilelistQuery(bucketName string) {
+	//verify bucket name
+	if !tools.VerifyBucketName(bucketName) {
+		Uld.Sugar().Errorf("[%v] Bucket name error", LOG_TAG_FILEQUERY)
+		log.Println("Please configure  the correct bucket name")
+		return
+	}
+	//query bucket info
+	bucketInfo, err := chain.ChainClient.GetBucketInfo(conf.PublicKey, bucketName)
+	if err != nil {
+		if err.Error() == chain.ERR_Empty {
+			Uld.Sugar().Errorf("[%v] No bucket info", LOG_TAG_FILEQUERY)
+			log.Println("Please check your params or configure the correct account seed")
+			return
+		}
+		Uld.Sugar().Errorf("[%v] Get bucket info error:%v", LOG_TAG_FILEQUERY, err)
+		log.Println("File list query failed.")
+		return
+	}
+	list := make([]string, len(bucketInfo.Objects_list))
+	for i := 0; i < len(bucketInfo.Objects_list); i++ {
+		list[i] = string(bucketInfo.Objects_list[i][:])
+	}
+	jbytes, err := json.Marshal(list)
+	if err != nil {
+		Uld.Sugar().Errorf("[%v] Marshal file list error:%v", LOG_TAG_FILEQUERY, err)
+		log.Println("file list query failed.")
+		return
+	}
+	fmt.Printf("file hash list of bucket \"%s\" is as follow :\n", bucketName)
+	tools.ShowJsonData(jbytes, "  ")
+}
+
+func FilestateQuery(fid string) {
+	filestate, err := chain.ChainClient.GetFileMetaInfo(fid) //GetFileMetaInfoOnChain(fid)
+	if err != nil {
+		if err.Error() == chain.ERR_Empty {
+			Uld.Sugar().Errorf("[%v] No fid", LOG_TAG_FILEQUERY)
+			log.Println("Please enter the correct fid")
+			return
+		}
+		Uld.Sugar().Errorf("[%v] Get user file state error:%v", LOG_TAG_FILEQUERY, err)
+		log.Println("File state query failed.")
+		return
+	}
+	shortInfo := &FileInfo{}
+	shortInfo.Size = uint64(filestate.Size)
+	shortInfo.State = string(filestate.State)
+	for _, v := range filestate.UserBriefs {
+		shortInfo.Names = append(shortInfo.Names, string(v.File_name))
+	}
+	jbytes, err := json.Marshal(shortInfo)
+	if err != nil {
+		Uld.Sugar().Errorf("[%v] Marshal file info error:%v", LOG_TAG_FILEQUERY, err)
+		log.Println("File state query failed.")
+		return
+	}
+	fmt.Printf("The short info of the file is as follow:\n")
+	tools.ShowJsonData(jbytes, "  ")
+}
+
+func BucketlistQuery() {
+	bucketList, err := chain.ChainClient.GetBucketList(conf.PublicKey)
+	if err != nil {
+		if err.Error() == chain.ERR_Empty {
+			Uld.Sugar().Errorf("[%v] No bucket info", LOG_TAG_BUCKETQUERY)
+			log.Println("Please configure the correct account seed")
+			return
+		}
+		Uld.Sugar().Errorf("[%v] Get bucket list error:%v", LOG_TAG_BUCKETQUERY, err)
+		log.Println("bucket list query failed.")
+		return
+	}
+	fmt.Printf("bucket list of your account:\n")
+	buckets := make([]string, len(bucketList))
+	for i, b := range bucketList {
+		buckets[i] = string(b)
+	}
+	jbytes, err := json.Marshal(buckets)
+	if err != nil {
+		Uld.Sugar().Errorf("[%v] Marshal bucket list error:%v", LOG_TAG_FILEQUERY, err)
+		log.Println("bucket list query failed.")
+		return
+	}
+	tools.ShowJsonData(jbytes, "  ")
 }

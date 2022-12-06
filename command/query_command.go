@@ -2,6 +2,11 @@ package command
 
 import (
 	"cess-portal/client"
+	"cess-portal/conf"
+	"cess-portal/internal/logger"
+	"fmt"
+	"os"
+
 	"github.com/spf13/cobra"
 )
 
@@ -11,71 +16,79 @@ func NewQueryCommand() *cobra.Command {
 		Short: "Query commands use for implement all of related find specific detail information",
 	}
 
-	fc.AddCommand(NewQueryPriceCommand())
-	fc.AddCommand(NewQueryPurchasedSpaceCommand())
-	fc.AddCommand(NewQueryFileCommand())
-
+	fc.AddCommand(NewQueryFilestateCommand())
+	fc.AddCommand(NewQueryFilelistCommand())
+	fc.AddCommand(NewQueryBucketlistCommand())
+	fc.AddCommand(NewQuerySpaceCommand())
 	return fc
 }
 
-// NewFindPriceCommand
-func NewQueryPriceCommand() *cobra.Command {
+func NewQueryFilestateCommand() *cobra.Command {
 	cc := &cobra.Command{
-		Use:   "price",
-		Short: "Query the current storage space price(TCESS/GB)",
-		Long:  `Price command use for query  and display the CESS network real-time storage space unit price (unit: TCESS/G).`,
+		Use:   "fstate <file id>",
+		Short: "Query the state of files in the CESS system",
+		Run:   QueryFilestateCommandFunc,
+	}
 
-		Run: QueryPriceCommandFunc,
+	return cc
+}
+func NewQueryFilelistCommand() *cobra.Command {
+	cc := &cobra.Command{
+		Use:   "files <bucket name>",
+		Short: "Query the list of files in the CESS system",
+		Run:   QueryFilelistCommandFunc,
 	}
 
 	return cc
 }
 
-func QueryPriceCommandFunc(cmd *cobra.Command, args []string) {
-	InitComponents(cmd)
+func NewQueryBucketlistCommand() *cobra.Command {
+	cc := &cobra.Command{
+		Use:   "buckets",
+		Short: "Query the list of bucket in the CESS system",
+		Run:   QueryBucketlistCommandFunc,
+	}
 
-	client.QueryPrice()
+	return cc
 }
 
-func NewQueryPurchasedSpaceCommand() *cobra.Command {
+func NewQuerySpaceCommand() *cobra.Command {
 	cc := &cobra.Command{
 		Use:   "space",
-		Short: "Query real-time storage space detailed information",
-		Long: `Space command use for query and display current account purchased storage space usage (used and remaining)..
-`,
-
-		Run: QueryPurchasedSpaceCommand,
+		Short: "Query space info of you account in the CESS system",
+		Run:   QuerySpaceCommandFunc,
 	}
-
 	return cc
 }
 
-func QueryPurchasedSpaceCommand(cmd *cobra.Command, args []string) {
-	InitComponents(cmd)
-
-	client.QueryPurchasedSpace()
+func QuerySpaceCommandFunc(cmd *cobra.Command, args []string) {
+	refreshProfile(cmd)
+	logger.Log_Init()
+	client.UserSpaceQuery()
 }
 
-func NewQueryFileCommand() *cobra.Command {
-	cc := &cobra.Command{
-		Use:   "file <file id>",
-		Short: "Query the uploaded files information",
-		Long:  `File command use for query the CESS chain uploaded file information, if you choose do not input in the <file id> then show the all uploaded file list information. `,
-
-		Run: QueryFileCommand,
+func QueryFilestateCommandFunc(cmd *cobra.Command, args []string) {
+	refreshProfile(cmd)
+	logger.Log_Init()
+	if len(args) < 1 {
+		fmt.Printf("Please enter the file id.\n")
+		os.Exit(conf.Exit_CmdLineParaErr)
 	}
-
-	return cc
+	client.FilestateQuery(args[0])
 }
 
-func QueryFileCommand(cmd *cobra.Command, args []string) {
-	InitComponents(cmd)
-	fileid := ""
-	if len(args) != 0 {
-		fileid = args[0]
-	} else {
-		cmd.Println("No parameter query, return a list of all files")
+func QueryFilelistCommandFunc(cmd *cobra.Command, args []string) {
+	refreshProfile(cmd)
+	logger.Log_Init()
+	if len(args) < 1 {
+		fmt.Printf("Please enter the bucket name.\n")
+		os.Exit(conf.Exit_CmdLineParaErr)
 	}
+	client.FilelistQuery(args[0])
+}
 
-	client.QueryFile(fileid)
+func QueryBucketlistCommandFunc(cmd *cobra.Command, args []string) {
+	refreshProfile(cmd)
+	logger.Log_Init()
+	client.BucketlistQuery()
 }
