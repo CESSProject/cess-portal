@@ -1,0 +1,6 @@
+#The rpc address of the chain node
+RpcAddr           = "wss://testnet-rpc1.cess.cloud/ws/"
+#Phrase or seed for wallet account
+AccountSeed       = ""
+#wallet account of cess 
+AccountId = ""
