@@ -21,8 +21,7 @@ First you need to download the cess-portal project from GitHub
 git clone https://github.com/CESSProject/cess-portal.git
 ```
 
-Then run the build.sh(On Linux) or build.bat(On Windows) script file in the ‘install_ctl‘ folder,You can compile this project on any system,Before downloading, please install golang on the system and the version must be over 1.19.
-
+Then compile the cess portal, and you will get an executable client program
 ```sh
 #Compile with simple commands
 cd /cess-portal/
@@ -30,7 +29,7 @@ go build portal.go
 ```
 
 # **Config**
-
+Open the configuration file of cess portal
 ```sh
 cd /cess-portal/
 
@@ -95,7 +94,8 @@ Please edit the configuration of the above file, press the ESC key on the keyboa
 ```
 ### 5.Upload file
 ```sh
-./protal file upload "/opt/test_file" # either absolute or relative path
+./protal file upload "/opt/test_file" "bucket_name"
+#The file path can be absolute or relative
 ```
 ### 6.Download file by file id
 ```sh
